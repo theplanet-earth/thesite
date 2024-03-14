@@ -1,0 +1,27 @@
+---
+# Feel free to add content and custom Front Matter to this file.
+# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
+
+layout: minimal
+title: "Your Page Title"
+---
+
+<div class="content">
+    <h1>Global coverage</h1>
+    <!-- Welcome to the Planet Earth ! -->
+    {% leaflet_map { "center" : [41.8908, 12.4749],
+                    "zoom" : 15,
+                    "providerBasemap": "CartoDB.PositronNoLabels" } %}
+        {% leaflet_geojson {
+        "type": "Feature",
+        "properties": { "popupContent": "The Game starts here",
+                        "href": "https://enjoy.theplanet.wtf" },
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [[
+                [12.47340, 41.89208],
+                [12.48048, 41.89208],
+                [12.48048, 41.88863],
+                [12.47340, 41.88863] ]] } } %}
+    {% endleaflet_map %}
+</div>
