@@ -58,7 +58,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Specify path to the build output directory relative to the working directory
-          path: ./_site
+          path: ./docs/_site
 
   # Deployment job
   deploy:
