@@ -1,0 +1,12 @@
+.logo {
+    /* text-align: center; */
+    display: block;    
+    margin: 0 auto;
+ }
+.glob_coverage {
+    padding: 2rem 1rem;
+    /* color: rgba(255,255,255,.5); */
+    color: #ddd;
+    /* background-color: #202020; */
+    background-color: #444; /* Lighter stripe 444 */
+ }

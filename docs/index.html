@@ -1,27 +1,70 @@
 ---
-# Feel free to add content and custom Front Matter to this file.
-# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
-
-layout: minimal
-title: "Your Page Title"
+layout: default
+title: Home
 ---
-
-<div class="content">
-    <h1>Global coverage</h1>
-    <!-- Welcome to the Planet Earth ! -->
-    {% leaflet_map { "center" : [41.8908, 12.4749],
-                    "zoom" : 15,
-                    "providerBasemap": "CartoDB.PositronNoLabels" } %}
-        {% leaflet_geojson {
-        "type": "Feature",
-        "properties": { "popupContent": "The Game starts here",
-                        "href": "https://enjoy.theplanet.wtf" },
-        "geometry": {
-            "type": "Polygon",
-            "coordinates": [[
-                [12.47340, 41.89208],
-                [12.48048, 41.89208],
-                [12.48048, 41.88863],
-                [12.47340, 41.88863] ]] } } %}
-    {% endleaflet_map %}
+<div class="glob_coverage">
+  <h1>Global coverage</h1>
 </div>
+<div id="mapid"></div>
+<script src="/assets/js/map.js"></script>
+<!-- 
+<script>
+  var map = L.map('mapid').setView([41.8908, 12.4749], 15);
+  // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}.png', {
+      // attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      attribution: 'Map tiles by Carto, under CC BY 3.0. Data by OpenStreetMap, under ODbL.',
+      maxZoom: 18,
+      minZoom: 3,
+      subdomains: 'abc',
+  }).addTo(map);
+  var polygon = L.polygon([
+    [41.89208, 12.47340],
+    [41.89208, 12.48048],
+    [41.88863, 12.48048],
+    [41.88863, 12.47340]
+  ]).addTo(map);
+  var popup = L.popup();
+
+  function onMapClick(e) {
+      popup
+          .setLatLng(e.latlng)
+          .setContent("You clicked the map at " + e.latlng.toString())
+          .openOn(map);
+  }
+
+  map.on('click', onMapClick);
+</script> -->
+
+<!-- <div class="posts">
+  {% for post in paginator.posts %}
+  <div class="post">
+    <h1 class="post-title">
+      <a href="{{ post.url }}">
+        {{ post.title }}
+      </a>
+    </h1>
+
+    <span class="post-date">{{ post.date | date_to_string }}</span>
+
+    {{ post.content }}
+  </div>
+  {% endfor %}
+</div> -->
+
+<!-- <div class="pagination">
+  {% if paginator.next_page %}
+    <a class="pagination-item older" href="{{ site.baseurl }}page{{paginator.next_page}}">Older</a>
+  {% else %}
+    <span class="pagination-item older">Older</span>
+  {% endif %}
+  {% if paginator.previous_page %}
+    {% if paginator.page == 2 %}
+      <a class="pagination-item newer" href="{{ site.baseurl }}">Newer</a>
+    {% else %}
+      <a class="pagination-item newer" href="{{ site.baseurl }}page{{paginator.previous_page}}">Newer</a>
+    {% endif %}
+  {% else %}
+    <span class="pagination-item newer">Newer</span>
+  {% endif %}
+</div> -->

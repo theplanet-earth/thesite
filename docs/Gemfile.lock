@@ -44,7 +44,6 @@ GEM
       webrick (~> 1.7)
     jekyll-feed (0.17.0)
       jekyll (>= 3.7, < 5.0)
-    jekyll-leaflet (0.2.1)
     jekyll-sass-converter (3.0.0)
       sass-embedded (~> 1.54)
     jekyll-seo-tag (2.8.0)
@@ -77,6 +76,10 @@ GEM
     sass-embedded (1.72.0)
       google-protobuf (>= 3.25, < 5.0)
       rake (>= 13.0.0)
+    sass-embedded (1.72.0-aarch64-linux-android)
+      google-protobuf (>= 3.25, < 5.0)
+    sass-embedded (1.72.0-aarch64-linux-gnu)
+      google-protobuf (>= 3.25, < 5.0)
     sass-embedded (1.72.0-aarch64-linux-musl)
       google-protobuf (>= 3.25, < 5.0)
     sass-embedded (1.72.0-arm-linux-androideabi)
@@ -108,6 +111,8 @@ GEM
 
 PLATFORMS
   aarch64-linux
+  aarch64-linux-android
+  aarch64-linux-gnu
   aarch64-linux-musl
   arm-linux-androideabi
   arm-linux-gnueabihf
@@ -127,7 +132,6 @@ DEPENDENCIES
   http_parser.rb (~> 0.6.0)
   jekyll (~> 4.3.3)
   jekyll-feed (~> 0.12)
-  jekyll-leaflet
   minima (~> 2.5)
   tzinfo (>= 1, < 3)
   tzinfo-data

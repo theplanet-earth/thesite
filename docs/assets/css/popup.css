@@ -1,0 +1,41 @@
+/* Change the background color of the popup */
+.leaflet-popup-content-wrapper {
+    background-color: #f9f9f9;
+}
+
+/* Change the font and text color of the popup content */
+.leaflet-popup-content {
+    font-family: 'Arial', sans-serif;
+    /* font-family: 'Droid Sans Mono', monospace; */
+    /* color: #333; */
+    color: #ddd;
+}
+
+/* Change the border color and border radius of the popup */
+.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+    background: #cc5500; /* #fff */
+    border-color: #bbb;
+    border-radius: 8px;
+}
+
+/* Add shadow to the popup */
+.leaflet-popup-content-wrapper {
+    box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+}
+
+/* Change the font size */
+.leaflet-popup-content {
+    font-size: 16px;
+}
+
+/* Use a custom font, ensure it's loaded in your site */
+/* @import url('https://fonts.googleapis.com/css?family=Roboto');
+.leaflet-popup-content {
+    font-family: 'Roboto', sans-serif;
+} */
+
+/* If you want to style specific popups differently, you can assign a custom class to them when creating the popup in your JavaScript: */
+.leaflet-popup.custom-popup .leaflet-popup-content-wrapper {
+    background-color: #e0e0e0; /* Custom background */
+    /* Additional custom styles here */
+}
