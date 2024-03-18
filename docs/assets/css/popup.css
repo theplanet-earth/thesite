@@ -5,8 +5,9 @@
 
 /* Change the font and text color of the popup content */
 .leaflet-popup-content {
-    font-family: 'Arial', sans-serif;
+    /* font-family: 'Arial', sans-serif; */
     /* font-family: 'Droid Sans Mono', monospace; */
+    font-family: "PT Sans", Helvetica, Arial, sans-serif;
     /* color: #333; */
     color: #ddd;
 }

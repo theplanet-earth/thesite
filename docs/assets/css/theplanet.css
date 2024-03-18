@@ -1,8 +1,7 @@
-.logo {
-    /* text-align: center; */
+/* .logo {
     display: block;    
     margin: 0 auto;
- }
+ } */
 .glob_coverage {
     padding: 2rem 1rem;
     /* color: rgba(255,255,255,.5); */
@@ -10,3 +9,29 @@
     /* background-color: #202020; */
     background-color: #444; /* Lighter stripe 444 */
  }
+
+.roboto-mono-sidebar {
+    font-family: 'Roboto Mono', monospace;
+    /* Other styles for your sidebar */
+}
+
+.roboto-mono-sidebar h1 {
+    font-optical-sizing: auto;
+    font-weight: 700; /* Makes the text bold */
+    font-style: normal;
+    /* Other styles for your h1 */
+    line-height: 0.8; /* Adjust this value as needed to reduce space */
+    /* Additional styles to center the h1 vertically and horizontally in the viewport */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 3em;
+    text-align: center;
+    border: 10px solid #444; /* Draw a thin black square around the text */
+    padding: 10px; /* Add some padding between the text and the border */
+}
+
+.roboto-mono-sidebar p, .sidebar a {
+    font-weight: 400; /* Regular font weight */
+    /* Additional styling */
+}

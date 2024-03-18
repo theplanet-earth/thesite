@@ -34,6 +34,7 @@
 html {
   font-family: "PT Sans", Helvetica, Arial, sans-serif;
   /* font-family: 'Droid Sans Mono', monospace; */
+  /* font-family: 'Roboto Mono', monospace; */
 }
 @media (min-width: 48em) {
   html {
@@ -84,7 +85,7 @@ html {
   color: #333; /* Adjusted color for visibility against light stripe 888 */
   margin-top: 0;
   /* font-family: "Abril Fatface", serif; */
-  font-family: 'Courier New', Courier, monospace;
+  /* font-family: 'Courier New', Courier, monospace; */
   /* font-size: 3.25rem; */
   font-size: 5em;
 }

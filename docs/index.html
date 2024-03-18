@@ -7,34 +7,6 @@ title: Home
 </div>
 <div id="mapid"></div>
 <script src="/assets/js/map.js"></script>
-<!-- 
-<script>
-  var map = L.map('mapid').setView([41.8908, 12.4749], 15);
-  // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}.png', {
-      // attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      attribution: 'Map tiles by Carto, under CC BY 3.0. Data by OpenStreetMap, under ODbL.',
-      maxZoom: 18,
-      minZoom: 3,
-      subdomains: 'abc',
-  }).addTo(map);
-  var polygon = L.polygon([
-    [41.89208, 12.47340],
-    [41.89208, 12.48048],
-    [41.88863, 12.48048],
-    [41.88863, 12.47340]
-  ]).addTo(map);
-  var popup = L.popup();
-
-  function onMapClick(e) {
-      popup
-          .setLatLng(e.latlng)
-          .setContent("You clicked the map at " + e.latlng.toString())
-          .openOn(map);
-  }
-
-  map.on('click', onMapClick);
-</script> -->
 
 <!-- <div class="posts">
   {% for post in paginator.posts %}
