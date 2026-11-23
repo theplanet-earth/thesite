@@ -3,18 +3,22 @@
 The project site of the GitHub organization **theplanet-earth**, published on GitHub Pages
 at <https://theplanet.wtf/> (the homepage of the repository).
 
+![The Pipeline](/docs/assets/images/theplanetearth.png)
+
 ## Status
 
-- `master` holds the harness of **thebox**, the template of every repository of the
+- The repository holds the harness of **thebox**, the template of every repository of the
   organization: devcontainer, conventions for people and for Claude Code, git hooks, checks,
-  CI and release workflows. It holds no site sources yet.
-- The site online today comes from a 2024 Jekyll prototype that lives only on the branches
-  `hyde_theme` (Hyde theme, Leaflet map) and `glob_coverage`, never merged into `master`.
-  According to the deployments of the repository, the last one to the `github-pages`
-  environment was made from `hyde_theme` on 2024-03-27, by the workflow
-  `.github/workflows/jekyll.yml` of that branch.
-- How the site is built on `master` (generator, theme, content) is an open decision of the
-  owner: `CLAUDE.md`, Section 12.
+  CI and release workflows.
+- `docs/` holds the 2024 Jekyll prototype of the site (Hyde theme on Poole, Leaflet map),
+  folded in from the branches `glob_coverage` and `hyde_theme`, which were then deleted. It
+  is not built by `npm run build` yet: only its own workflow, `.github/workflows/jekyll.yml`,
+  builds and deploys it, and that workflow now runs only by hand.
+- The site online today comes from that prototype: according to the deployments of the
+  repository, the last one to the `github-pages` environment was made from `hyde_theme` on
+  2024-03-27.
+- How the site is built from now on (keep and evolve the Jekyll prototype, or another
+  generator) is an open decision of the owner: `CLAUDE.md`, Section 12.
 
 ## Getting started
 
@@ -39,4 +43,5 @@ site online with an empty one.
 
 ## License
 
-[Apache License 2.0](LICENSE).
+[Apache License 2.0](LICENSE). The Hyde theme in `docs/` keeps its own MIT license
+(`docs/LICENSE.md`).

@@ -18,10 +18,11 @@ GitHub Pages at `https://theplanet.wtf/`, the custom domain of the repository. T
 repository is **public**: everything committed here, including branches and pull requests,
 is visible to anyone (Section 8).
 
-`master` holds only the harness of thebox so far. The site online comes from a 2024 Jekyll
-prototype that lives only on the branches `hyde_theme` and `glob_coverage` (`README.md`,
-*Status*). How `master` builds the site, what the site shows and how it links the other
-repositories of the organization are open decisions of the owner (Section 12).
+Besides the harness of thebox, the repository holds in `docs/` the 2024 Jekyll prototype the
+site online comes from, folded in on 2026-11-23 from the branches `glob_coverage` and
+`hyde_theme` (opened in this order, then deleted; `README.md`, *Status*). `npm run build`
+does not build it yet. How the site is built from now on, what it shows and how it links the
+other repositories of the organization are open decisions of the owner (Section 12).
 
 **Golden rule: sources, traceability, no silent fixes.**
 
@@ -97,8 +98,18 @@ otherwise):
 `LICENSE` is the Apache License 2.0 of thesite (thebox itself is MIT: the license is not part
 of the harness).
 
+The 2024 prototype, as folded in from `hyde_theme` (Section 12):
+
+| Path | Content |
+|---|---|
+| `docs/` | Jekyll 4.3 site: `_config.yml`, `Gemfile` and `Gemfile.lock`, `_layouts/`, `_includes/`, `index.html`, `about.md`, `404.html`, `atom.xml`, `CNAME` |
+| `docs/public/`, `docs/README.md`, `docs/LICENSE.md` | The Hyde theme on Poole, third-party, MIT: its README and parts of `about.md` are still the demo text of the theme |
+| `docs/assets/` | The project's own CSS (`theplanet.css`, `map.css`, `popup.css`), the Leaflet map (`js/map.js`) and the logos |
+| `.github/workflows/jekyll.yml` | Builds `docs/` with Ruby 3.1 and deploys it to GitHub Pages; its push trigger names the deleted branch `hyde_theme`, so it now runs only by hand |
+| `new_0/` | Holds only a `.gitignore` that ignores everything else in the folder; its purpose is not documented |
+
 <!-- TEMPLATE: the folders and files of the site (sources, content, assets, configuration),
-once the owner decides how master builds it (Section 12). -->
+once the owner decides how it is built (Section 12). -->
 
 ## 5. Checks before reporting a change as done
 
@@ -235,26 +246,31 @@ harness) comes from thebox, which is versioned and released like any other repos
   Chromium revision other than the one of the project; `post-create.sh` installs the one it
   needs. If it is missing, the MCP tool `browser_install` installs it.
 
-- **The site is not on `master` yet.** Pages is configured with build type *GitHub Actions*
-  and the custom domain `theplanet.wtf` (GitHub API, `GET /repos/theplanet-earth/thesite/pages`,
-  2026-11-23); the last deployment to the `github-pages` environment came from `hyde_theme` on
-  2024-03-27 (`GET .../deployments`). The workflow runs themselves are past GitHub's
-  retention.
-- **Inconsistency on the prototype branch, reported and not fixed**: on `hyde_theme`,
-  `docs/CNAME` says `hyde.getpoole.com` and `docs/_config.yml` keeps the `url` and the
-  description of the Hyde demo, while GitHub Pages serves `theplanet.wtf` (which is also what
-  `docs/CNAME` of `glob_coverage` says). With a
-  GitHub Actions workflow a `CNAME` file is ignored
+- **GitHub Pages** (GitHub API, `GET /repos/theplanet-earth/thesite/pages` and
+  `.../environments/github-pages`, 2026-11-23): build type *GitHub Actions*, custom domain
+  `theplanet.wtf`; the `github-pages` environment accepts deployments from `master`,
+  `glob_coverage` and `hyde_theme` (the last two are stale after the deletion of the branches,
+  harmless). The last deployment came from `hyde_theme` (commit `ec8acac`, now in the history
+  of `dev`) on 2024-03-27 (`GET .../deployments`); the workflow runs themselves are past
+  GitHub's retention. Deleting the branches does not take the site down.
+- **Inconsistency in the prototype, reported and not fixed**: `docs/CNAME` says
+  `hyde.getpoole.com` (changed by `1b80293`, "brand new style", from the `theplanet.wtf` of
+  `f820ec2`) and `docs/_config.yml` keeps the `url` and the description of the Hyde demo, while
+  GitHub Pages serves `theplanet.wtf`. With a GitHub Actions workflow a `CNAME` file is ignored
   ([GitHub Docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site)),
-  so the domain in the settings wins; the file is still wrong if the prototype is brought over.
+  so the domain in the settings wins; the files are still wrong and get fixed when the owner
+  decides what to do with the prototype.
 
 Open points for the owner:
 
-- [ ] Decide how `master` builds the site: bring over the Jekyll prototype of `hyde_theme`
-  (Hyde theme on Poole, Leaflet map, Ruby 3.1 and Jekyll 4.3 in its workflow) or start again
-  with another generator. Then: the toolchain in the devcontainer and in the workflows, the
-  build into `build/pages/`, the visual checks (Section 5), and the `TEMPLATE` markers left
-  (`npm run check:template -- --list`).
+- [ ] Decide how the site is built from now on: keep and evolve the Jekyll prototype of
+  `docs/` (Hyde theme on Poole, Leaflet map, Ruby 3.1 and Jekyll 4.3 in `jekyll.yml`) or start
+  again with another generator. Then: the toolchain in the devcontainer and in the workflows,
+  the build into `build/pages/` by `npm run build` (which replaces `jekyll.yml`), the visual
+  checks (Section 5), and the `TEMPLATE` markers left (`npm run check:template -- --list`).
+- [ ] Do not run `jekyll.yml` by hand from `master` unless the prototype is meant to be
+  deployed again: the `github-pages` environment accepts `master`, so it would replace the
+  site online.
 - [ ] Leave the repository variable `PUBLISH_PAGES` unset until `build/pages/` holds the
   site: `release.yml` would otherwise replace the site online at the first merge. The token of
   this Codespace cannot list the variables (HTTP 403), so the owner checks it in *Settings,
@@ -267,5 +283,3 @@ Open points for the owner:
 - [ ] Create a new Codespace on `dev` (a rebuild does not grant the access) and authorize read
   access to `theplanet-earth/*`; then find the release of thebox that matches commit `db3b47c`
   and record it in Section 11.
-- [ ] Once the site is on `master`, decide whether to delete the branches `hyde_theme` and
-  `glob_coverage`.
