@@ -253,6 +253,11 @@ harness) comes from thebox, which is versioned and released like any other repos
   harmless). The last deployment came from `hyde_theme` (commit `ec8acac`, now in the history
   of `dev`) on 2024-03-27 (`GET .../deployments`); the workflow runs themselves are past
   GitHub's retention. Deleting the branches does not take the site down.
+- **The domain does not reach the site** (checked on 2026-11-23): `https://theplanet.wtf/`
+  answers HTTP 403 from Cloudflare with the page "DNS points to prohibited IP"
+  ([Cloudflare Error 1000](https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1000/)),
+  while `https://theplanet-earth.github.io/thesite/` answers 301 to `https://theplanet.wtf/`:
+  GitHub Pages works, the DNS records of the domain on Cloudflare do not.
 - **Inconsistency in the prototype, reported and not fixed**: `docs/CNAME` says
   `hyde.getpoole.com` (changed by `1b80293`, "brand new style", from the `theplanet.wtf` of
   `f820ec2`) and `docs/_config.yml` keeps the `url` and the description of the Hyde demo, while
@@ -275,6 +280,9 @@ Open points for the owner:
   site: `release.yml` would otherwise replace the site online at the first merge. The token of
   this Codespace cannot list the variables (HTTP 403), so the owner checks it in *Settings,
   Secrets and variables, Actions*.
+- [ ] Fix the DNS records of `theplanet.wtf` on Cloudflare so that the domain reaches GitHub
+  Pages
+  ([GitHub Docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site#configuring-an-apex-domain)).
 - [ ] The Pages API reports `protected_domain_state: unverified` for `theplanet.wtf`: verify
   the domain for the organization, which protects it from takeover
   ([GitHub Docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/verifying-your-custom-domain-for-github-pages)).
