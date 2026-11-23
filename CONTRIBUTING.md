@@ -1,0 +1,137 @@
+# Contributing
+
+How to work in this repository. These rules apply to people and to assistants alike: Claude
+Code reads them through `CLAUDE.md`, which imports this file, and GitHub Copilot through
+`.github/copilot-instructions.md`. They come from **thebox**, the template of every repository
+of the GitHub organization **theplanet-earth**; what is specific to this repository is in
+`README.md` and `CLAUDE.md`.
+
+## Getting started
+
+1. Open the repository in a **Codespace** or in the **devcontainer** (VS Code: *Reopen in
+   Container*). `.devcontainer/post-create.sh` enables the git hooks, installs the Node and
+   Python dependencies, the Chromium of the Playwright MCP server, and runs a first build.
+   When GitHub asks, at the creation of the Codespace, to authorize read access to the other
+   repositories of the organization (`theplanet-earth/*`), accept: assistants working in the
+   Codespace use it to read the repositories this one depends on.
+2. Build with `npm run build` (or *Terminal, Run Task, Build*, `Ctrl+Shift+B`), check with
+   `npm run check`.
+
+Without the devcontainer you need Git, Node 22 or later and Python 3; then run
+`git config core.hooksPath .githooks`, `npm ci` and `npm run setup:python`.
+
+## Commands
+
+Every command is an npm script and a VS Code task (*Terminal, Run Task*). The npm scripts
+call the shell scripts in `scripts/`, so they also run without npm.
+
+| Command | What it does |
+|---|---|
+| `npm run build` | Every output in `build/`: the files to attach to a release in `build/release/`, the site for GitHub Pages in `build/pages/` |
+| `npm test` | Unit tests (`scripts/test.sh`) |
+| `npm run check` | Tests, confidentiality, `TEMPLATE` markers and the checks of this repository: **run it before every pull request** |
+| `npm run check:confidential` | Confidentiality guard on every tracked file |
+| `npm run check:template -- --list` | The `TEMPLATE` markers still to resolve, with their line |
+| `npm run setup:python` | `.venv/` from `requirements.txt`, when the repository has one |
+| `npm run version:current` / `version:next` / `release:notes` | Version of this build, of the next release, and the notes of the next release |
+| `npm run clean` | Remove `build/` |
+
+<!-- TEMPLATE: the commands of this repository (dev server, live preview, lint, deploy dry run). -->
+
+## Branches and pull requests
+
+- The main branch is **`master`**. Nobody pushes to it: every change reaches it through a pull
+  request, and the **owner of the repository merges** it.
+- Work happens on **`dev`**; a separate piece of work goes on a branch of its own, so that each
+  pull request can be merged on its own. Bringing `master` into the working branch is fine;
+  force-pushing or rewriting pushed commits is not.
+- Every pull request to `master` runs **CI** (`.github/workflows/ci.yml`): checks and build. Its
+  job summary shows the version and the release notes that merging would publish, and the
+  `TEMPLATE` markers left.
+- The pull request template (`.github/pull_request_template.md`) is the checklist: build and
+  checks green, tests, documentation aligned, no confidential material, screenshots when the
+  appearance changed.
+
+## Commits
+
+[Conventional commits](https://www.conventionalcommits.org/): a prefix, English, imperative
+mood, subject under 72 characters, and a body explaining **why** rather than restating the diff.
+**The prefixes decide the version** (next section): choose them with care.
+
+| Prefix | Use for | Increment |
+|---|---|---|
+| `feat:` | A new capability, or a visible change of one | minor |
+| `fix:` | A correction (bug, typo, wrong value, broken link) | patch |
+| `perf:`, `refactor:` | Faster, or restructured, with the same behavior | patch |
+| `style:` | Formatting, layout, look | patch |
+| `docs:` | `README.md`, `CONTRIBUTING.md`, `CLAUDE.md`, comments, documentation | patch |
+| `build:`, `ci:`, `test:`, `chore:`, `revert:` | Tooling, workflows, tests, maintenance | patch |
+
+In a commit that gathers others (a squash), every `type: text` line at the start of a body
+line counts as its own entry of the release notes.
+
+## Versions and releases
+
+- **SemVer** tags `vX.Y.Z`, computed from the commits by `scripts/version.py` (tested in
+  `tests/test_version.py`); the first release is `v0.1.0`.
+  - **minor** when a commit since the last tag is `feat:`; **patch** for everything else;
+  - **major never automatic**: `!` and `BREAKING CHANGE` count as minor. A major release needs
+    the `release:major` label on the pull request or a manual run of *Release* with
+    `bump = major`, and only on an explicit request of the owner;
+  - the labels `release:minor` and `release:patch` force the increment.
+- **No version number or release date is written by hand.** A build reads them from
+  `scripts/version.py` (`X.Y.Z-dev` locally) or from `RELEASE_VERSION` in CI
+  (`project_version` in `scripts/lib.sh`).
+- `release.yml` (push to `master`, or by hand): version, build with `RELEASE_VERSION`, then a
+  GitHub release `vX.Y.Z` with the notes, the files of `build/release/` and their
+  `SHA256SUMS.txt`; skipped when there is no new commit. With the repository variable
+  `PUBLISH_PAGES = true` it also publishes `build/pages/` on GitHub Pages.
+- A repository may add its own prefixes (a documentation repository, for instance, makes
+  `content:` and `slides:` minor): change `MINOR_TYPES` and `TYPE_TITLES` in
+  `scripts/version.py`, its tests and the table above, in the same pull request.
+
+## Checks
+
+`npm run check` runs every check in the order CI runs them; CI runs the same script. A change
+is done when `npm run build` succeeds and `npm run check` passes. A failing or skipped check is
+reported as such, with its output, never hidden.
+
+## Confidentiality
+
+- Real names that must not be published (clients, people, hosts, addresses, internal systems,
+  credentials) are listed, one per line, in **`confidential-terms.local`** at the root
+  (git-ignored, never committed; `#` starts a comment). The pre-commit hook
+  (`.githooks/pre-commit`) and `npm run check:confidential` block any file that contains one,
+  ignoring case, and any private file: `*.local`, `*.local.*`, `.env`, `.env.*` (except
+  `.env.example`), `private/` folders, `*.pem`, `*.key`, `*.p12`, `*.pfx`. The check never
+  prints the term, so that it cannot reach a CI log.
+- **Never** bypass them with `git commit --no-verify` or `git add -f`.
+- In text, refer to private things generically ("the client", "Server A") and keep examples
+  generic (`example.org`, RFC 5737 addresses such as `192.0.2.10`).
+- Credentials, account identifiers and the lists of readers or users live in the secrets and
+  variables of the repository or of the organization, or in the environment of whoever runs
+  a command: never in a file of the repository.
+- A credential found in a tracked file: name the file, never the value; add the value to
+  `confidential-terms.local`; tell the owner, who rotates it.
+- Third-party documents are committed only when their license allows redistribution;
+  otherwise they stay in a `private/` folder (git-ignored). Screenshots and logs are checked
+  for personal data before they are committed.
+
+## Writing style
+
+Applies to documentation, comments, commit messages and pull request descriptions.
+
+- **Everything in the repository is written in English**: Markdown, YAML, code, comments,
+  script output, file and branch names, commit messages.
+- Formal, precise register. Define a term once, at its first use, then use it exactly; no
+  synonyms. State claims as strongly as the evidence supports, no more: no marketing language
+  ("novel", "seamless", "cutting-edge"), no exclamation marks, no emoji.
+- **Never use an em dash** (U+2014). Use a comma, colon, semicolon or parentheses; write ranges
+  as "1 to 5"; write "none" in an empty table cell.
+- Where a document states a requirement, *shall*, *should* and *may* carry their normative
+  meaning; elsewhere do not use them loosely.
+- A statement about external work, a third-party API or a tool links to its source.
+- Something not yet done is marked explicitly, never with ad hoc text: a `TODO` comment that
+  says what is missing and why, or, in a file that comes from thebox, its `TEMPLATE` marker.
+
+<!-- TEMPLATE: the conventions specific to this repository (code style, linters, naming). -->

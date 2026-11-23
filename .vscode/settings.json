@@ -1,0 +1,15 @@
+{
+  // The project commands are npm scripts and tasks (Terminal, Run Task). Python runs with
+  // the project environment when the repository has a requirements.txt (npm run setup:python).
+  // TEMPLATE: the settings of the tools of this repository.
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "files.exclude": {
+    "**/.venv": true,
+    "**/node_modules": true,
+    "**/.playwright-mcp": true,
+    "**/__pycache__": true
+  },
+  "[markdown]": { "editor.wordWrap": "on" },
+  "cSpell.language": "en,en-GB",
+  "cSpell.words": ["thesite", "thebox", "theplanet", "devcontainer", "Codespace", "Codespaces", "githooks", "venv", "semver", "SHA256SUMS"]
+}

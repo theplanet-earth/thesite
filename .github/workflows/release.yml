@@ -1,0 +1,121 @@
+# Release: on every push to master (the merge of a pull request), compute the next
+# version from the commits (scripts/version.py), build with it (RELEASE_VERSION), tag
+# vX.Y.Z and publish a GitHub release with the notes, the files the build put in
+# build/release/ and their SHA256SUMS.txt.
+# Optional: publish build/pages/ on GitHub Pages (repository variable
+# PUBLISH_PAGES = true, and Settings > Pages > Source: GitHub Actions).
+#
+# Major versions are never automatic: only the `release:major` label on the pull
+# request, or a manual run with bump = major, and only on an explicit request of the
+# owner.
+name: Release
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Increment (auto = from the commits; major only on explicit request)"
+        type: choice
+        options: [auto, patch, minor, major]
+        default: auto
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Version
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_BUMP: ${{ inputs.bump }}
+        run: |
+          BUMP=""
+          if [[ -n "$INPUT_BUMP" && "$INPUT_BUMP" != "auto" ]]; then
+            BUMP="$INPUT_BUMP"
+          else
+            LABELS="$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" --jq '.[0].labels[].name' 2> /dev/null || true)"
+            for kind in major minor patch; do
+              if grep -qx "release:$kind" <<< "$LABELS"; then BUMP="$kind"; break; fi
+            done
+          fi
+          if VERSION="$(python3 scripts/version.py next ${BUMP:+--bump "$BUMP"})"; then
+            echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+            echo "bump=$BUMP" >> "$GITHUB_OUTPUT"
+            echo "Releasing v$VERSION"
+          else
+            echo "No commits since the last release: nothing to publish."
+          fi
+
+      # No dependency cache in a workflow that publishes: a poisoned cache would run with
+      # contents: write (https://github.com/actions/setup-node/pull/1567).
+      - uses: actions/setup-node@v7
+        if: steps.version.outputs.version
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      # TEMPLATE: the same toolchain as ci.yml.
+      - name: Toolchain
+        if: steps.version.outputs.version
+        run: |
+          npm ci --no-audit --no-fund
+          npm run setup:python
+
+      - name: Build
+        if: steps.version.outputs.version
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: npm run build
+
+      - name: Publish the release
+        if: steps.version.outputs.version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+          BUMP: ${{ steps.version.outputs.bump }}
+        run: |
+          python3 scripts/version.py notes ${BUMP:+--bump "$BUMP"} > "$RUNNER_TEMP/release-notes.md"
+          mapfile -t files < <(find build/release -maxdepth 1 -type f 2> /dev/null | sort)
+          if (( ${#files[@]} )); then
+            (cd build/release && sha256sum -- "${files[@]##*/}") > "$RUNNER_TEMP/SHA256SUMS.txt"
+            files+=("$RUNNER_TEMP/SHA256SUMS.txt")
+          fi
+          gh release create "v$VERSION" \
+            --target "$GITHUB_SHA" \
+            --title "v$VERSION" \
+            --notes-file "$RUNNER_TEMP/release-notes.md" \
+            "${files[@]}"
+
+      - uses: actions/upload-pages-artifact@v5
+        if: steps.version.outputs.version && vars.PUBLISH_PAGES == 'true'
+        with:
+          path: build/pages
+
+  pages:
+    needs: release
+    if: needs.release.outputs.version && vars.PUBLISH_PAGES == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v5

@@ -1,0 +1,30 @@
+{
+  // Every command of the repository as a task (Terminal, Run Task): the npm scripts of
+  // package.json. TEMPLATE: the tasks of this repository (live preview, dev server, deploy dry run).
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build",
+      "detail": "Every output in build/ (build/release/ for the release, build/pages/ for GitHub Pages)",
+      "type": "npm",
+      "script": "build",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Check: everything",
+      "detail": "Tests, confidentiality, TEMPLATE markers and the checks of the repository, as CI runs them",
+      "type": "npm",
+      "script": "check",
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": []
+    },
+    { "label": "Check: unit tests", "type": "npm", "script": "test", "group": "test", "problemMatcher": [] },
+    { "label": "Check: confidentiality", "type": "npm", "script": "check:confidential", "group": "test", "problemMatcher": [] },
+    { "label": "Check: TEMPLATE markers left", "type": "shell", "command": "npm run check:template -- --list", "group": "test", "problemMatcher": [] },
+    { "label": "Python: set up .venv", "type": "npm", "script": "setup:python", "problemMatcher": [] },
+    { "label": "Release: next version", "type": "npm", "script": "version:next", "problemMatcher": [] },
+    { "label": "Release: notes preview", "type": "npm", "script": "release:notes", "problemMatcher": [] },
+    { "label": "Clean", "type": "npm", "script": "clean", "problemMatcher": [] }
+  ]
+}

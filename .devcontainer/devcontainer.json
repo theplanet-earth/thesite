@@ -1,0 +1,44 @@
+{
+  // TEMPLATE: the name of this environment, its system packages (EXTRA_PACKAGES), the ports
+  // it forwards with their labels, and the extensions of its tools (keep
+  // .vscode/extensions.json identical).
+  "name": "thesite",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "..",
+    "args": {
+      "EXTRA_PACKAGES": ""
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": { "version": "24" },
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
+  },
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "forwardPorts": [],
+  "portsAttributes": {},
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "anthropic.claude-code",
+        "mhutchie.git-graph",
+        "github.vscode-github-actions",
+        "bierner.markdown-mermaid",
+        "streetsidesoftware.code-spell-checker",
+        "ms-python.python"
+      ]
+    },
+    "codespaces": {
+      "openFiles": ["README.md", "CLAUDE.md"],
+      // Read access to every repository of the organization, granted when the Codespace is
+      // created (CLAUDE.md, Known issues).
+      "repositories": {
+        "theplanet-earth/*": {
+          "permissions": "read-all"
+        }
+      }
+    }
+  },
+  "remoteUser": "vscode"
+}

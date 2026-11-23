@@ -1,0 +1,21 @@
+{
+  "name": "thesite",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The project site of the theplanet-earth organization, with the harness of thebox: devcontainer, conventions for people and for Claude Code, git hooks, checks and releases.",
+  "scripts": {
+    "build": "bash scripts/build.sh",
+    "test": "bash scripts/test.sh",
+    "check": "bash scripts/check.sh",
+    "check:confidential": "python3 scripts/check-confidential.py --all",
+    "check:template": "bash scripts/check-template.sh",
+    "setup:python": "bash scripts/setup-python.sh",
+    "version:current": "python3 scripts/version.py current",
+    "version:next": "python3 scripts/version.py next",
+    "release:notes": "python3 scripts/version.py notes",
+    "clean": "rm -rf build"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
