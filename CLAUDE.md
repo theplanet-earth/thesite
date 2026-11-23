@@ -70,6 +70,19 @@ Dated, in the owner's words where possible. Add every new standing instruction h
 - 2026-11-23, "aggiungi anche la skill della issue #4 e implementiamo la #5": the skill
   `security-audit` of Cloudflare is installed for the user by `scripts/install-skills.sh`; the
   branches `dev` and `stage` and the stage deploy follow issue #5.
+- 2026-11-23, "in thebox è stato risolto: risolvilo anche qui" (the warning "Default
+  interpreter path '${workspaceFolder}/.venv/bin/python' could not be resolved"): thesite
+  follows thebox v0.1.2 (Section 11), which also brings the squash merges along the chain.
+- 2026-11-23, "vorrei pubblicare master così com'è e intanto sviluppare su stage e pubblicarla
+  una versione migliora nella cui home iniziamo a sviluppare un globo come questo [GitHub
+  globe] creditando il lavoro qui descritto adeguatamente. in realtà utilizzando anche un
+  apikey di meshy.ai vorrei trasformare questo globo qui in uno più simile a quello del nostro
+  logo, aggiungendogli, gambre, braccia, occhiali": the home of the stage site gets a 3D globe
+  built on the techniques of
+  [How we built the GitHub globe](https://github.blog/engineering/engineering-principles/how-we-built-the-github-globe/)
+  (Tobias Ahlin, GitHub, 2020), credited on the site; a model of the mascot of the logo,
+  generated with the API of [Meshy](https://docs.meshy.ai/en/api/image-to-3d), follows. The
+  key of Meshy lives only in the environment (`MESHY_API_KEY`), never in a file.
 
 Rules of the organization, carried over from thebox or from its issues (keep them unless the
 owner decides otherwise):
@@ -80,6 +93,12 @@ owner decides otherwise):
   mergiano su staging e poi staging su master" and "usiamo stage per tutti i repo": `dev` into
   `stage`, `stage` into `master`, by pull requests (`CONTRIBUTING.md`, *Branches and pull
   requests*).
+- 2026-11-23 (thebox v0.1.1), "dev va sempre squashata dentro stage (se c'è) e master, che
+  poi vanno rimergiate dentro dev per evitare conflitti": pull requests along the chain `dev`,
+  `stage`, `master` are **squash-merged**; right after each, the target is **merged back down
+  the chain to `dev`** (`CONTRIBUTING.md`, *Branches and pull requests*). Pull requests of the
+  branches of work into `dev` are not squashed: merge commit. Claude completes any missing
+  merge back at the start of the work ("fallo sempre all'inizio se serve").
 - SemVer releases at every merge on `master`; **Claude increments only minor or patch, a major
   only when the owner explicitly asks for it**, and never adds the `release:major` label on its
   own (`CONTRIBUTING.md`, *Versions and releases*).
@@ -202,10 +221,18 @@ The rules are in `CONTRIBUTING.md`, *Confidentiality*. In addition:
   the work belongs to it; a separate piece of work goes on a new branch, merged into `dev`.
   Once the owner has merged into `stage` and checked the stage site, Claude may open the pull
   request from `stage` to `master` when the owner asks for a release.
-- The working branch is **`dev`** unless the owner names another.
-- **Never merge into `stage` or `master`, push to them, force-push or rewrite pushed
-  commits.** Merging is the owner's decision. Bringing `stage` or `master` into the working
-  branch (fast-forward or merge) is allowed, to keep the pull request clean.
+- The working branch is **`dev`** unless the owner names another; a separate piece of work
+  goes on a new branch from `dev`, whose pull request goes into `dev` and is merged with a
+  merge commit.
+- **Never merge a pull request into `stage` or `master` on your own initiative, push to
+  `master`, force-push or rewrite pushed commits.** Merging is the owner's decision. When the
+  owner asks Claude to merge a pull request, Claude squash-merges it with the subject and body
+  that `CONTRIBUTING.md` describes (`gh pr merge --squash --subject ... --body ...`), then
+  merges the target back down the chain. The only push to `stage` outside a pull request is
+  the merge back of `master` into it.
+- **Before working on `dev`**, fetch and complete any merge back the chain lacks (`master`
+  into `stage`, `stage` into `dev`): the owner may have squash-merged a pull request without
+  merging it back. Merging them into the working branch is always allowed.
 - **Stage only your own changes.** When the working tree holds changes Claude did not make,
   ask before committing them; files the owner staged stay staged, never unstage them
   (`git reset`, `git restore --staged`). Move files with plain `mv`: git detects the rename.
@@ -272,11 +299,13 @@ harness) comes from thebox, which is versioned and released like any other repos
   left.
 - An improvement that is useful to every repository is made in thebox first, then brought
   here (`README.md` of thebox, *Updating a repository*).
-- This repository follows thebox: **`master` at commit `db3b47c`** (the commit recorded in
-  the archive `thebox-master.zip`, files dated 2026-11-13), adopted on 2026-11-23. thebox
-  was not readable from the Codespace where it was adopted (Section 12), so the release tag
-  of that commit is still to be checked; until then, compute the diff of an update from
-  `db3b47c` instead of a tag.
+- This repository follows thebox **v0.1.2** (commit `d7b22c9`, 2026-11-23), adopted on
+  2026-11-23. It was first set up from the archive `thebox-master.zip`, commit `db3b47c`,
+  which is **v0.1.0** (`gh api repos/theplanet-earth/thebox/tags`); the update to v0.1.2
+  brought v0.1.1 (`22cd1b6`: no `python.defaultInterpreterPath`, squash merges along the
+  chain and their merges back, counted once by `scripts/version.py`) and v0.1.2 (`d7b22c9`:
+  tests of the chain `dev`, `stage`, `master` and of branches merged into `dev`). Compute the
+  diff of the next update from `v0.1.2`.
 - Changes made here outside the `TEMPLATE` markers, to carry over by hand at the next update
   (and to propose to thebox where they are useful to every repository): the branch model
   `dev`, `stage`, `master` of issue #5, a rule of the whole organization (`ci.yml` triggers,
@@ -291,9 +320,29 @@ harness) comes from thebox, which is versioned and released like any other repos
   user authorized them then; a rebuild does not renew them. Create a new Codespace, or export
   a fine-grained token with read access as `GH_TOKEN`, which `gh` prefers. The token of a
   Codespace cannot list the packages of the organization on the GHCR (HTTP 403), nor see
-  workflow runs older than GitHub's retention.
+  workflow runs older than GitHub's retention. The Codespace created on `dev` on 2026-11-23,
+  with the access authorized, reads thebox.
 - **Git LFS hooks**: Codespaces writes Git LFS hooks in `.git/hooks` that abort every push when
   `git-lfs` is not installed; `core.hooksPath .githooks` makes git ignore them.
+- **Python interpreter in VS Code**: `.vscode/settings.json` does not set
+  `python.defaultInterpreterPath`. When that path does not exist, the Python Environments
+  extension (`ms-python.vscode-python-envs`, installed with `ms-python.python`) warns at every
+  start ("Default interpreter path ... could not be resolved"): `.venv/` is missing in a
+  repository without `requirements.txt`, as this one, and on the first start of a Codespace,
+  because `postCreateCommand` runs after the editor has connected
+  ([`waitFor`](https://containers.dev/implementors/json_reference/)). Without the setting, the
+  extension chooses the `.venv/` of the workspace, otherwise the `python3` of the system
+  ([startup flow](https://github.com/microsoft/vscode-python-environments/blob/main/docs/startup-flow.md)).
+  A `.venv/` created while a window is open is chosen with *Python: Select Interpreter*.
+- **First start of a Codespace**: `post-create.sh` runs after the editor has connected and
+  takes about three minutes; until it ends, `~/.claude/skills/security-audit` and `build/` do
+  not exist yet. `/workspaces/.codespaces/.persistedshare/creation.log` shows its progress.
+- **Plugin `ui-ux-pro-max`**: `.claude/settings.json` declares it, but on 2026-11-23 the
+  Claude Code extension of VS Code installed neither the marketplace nor the plugin in a new
+  Codespace (`claude plugin list`: "No plugins installed"). Start `claude` in a terminal at
+  the root of the repository, trust the folder and accept the marketplace and the plugin it
+  offers (pinned to v2.15.0 by `.claude/settings.json`); `/plugin` shows them. Then start a
+  new session.
 - **Stale `.venv/`**: a `.venv/` that survives a change of image keeps a dangling interpreter
   link; `scripts/setup-python.sh` recreates it with `--clear`.
 - **Playwright MCP browser**: `@playwright/mcp` pins its own Playwright, which may expect a
@@ -319,6 +368,22 @@ harness) comes from thebox, which is versioned and released like any other repos
   so nothing breaks today; it is part of the cleanup below.
 - **`PUBLISH_PAGES` stays unset** in this repository: the GitHub Pages site here is the stage
   site, and `release.yml` would publish `master` on it.
+- **What the preview shows** (`npm run serve`, Playwright at 1280x800 and 390x844,
+  2026-11-23; screenshots in `.playwright-mcp/baseline/`, git-ignored):
+  - the tiles of the map, `https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/`
+    in `docs/assets/js/map.js`, answer HTTP 200 with an image that reads "API KEY REQUIRED,
+    carto.com/basemaps/apikey": the basemap is not shown;
+  - a click anywhere on the map leads to `https://enjoy.theplanet.wtf`, whose name does not
+    resolve (no DNS record);
+  - `/about/` loads no style of the theme: `_includes/head.html` links `public/css/*.css` and
+    `public/favicon.ico` relatively, so from `/about/` they become `/about/public/...` and
+    answer 404 (four console errors); its text is still the demo of Hyde;
+  - the home has no console error and no horizontal scroll at either size, and no link to
+    `/about/`; the font PT Sans is requested over `http` and upgraded by the browser.
+- **Merge settings of the repository** (GitHub API, 2026-11-23): squash, merge commits and
+  rebase all allowed; squash title `COMMIT_OR_PR_TITLE` and message `COMMIT_MESSAGES`.
+  `CONTRIBUTING.md` (thebox v0.1.2) expects the pull request title as subject, no list of
+  commits, and rebase off; no ruleset exists. Owner steps in issue #7.
 
 Open points:
 
@@ -339,6 +404,7 @@ Open points:
   profile `quick`, findings only as private advisories).
 - [ ] The labels `release:major`, `release:minor` and `release:patch`, read by `ci.yml` and
   `release.yml`, do not exist in the repository yet; create them when one is needed.
-- [ ] Create a new Codespace on `dev` (a rebuild does not grant the access) and authorize read
-  access to `theplanet-earth/*`; then find the release of thebox that matches commit `db3b47c`
-  and record it in Section 11.
+- [ ] Owner: the merge settings and the ruleset of the repository (issue #7), so that the
+  squash along the chain takes the pull request title and no list of commits.
+- [ ] The globe on the home of the stage site and the mascot model from Meshy (Section 2):
+  plan to be agreed with the owner.

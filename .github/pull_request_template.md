@@ -10,3 +10,7 @@
 - [ ] Commit prefixes chosen with care (they decide the version); no `release:major` label without the owner's request
 - [ ] No confidential term, credential or personal data (files, screenshots, logs)
 - [ ] Screenshots attached when the appearance changed
+
+Into `stage` or `master`: *Squash and merge*, the title as subject, the `type: text` lines of
+the changes as body; then merge the target back down the chain `master`, `stage`, `dev`.
+Into `dev`: *Create a merge commit*. (`CONTRIBUTING.md`, *Branches and pull requests*.)

@@ -15,7 +15,9 @@ them. In short:
 - Never use an em dash. Never write confidential names or credentials, never bypass the
   pre-commit hook (`--no-verify`, `git add -f`).
 - Branches `dev`, `stage`, `master`: commit and push on `dev`, open the pull request to `stage`;
-  the owner merges it, and later `stage` into `master`.
+  the owner squash-merges it, and later `stage` into `master`; then the target is merged back
+  down the chain. A pull request from a branch of work into `dev` is merged with a merge
+  commit, not squashed.
 
 - The site is Jekyll in `docs/` (Ruby 3.3); the stage site is `theplanet.wtf`, production
   `theplanet.observer` (`README.md`, *Environments*).

@@ -48,10 +48,34 @@ call the shell scripts in `scripts/`, so they also run without npm.
   branch, by a pull request, whose merge publishes a release (and, once issue #2 is done, the
   production site at `theplanet.observer`).
 - Nobody pushes to `stage` or `master`: every change reaches them through a pull request, and
-  the **owner of the repository merges** it.
-- A separate piece of work may go on a branch of its own, started from `dev` and merged back
-  into `dev` by a pull request. Bringing `stage` or `master` into the working branch is fine;
+  the **owner of the repository merges** it. The only push outside a pull request is the merge
+  back of `master` into `stage` (below).
+- A separate piece of work may go on a branch of its own, started from `dev`, so that each
+  pull request can be merged on its own. **A pull request into `dev` is merged with a merge
+  commit** (*Create a merge commit*), never squashed: `dev` keeps its commits, and the squash
+  along the chain gathers them. Bringing `stage` or `master` into the working branch is fine;
   force-pushing or rewriting pushed commits is not.
+- **Along the chain `dev`, `stage`, `master`, pull requests are squash-merged** (*Squash and
+  merge*): `dev` goes into `stage`, then `stage` into `master`. The squash commit takes the
+  title of the pull request as its subject, a conventional commit whose prefix decides the
+  version, and as its body the `type: text` lines of the changes it gathers, one per line
+  (*Commits*). Do not paste the list of commits that GitHub may propose: it includes those
+  already squashed (the *Commits* tab of the pull request shows them too; *Files changed*
+  shows the real difference).
+- **Right after every squash merge, the target is merged back down the chain**, and the
+  branches merged into are pushed: after `dev` into `stage`, `stage` into `dev`; after `stage`
+  into `master`, `master` into `stage`, then `stage` into `dev`. A squash leaves the original
+  commits on the source and a new commit with the same changes on the target: until the
+  target is merged back, the next pull request conflicts wherever the source changes again a
+  file the squash touched. `scripts/version.py` recognizes the merges back and counts each
+  change once, through its squash commit.
+- The merge methods are a setting of the whole repository, so both stay allowed and whoever
+  merges picks the method on the merge button: *Squash and merge* along the chain, *Create a
+  merge commit* into `dev`. The settings of the repository that go with it (*Settings,
+  General, Pull Requests*: keep merge commits and squash merging, *Default to pull request
+  title* for the squash, rebase merging off) and the ruleset on `stage` and `master` are
+  steps of issue #7
+  ([GitHub documentation](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/configuring-commit-squashing-for-pull-requests)).
 - Every pull request to `stage` or `master` runs **CI** (`.github/workflows/ci.yml`): checks and
   build. Its job summary shows the version and the release notes that merging into `master`
   would publish, and the `TEMPLATE` markers left.

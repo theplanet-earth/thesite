@@ -13,6 +13,9 @@ Rules (CONTRIBUTING.md, "Versions and releases"):
     of the release workflow): only on an explicit request of the owner;
   * a commit that gathers others (squash) also counts each `type: text` line that starts
     a line of its body;
+  * the commits already gathered by a squash merge are left out once the target branch has
+    been merged back (`squashed`): dev, stage and the merge a pull request is checked on
+    count each change once;
   * the first release is 0.1.0.
 `current` is the latest tag when HEAD is that tag and the tree is clean; otherwise the next
 version with `-dev`, so that a local build never looks like a release.
@@ -62,18 +65,46 @@ def parse(tag: str) -> tuple[int, int, int]:
     return major, minor, patch
 
 
+def squashed(tag: str) -> set[str]:
+    """Full hashes of the commits already gathered by a squash merge.
+
+    A squash merge (CONTRIBUTING.md, "Branches and pull requests") gives the target branch
+    (stage or master) one new commit; the source branch keeps the commits it gathers, which
+    never become ancestors of the tag, even after the target is merged back into it. In a
+    merge back, the second parent (the target) has the tree of a past commit of the first
+    parent: that commit is the state that was squashed. It and its ancestors that the target
+    does not contain are counted through the squash commit instead. The chain dev, stage,
+    master applies this twice: dev is counted through the squashes on stage, which are
+    counted through the squash on master. When no commit has that tree (an ordinary merge,
+    or a target changed in another way), nothing is left out.
+    """
+    found: set[str] = set()
+    for line in git("rev-list", "--merges", "--parents", f"{tag}..HEAD").splitlines():
+        first, second = line.split()[1:3]
+        tree = git("rev-parse", f"{second}^{{tree}}")
+        for candidate in git("log", "--format=%H %T", f"{tag}..{first}").splitlines():
+            sha, candidate_tree = candidate.split()
+            if candidate_tree == tree:
+                found.update(git("rev-list", sha, f"^{second}", f"^{tag}").split())
+                break
+    return found
+
+
 def commits_since(tag: str | None) -> list[tuple[str, str, str]]:
-    """(hash, subject, body) of the commits after tag, oldest first, merges excluded."""
-    span = f"{tag}..HEAD" if tag else "HEAD"
+    """(hash, subject, body) of the commits after tag, oldest first, merges and commits
+    already gathered by a squash merge excluded."""
     try:
-        raw = git("log", "--no-merges", "--reverse", "--format=%h%x1f%s%x1f%b%x1e", span)
+        span = f"{tag}..HEAD" if tag else "HEAD"
+        raw = git("log", "--no-merges", "--reverse", "--format=%H%x1f%h%x1f%s%x1f%b%x1e", span)
+        gathered = squashed(tag) if tag else set()
     except subprocess.CalledProcessError:
         return []
     out = []
     for record in raw.split("\x1e"):
         if record.strip():
-            sha, subject, body = (record.strip("\n").split("\x1f") + ["", ""])[:3]
-            out.append((sha, subject, body))
+            full, sha, subject, body = (record.strip("\n").split("\x1f") + ["", "", ""])[:4]
+            if full not in gathered:
+                out.append((sha, subject, body))
     return out
 
 

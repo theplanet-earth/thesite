@@ -12,13 +12,16 @@ The project site of the GitHub organization **theplanet-earth**.
 | Production | `master` | <https://theplanet.observer/> | A Cloudflare Worker with static assets, at every merge into `master` (not automated yet, issue #2) |
 
 Work happens on `dev`; `dev` goes into `stage`, and `stage` into `master`, by pull requests
-that the owner merges ([CONTRIBUTING.md](CONTRIBUTING.md#branches-and-pull-requests)).
+that the owner squash-merges, each followed by a merge back down the chain
+([CONTRIBUTING.md](CONTRIBUTING.md#branches-and-pull-requests)).
 
 ## Status
 
 - The site is the 2024 Jekyll prototype in `docs/` (Hyde theme on Poole, Leaflet map), folded
   in from the branches `glob_coverage` and `hyde_theme`, which were then deleted. It still
-  carries demo text of the theme and is to be cleaned up.
+  carries demo text of the theme and is to be cleaned up: the page `/about/` loads no style,
+  and the basemap of the map is not shown, because its tile provider (Carto) now requires an
+  API key (`CLAUDE.md`, *Known issues and TODO*).
 - On 2026-11-23 neither address reaches the site: `theplanet.wtf` answers with a Cloudflare
   error, "DNS points to prohibited IP", and `theplanet.observer` has no DNS record yet. The
   steps for the owner are in issues #6 (Cloudflare) and #7 (GitHub).
