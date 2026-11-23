@@ -5,6 +5,7 @@
   "description": "The project site of the theplanet-earth organization, with the harness of thebox: devcontainer, conventions for people and for Claude Code, git hooks, checks and releases.",
   "scripts": {
     "build": "bash scripts/build.sh",
+    "serve": "bash scripts/serve.sh",
     "test": "bash scripts/test.sh",
     "check": "bash scripts/check.sh",
     "check:confidential": "python3 scripts/check-confidential.py --all",

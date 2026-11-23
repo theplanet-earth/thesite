@@ -21,4 +21,9 @@ __pycache__/
 private/
 # Copies of this file left by a download or an upload, such as "CLAUDE (1).md"
 /CLAUDE (*).md
-# TEMPLATE: the generated files and local state of the tools of this repository.
+# Jekyll and Bundler, when run by hand in docs/ (the scripts write to build/ only)
+/docs/_site/
+/docs/.jekyll-cache/
+/docs/.jekyll-metadata
+/docs/.bundle/
+/docs/vendor/

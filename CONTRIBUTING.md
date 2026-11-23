@@ -9,16 +9,18 @@ of the GitHub organization **theplanet-earth**; what is specific to this reposit
 ## Getting started
 
 1. Open the repository in a **Codespace** or in the **devcontainer** (VS Code: *Reopen in
-   Container*). `.devcontainer/post-create.sh` enables the git hooks, installs the Node and
-   Python dependencies, the Chromium of the Playwright MCP server, and runs a first build.
+   Container*). `.devcontainer/post-create.sh` enables the git hooks, installs the Node,
+   Python and Ruby dependencies, the Chromium of the Playwright MCP server and the Claude Code
+   skills of the user, and runs a first build.
    When GitHub asks, at the creation of the Codespace, to authorize read access to the other
    repositories of the organization (`theplanet-earth/*`), accept: assistants working in the
    Codespace use it to read the repositories this one depends on.
 2. Build with `npm run build` (or *Terminal, Run Task, Build*, `Ctrl+Shift+B`), check with
    `npm run check`.
 
-Without the devcontainer you need Git, Node 22 or later and Python 3; then run
-`git config core.hooksPath .githooks`, `npm ci` and `npm run setup:python`.
+Without the devcontainer you need Git, Node 22 or later, Python 3, and Ruby 3.3 with Bundler
+for the site; then run `git config core.hooksPath .githooks`, `npm ci` and
+`npm run setup:python`.
 
 ## Commands
 
@@ -27,7 +29,8 @@ call the shell scripts in `scripts/`, so they also run without npm.
 
 | Command | What it does |
 |---|---|
-| `npm run build` | Every output in `build/`: the files to attach to a release in `build/release/`, the site for GitHub Pages in `build/pages/` |
+| `npm run build` | Every output in `build/`: the files to attach to a release in `build/release/`, the site (Jekyll, from `docs/`) in `build/pages/` |
+| `npm run serve` | Preview of the site at `http://localhost:4000`, rebuilt on every change (task *Preview: site (live reload)*) |
 | `npm test` | Unit tests (`scripts/test.sh`) |
 | `npm run check` | Tests, confidentiality, `TEMPLATE` markers and the checks of this repository: **run it before every pull request** |
 | `npm run check:confidential` | Confidentiality guard on every tracked file |
@@ -36,18 +39,22 @@ call the shell scripts in `scripts/`, so they also run without npm.
 | `npm run version:current` / `version:next` / `release:notes` | Version of this build, of the next release, and the notes of the next release |
 | `npm run clean` | Remove `build/` |
 
-<!-- TEMPLATE: the commands of this repository (dev server, live preview, lint, deploy dry run). -->
 
 ## Branches and pull requests
 
-- The main branch is **`master`**. Nobody pushes to it: every change reaches it through a pull
-  request, and the **owner of the repository merges** it.
-- Work happens on **`dev`**; a separate piece of work goes on a branch of its own, so that each
-  pull request can be merged on its own. Bringing `master` into the working branch is fine;
+- Three branches, the rule of the organization (issue #5): work happens on **`dev`**; `dev`
+  goes into **`stage`** by a pull request, whose merge deploys the stage site
+  (`.github/workflows/stage.yml`, `theplanet.wtf`); `stage` goes into **`master`**, the main
+  branch, by a pull request, whose merge publishes a release (and, once issue #2 is done, the
+  production site at `theplanet.observer`).
+- Nobody pushes to `stage` or `master`: every change reaches them through a pull request, and
+  the **owner of the repository merges** it.
+- A separate piece of work may go on a branch of its own, started from `dev` and merged back
+  into `dev` by a pull request. Bringing `stage` or `master` into the working branch is fine;
   force-pushing or rewriting pushed commits is not.
-- Every pull request to `master` runs **CI** (`.github/workflows/ci.yml`): checks and build. Its
-  job summary shows the version and the release notes that merging would publish, and the
-  `TEMPLATE` markers left.
+- Every pull request to `stage` or `master` runs **CI** (`.github/workflows/ci.yml`): checks and
+  build. Its job summary shows the version and the release notes that merging into `master`
+  would publish, and the `TEMPLATE` markers left.
 - The pull request template (`.github/pull_request_template.md`) is the checklist: build and
   checks green, tests, documentation aligned, no confidential material, screenshots when the
   appearance changed.

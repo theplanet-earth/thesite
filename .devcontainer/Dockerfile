@@ -18,6 +18,5 @@ RUN apt-get update -qq \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
-# TEMPLATE: the tools of this repository, for instance
-#   COPY scripts/install-<tool>.sh /tmp/install/
-#   RUN bash /tmp/install/install-<tool>.sh && rm -rf /tmp/install
+# thesite needs no tool here: Ruby, for the site, comes from the feature
+# ghcr.io/devcontainers/features/ruby in devcontainer.json.

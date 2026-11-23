@@ -13,16 +13,22 @@ GitHub organization **theplanet-earth** (Section 11). The rules shared with peop
 
 ## 1. The repository
 
-**thesite** is the project site of the GitHub organization **theplanet-earth**, published on
-GitHub Pages at `https://theplanet.wtf/`, the custom domain of the repository. The
+**thesite** is the project site of the GitHub organization **theplanet-earth**. The
 repository is **public**: everything committed here, including branches and pull requests,
 is visible to anyone (Section 8).
 
-Besides the harness of thebox, the repository holds in `docs/` the 2024 Jekyll prototype the
-site online comes from, folded in on 2026-11-23 from the branches `glob_coverage` and
-`hyde_theme` (opened in this order, then deleted; `README.md`, *Status*). `npm run build`
-does not build it yet. How the site is built from now on, what it shows and how it links the
-other repositories of the organization are open decisions of the owner (Section 12).
+The site is a Jekyll site in `docs/`, the 2024 prototype folded in on 2026-11-23 from the
+branches `glob_coverage` and `hyde_theme` (opened in this order, then deleted). `npm run build`
+builds it into `build/pages/`, `npm run serve` previews it. Two environments, decided by the
+owner on 2026-11-23 following issue #2:
+
+| Environment | Branch | Where | How | State |
+|---|---|---|---|---|
+| Stage | `stage` | `https://theplanet.wtf/`, GitHub Pages of this repository | `.github/workflows/stage.yml` on every push to `stage` | DNS broken (issue #6), environment rule for `stage` missing (issue #7) |
+| Production | `master` | `https://theplanet.observer/`, Cloudflare Pages | not automated yet (issue #2) | Cloudflare project, token and DNS to set up (issues #6, #7) |
+
+What the site shows and how it links the other repositories of the organization are decided
+by the owner, request by request.
 
 **Golden rule: sources, traceability, no silent fixes.**
 
@@ -43,12 +49,35 @@ Dated, in the owner's words where possible. Add every new standing instruction h
 - 2026-11-23, "usa thebox-master.zip poi buttalo e pulisci tutto quello che non ti serve":
   archives and extracted copies used to set up the repository are deleted once used, never
   committed (Section 8).
+- 2026-11-23, "folda i due branch attualmente presenti sulla repo [...] l'uno sull'altro e poi
+  su dev e poi cancellali e pusha dev": `glob_coverage` and `hyde_theme` were merged into `dev`
+  and deleted. Asked again the same day, against point 4 of issue #5 (keep them until the
+  first release of `thestory`), the owner chose to leave them deleted; their commits are in
+  the history of `dev` (`c8a2c5d`, `ec8acac`).
+- 2026-11-23, "voglio creare anche stage e pubblicare [...] master su theplanet.observer e
+  stage su theplanet.wtf": production at `theplanet.observer`, stage at `theplanet.wtf`
+  (Section 1). Told that GitHub Pages serves one domain per repository, the owner chose the
+  split of issue #2: stage on GitHub Pages, production on Cloudflare Pages.
+- 2026-11-23, "voglio poi usare la skill [ui-ux-pro-max] per migliorare la pagina e apportare
+  dei cambiamenti che ti dirò": the plugin is enabled in `.claude/settings.json` (Section 10);
+  the changes to the page come from the owner, request by request.
+- 2026-11-23, "voglio anche creare dei task per vederla in anteprima qui dal codespace":
+  `npm run serve` and the task *Preview: site (live reload)*, port 4000 forwarded.
+- 2026-11-23, "voglio anche sistemare il codice qui nel progetto, mi sembra un po'
+  disordinato": the prototype in `docs/` is to be cleaned up (Section 12).
+- 2026-11-23, "aggiungi anche la skill della issue #4 e implementiamo la #5": the skill
+  `security-audit` of Cloudflare is installed for the user by `scripts/install-skills.sh`; the
+  branches `dev` and `stage` and the stage deploy follow issue #5.
 
-Rules of the organization, carried over from thebox (keep them unless the owner decides
-otherwise):
+Rules of the organization, carried over from thebox or from its issues (keep them unless the
+owner decides otherwise):
 
 - "Vai più avanti possibile da solo": Claude proceeds autonomously as far as it can; **the
-  owner only merges the pull requests on `master`** (Section 9).
+  owner only merges the pull requests on `stage` and `master`** (Section 9).
+- 2026-11-14 and 2026-11-15 (issue #5), "su ogni repo ci sia sempre un ramo dev che poi
+  mergiano su staging e poi staging su master" and "usiamo stage per tutti i repo": `dev` into
+  `stage`, `stage` into `master`, by pull requests (`CONTRIBUTING.md`, *Branches and pull
+  requests*).
 - SemVer releases at every merge on `master`; **Claude increments only minor or patch, a major
   only when the owner explicitly asks for it**, and never adds the `release:major` label on its
   own (`CONTRIBUTING.md`, *Versions and releases*).
@@ -80,7 +109,9 @@ otherwise):
 | `CLAUDE.md` | This file: instructions for assistants |
 | `package.json` | The command surface: every command is an npm script (`CONTRIBUTING.md`, *Commands*) |
 | `scripts/lib.sh` | Helpers shared by the shell scripts: repository root, `build/`, `$PY`, `log`, `warn`, `die`, `need`, `project_version` |
-| `scripts/build.sh`, `test.sh`, `check.sh` | Build, unit tests, every check (the entry points of CI) |
+| `scripts/build.sh`, `test.sh`, `check.sh` | Build (the site into `build/pages/`), unit tests, every check (the entry points of CI) |
+| `scripts/serve.sh` | Live preview of the site at `http://localhost:4000` (`npm run serve`) |
+| `scripts/install-skills.sh` | Claude Code skills installed for the user, pinned to a commit (Section 10) |
 | `scripts/check-confidential.py` | Confidentiality guard (pre-commit hook and `npm run check`) |
 | `scripts/check-template.sh` | Lists the `TEMPLATE` markers left |
 | `scripts/version.py` | Version, next version and release notes from the tags and the commits |
@@ -89,8 +120,9 @@ otherwise):
 | `.devcontainer/` | `Dockerfile`, `devcontainer.json`, `post-create.sh` (Section 10) |
 | `.vscode/` | Recommended extensions, settings, and every command as a task |
 | `.mcp.json` | Project MCP servers for Claude Code: Playwright |
+| `.claude/settings.json` | Project settings of Claude Code: the plugin marketplaces and plugins of the repository (Section 10) |
 | `.githooks/pre-commit` | Confidentiality guard, enabled by `post-create.sh` |
-| `.github/workflows/` | `ci.yml` (pull requests to `master`), `release.yml` (merge on `master`) |
+| `.github/workflows/` | `ci.yml` (pull requests to `stage` and `master`), `stage.yml` (push to `stage`: the stage site on GitHub Pages), `release.yml` (merge on `master`) |
 | `.github/pull_request_template.md` | Checklist of every pull request |
 | `.github/copilot-instructions.md` | Points GitHub Copilot to these conventions |
 | `build/` | Every output (git-ignored): `build/release/`, `build/pages/` |
@@ -98,18 +130,14 @@ otherwise):
 `LICENSE` is the Apache License 2.0 of thesite (thebox itself is MIT: the license is not part
 of the harness).
 
-The 2024 prototype, as folded in from `hyde_theme` (Section 12):
+The site, as folded in from `hyde_theme` and not cleaned up yet (Section 12):
 
 | Path | Content |
 |---|---|
 | `docs/` | Jekyll 4.3 site: `_config.yml`, `Gemfile` and `Gemfile.lock`, `_layouts/`, `_includes/`, `index.html`, `about.md`, `404.html`, `atom.xml`, `CNAME` |
 | `docs/public/`, `docs/README.md`, `docs/LICENSE.md` | The Hyde theme on Poole, third-party, MIT: its README and parts of `about.md` are still the demo text of the theme |
 | `docs/assets/` | The project's own CSS (`theplanet.css`, `map.css`, `popup.css`), the Leaflet map (`js/map.js`) and the logos |
-| `.github/workflows/jekyll.yml` | Builds `docs/` with Ruby 3.1 and deploys it to GitHub Pages; its push trigger names the deleted branch `hyde_theme`, so it now runs only by hand |
 | `new_0/` | Holds only a `.gitignore` that ignores everything else in the folder; its purpose is not documented |
-
-<!-- TEMPLATE: the folders and files of the site (sources, content, assets, configuration),
-once the owner decides how it is built (Section 12). -->
 
 ## 5. Checks before reporting a change as done
 
@@ -123,8 +151,10 @@ once the owner decides how it is built (Section 12). -->
    build it and inspect it; say what was not verified.
 4. Report results faithfully: if a check fails or was skipped, say so with its output.
 
-<!-- TEMPLATE: the checks specific to this repository (URLs and ports to open, pages or
-screens to look at, outputs to inspect). -->
+For the site: `npm run serve` (or the task *Preview: site (live reload)*), then open
+`http://localhost:4000` with the Playwright MCP server, the home page, `/about/` and the map
+at least; and after `npm run build`, check that `build/pages/` holds no file that should not
+be published (theme README, licences, `CNAME` of the demo).
 
 ## 6. How to handle the owner's requests (permanent)
 
@@ -166,12 +196,14 @@ The rules are in `CONTRIBUTING.md`, *Confidentiality*. In addition:
 
 - **Claude commits, pushes and prepares the pull request; the owner merges it.** When a
   request is done and the checks are green, Claude commits its changes on the working branch,
-  pushes it and opens the pull request to `master`, or lets the open one grow when the work
-  belongs to it; a separate piece of work goes on a new branch.
+  pushes it and opens the pull request from `dev` to `stage`, or lets the open one grow when
+  the work belongs to it; a separate piece of work goes on a new branch, merged into `dev`.
+  Once the owner has merged into `stage` and checked the stage site, Claude may open the pull
+  request from `stage` to `master` when the owner asks for a release.
 - The working branch is **`dev`** unless the owner names another.
-- **Never merge into `master`, push to `master`, force-push or rewrite pushed commits.**
-  Merging is the owner's decision. Bringing `master` into the working branch (fast-forward or
-  merge) is allowed, to keep the pull request clean.
+- **Never merge into `stage` or `master`, push to them, force-push or rewrite pushed
+  commits.** Merging is the owner's decision. Bringing `stage` or `master` into the working
+  branch (fast-forward or merge) is allowed, to keep the pull request clean.
 - **Stage only your own changes.** When the working tree holds changes Claude did not make,
   ask before committing them; files the owner staged stay staged, never unstage them
   (`git reset`, `git restore --staged`). Move files with plain `mv`: git detects the rename.
@@ -190,8 +222,20 @@ The rules are in `CONTRIBUTING.md`, *Confidentiality*. In addition:
   the workflows, so that the devcontainer and CI install the same version.
 - `post-create.sh` enables the git hooks (`core.hooksPath .githooks`), runs `npm ci` and
   `npm run setup:python` when the repository has a `package-lock.json` or a
-  `requirements.txt`, installs the Chromium of the Playwright MCP server, and runs a first
-  build.
+  `requirements.txt`, installs the Chromium of the Playwright MCP server, the gems of the
+  site (`docs/Gemfile.lock`) and the skills of the user (`scripts/install-skills.sh`), and
+  runs a first build.
+- **Ruby 3.3** for the site: the devcontainer feature `ghcr.io/devcontainers/features/ruby`
+  and `ruby/setup-ruby` in the workflows, both on the latest 3.3 release. Jekyll 4.3.3 of
+  `docs/Gemfile.lock` does not start on Ruby 3.4 (`csv` is no longer a default gem): moving
+  to 3.4 means updating Jekyll first.
+- **Ports**: 4000, the preview of `npm run serve` (opened in the VS Code preview); 35729, its
+  live reload (works in VS Code desktop; in a browser, reload by hand).
+- **Skills and plugins of Claude Code**: `.claude/settings.json` declares the marketplace of
+  `ui-ux-pro-max` and enables the plugin (Claude Code asks to install it when the folder is
+  trusted; `/plugin` shows it); `scripts/install-skills.sh` copies `security-audit` of
+  Cloudflare into `~/.claude/skills/`, so that nothing of it lands in the repository (issue
+  #4).
 - The devcontainer requests **read access to every repository of the organization**
   (`customizations.codespaces.repositories`), so that an assistant can read the repositories
   this one depends on.
@@ -207,10 +251,12 @@ The rules are in `CONTRIBUTING.md`, *Confidentiality*. In addition:
 | Base image | Ubuntu 24.04 (`devcontainers/base:noble`) | `.devcontainer/Dockerfile` |
 | Node | 24 (package.json accepts 22 or later) | `devcontainer.json`, workflows |
 | @playwright/mcp | 0.0.84 | `.mcp.json` |
-| GitHub Actions | `checkout@v7`, `setup-node@v7`, `upload-artifact@v7`, `upload-pages-artifact@v5`, `deploy-pages@v5` (all on Node 24; `release.yml` without dependency cache) | `.github/workflows/` |
+| GitHub Actions | `checkout@v7`, `setup-node@v7`, `upload-artifact@v7`, `configure-pages@v6`, `upload-pages-artifact@v5`, `deploy-pages@v5` (all on Node 24; `release.yml` and `stage.yml` without dependency cache) | `.github/workflows/` |
+| Ruby | 3.3 (`ruby/setup-ruby` v1.338.0, pinned by commit `b3aacea`) | `devcontainer.json`, workflows |
+| Jekyll | 4.3.3, with the gems of `docs/Gemfile.lock` (Bundler 2.5.6) | `docs/` |
+| Plugin `ui-ux-pro-max` | v2.15.0 of `nextlevelbuilder/ui-ux-pro-max-skill` (MIT; its manifest at that tag says 2.13.0) | `.claude/settings.json` |
+| Skill `security-audit` | commit `c1c8a8c` (2026-09-14) of `cloudflare/security-audit-skill` (MIT) | `scripts/install-skills.sh` |
 
-<!-- TEMPLATE: the tools and versions of this repository (runtimes, frameworks, CLIs), the
-ports the devcontainer forwards and what each serves. -->
 
 ## 11. Keeping in step with thebox
 
@@ -229,6 +275,12 @@ harness) comes from thebox, which is versioned and released like any other repos
   was not readable from the Codespace where it was adopted (Section 12), so the release tag
   of that commit is still to be checked; until then, compute the diff of an update from
   `db3b47c` instead of a tag.
+- Changes made here outside the `TEMPLATE` markers, to carry over by hand at the next update
+  (and to propose to thebox where they are useful to every repository): the branch model
+  `dev`, `stage`, `master` of issue #5, a rule of the whole organization (`ci.yml` triggers,
+  `CONTRIBUTING.md`, *Branches and pull requests*, Sections 2 and 9 of this file); the
+  workflow `stage.yml`; the note on `PUBLISH_PAGES` in `release.yml`; the Ruby step of the
+  workflows; `scripts/serve.sh`, `scripts/install-skills.sh` and `.claude/settings.json`.
 
 ## 12. Known issues and TODO
 
@@ -248,44 +300,38 @@ harness) comes from thebox, which is versioned and released like any other repos
 
 - **GitHub Pages** (GitHub API, `GET /repos/theplanet-earth/thesite/pages` and
   `.../environments/github-pages`, 2026-11-23): build type *GitHub Actions*, custom domain
-  `theplanet.wtf`; the `github-pages` environment accepts deployments from `master`,
-  `glob_coverage` and `hyde_theme` (the last two are stale after the deletion of the branches,
-  harmless). The last deployment came from `hyde_theme` (commit `ec8acac`, now in the history
-  of `dev`) on 2024-03-27 (`GET .../deployments`); the workflow runs themselves are past
-  GitHub's retention. Deleting the branches does not take the site down.
-- **The domain does not reach the site** (checked on 2026-11-23): `https://theplanet.wtf/`
+  `theplanet.wtf`, the stage site. The `github-pages` environment accepts deployments from
+  `master`, `glob_coverage` and `hyde_theme`, **not from `stage`**: until the owner changes it
+  (issue #7), the deploy job of `stage.yml` is refused. The last deployment came from
+  `hyde_theme` (commit `ec8acac`, now in the history of `dev`) on 2024-03-27.
+- **The stage domain does not reach the site** (checked on 2026-11-23): `https://theplanet.wtf/`
   answers HTTP 403 from Cloudflare with the page "DNS points to prohibited IP"
   ([Cloudflare Error 1000](https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1000/)),
   while `https://theplanet-earth.github.io/thesite/` answers 301 to `https://theplanet.wtf/`:
-  GitHub Pages works, the DNS records of the domain on Cloudflare do not.
-- **Inconsistency in the prototype, reported and not fixed**: `docs/CNAME` says
+  GitHub Pages works, the DNS records on Cloudflare do not (issue #6).
+  `theplanet.observer` has no A, AAAA or CNAME record yet.
+- **Inconsistency in the site, reported and not fixed**: `docs/CNAME` says
   `hyde.getpoole.com` (changed by `1b80293`, "brand new style", from the `theplanet.wtf` of
-  `f820ec2`) and `docs/_config.yml` keeps the `url` and the description of the Hyde demo, while
-  GitHub Pages serves `theplanet.wtf`. With a GitHub Actions workflow a `CNAME` file is ignored
+  `f820ec2`) and `docs/_config.yml` keeps the `url` and the description of the Hyde demo. With
+  a GitHub Actions workflow a `CNAME` file is ignored
   ([GitHub Docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site)),
-  so the domain in the settings wins; the files are still wrong and get fixed when the owner
-  decides what to do with the prototype.
+  so nothing breaks today; it is part of the cleanup below.
+- **`PUBLISH_PAGES` stays unset** in this repository: the GitHub Pages site here is the stage
+  site, and `release.yml` would publish `master` on it.
 
-Open points for the owner:
+Open points:
 
-- [ ] Decide how the site is built from now on: keep and evolve the Jekyll prototype of
-  `docs/` (Hyde theme on Poole, Leaflet map, Ruby 3.1 and Jekyll 4.3 in `jekyll.yml`) or start
-  again with another generator. Then: the toolchain in the devcontainer and in the workflows,
-  the build into `build/pages/` by `npm run build` (which replaces `jekyll.yml`), the visual
-  checks (Section 5), and the `TEMPLATE` markers left (`npm run check:template -- --list`).
-- [ ] Do not run `jekyll.yml` by hand from `master` unless the prototype is meant to be
-  deployed again: the `github-pages` environment accepts `master`, so it would replace the
-  site online.
-- [ ] Leave the repository variable `PUBLISH_PAGES` unset until `build/pages/` holds the
-  site: `release.yml` would otherwise replace the site online at the first merge. The token of
-  this Codespace cannot list the variables (HTTP 403), so the owner checks it in *Settings,
-  Secrets and variables, Actions*.
-- [ ] Fix the DNS records of `theplanet.wtf` on Cloudflare so that the domain reaches GitHub
-  Pages
-  ([GitHub Docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site#configuring-an-apex-domain)).
-- [ ] The Pages API reports `protected_domain_state: unverified` for `theplanet.wtf`: verify
-  the domain for the organization, which protects it from takeover
-  ([GitHub Docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/verifying-your-custom-domain-for-github-pages)).
+- [ ] Owner: the Cloudflare side of both environments, issue #6; the GitHub side, issue #7.
+- [ ] Production deploy (issue #2): `release.yml` uploads `build/pages/` to Cloudflare Pages
+  once the project, the token and the secrets of issues #6 and #7 exist.
+- [ ] Clean up the site in `docs/` (owner, 2026-11-23): the demo text and links of Hyde
+  (`about.md`, `docs/README.md`, the sidebar, `_config.yml`), `docs/CNAME`, `new_0/`, the
+  fonts loaded over `http`, the relative links to `public/`, the warning on `jekyll-paginate`,
+  what `build/pages/` publishes (`README.md`, `LICENSE.md`); then the `TEMPLATE` markers left
+  (`npm run check:template -- --list`).
+- [ ] Older issues to plan with the owner: #1 (coverage map: colours from an API,
+  click to explore), #3 (hardening of the Cloudflare zones), #4 (security audit with the skill,
+  profile `quick`, findings only as private advisories).
 - [ ] The labels `release:major`, `release:minor` and `release:patch`, read by `ci.yml` and
   `release.yml`, do not exist in the repository yet; create them when one is needed.
 - [ ] Create a new Codespace on `dev` (a rebuild does not grant the access) and authorize read

@@ -34,7 +34,13 @@ if [[ -f .mcp.json ]] && grep -q '@playwright/mcp@' .mcp.json; then
   fi
 fi
 
-# TEMPLATE: the setup steps of this repository (tools, services, seed data), if any.
+if [[ -f docs/Gemfile ]]; then
+  step "Ruby gems of the site (docs/Gemfile.lock)"
+  BUNDLE_GEMFILE=docs/Gemfile bundle install || warn "gems not installed; npm run build installs them later"
+fi
+
+step "Claude Code skills of the user (scripts/install-skills.sh)"
+bash scripts/install-skills.sh || warn "skills not installed; run bash scripts/install-skills.sh later"
 
 step "First build"
 npm run build || warn "the first build failed, see above"
@@ -42,6 +48,7 @@ npm run build || warn "the first build failed, see above"
 cat << 'EOF'
 
 Ready. Useful commands (also in Terminal > Run Task):
+  npm run serve                       preview of the site at http://localhost:4000
   npm run build                       every output in build/
   npm run check                       tests, confidentiality, template markers, checks of the repository
   npm run check:template -- --list    the TEMPLATE markers still to resolve

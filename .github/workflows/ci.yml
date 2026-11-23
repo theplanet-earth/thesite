@@ -1,11 +1,12 @@
-# CI: on every pull request to master, run every check and the build.
+# CI: on every pull request to stage or master (dev into stage, stage into master), run
+# every check and the build.
 # The job summary shows the version and the release notes that merging would publish,
 # and the TEMPLATE markers still to resolve.
 name: CI
 
 on:
   pull_request:
-    branches: [master]
+    branches: [stage, master]
   workflow_dispatch:
 
 permissions:
@@ -28,8 +29,13 @@ jobs:
           node-version: 24
           cache: npm
 
-      # TEMPLATE: install here the tools of this repository that are not npm or Python
-      # packages, with the same install scripts as .devcontainer/Dockerfile.
+      # Ruby for the site (Jekyll), the same minor version as the devcontainer; the gems
+      # are installed by npm run build from docs/Gemfile.lock.
+      - uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
+        with:
+          ruby-version: "3.3"
+          bundler-cache: false
+
       - name: Toolchain
         run: |
           npm ci --no-audit --no-fund

@@ -1,8 +1,16 @@
 {
   // Every command of the repository as a task (Terminal, Run Task): the npm scripts of
-  // package.json. TEMPLATE: the tasks of this repository (live preview, dev server, deploy dry run).
+  // package.json.
   "version": "2.0.0",
   "tasks": [
+    {
+      "label": "Preview: site (live reload)",
+      "detail": "Jekyll serves docs/ at http://localhost:4000 and rebuilds on every change (npm run serve); stop it with Ctrl+C or Terminate Task",
+      "type": "npm",
+      "script": "serve",
+      "isBackground": true,
+      "problemMatcher": []
+    },
     {
       "label": "Build",
       "detail": "Every output in build/ (build/release/ for the release, build/pages/ for GitHub Pages)",

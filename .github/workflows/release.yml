@@ -4,6 +4,8 @@
 # build/release/ and their SHA256SUMS.txt.
 # Optional: publish build/pages/ on GitHub Pages (repository variable
 # PUBLISH_PAGES = true, and Settings > Pages > Source: GitHub Actions).
+# In thesite PUBLISH_PAGES stays unset: the GitHub Pages site of this repository is the
+# stage site (stage.yml, theplanet.wtf); production goes to Cloudflare Pages (issue #2).
 #
 # Major versions are never automatic: only the `release:major` label on the pull
 # request, or a manual run with bump = major, and only on an explicit request of the
@@ -69,7 +71,13 @@ jobs:
           node-version: 24
           package-manager-cache: false
 
-      # TEMPLATE: the same toolchain as ci.yml.
+      # The same toolchain as ci.yml: Ruby for the site (Jekyll).
+      - uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
+        if: steps.version.outputs.version
+        with:
+          ruby-version: "3.3"
+          bundler-cache: false
+
       - name: Toolchain
         if: steps.version.outputs.version
         run: |
