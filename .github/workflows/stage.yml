@@ -1,8 +1,8 @@
 # Stage: on every push to stage (the merge of a pull request from dev), build the site with
 # the command CI runs (npm run build) and deploy build/pages/ to the GitHub Pages site of
 # this repository, served at theplanet.wtf (CLAUDE.md, Section 1). Production, from master,
-# goes to Cloudflare Pages at theplanet.observer (issue #2), never to this GitHub Pages site:
-# PUBLISH_PAGES stays unset in this repository.
+# goes to a Cloudflare Worker at theplanet.observer (issue #2), never to this GitHub Pages
+# site: PUBLISH_PAGES stays unset in this repository.
 #
 # It replaces the 2024 workflow jekyll.yml of the branch hyde_theme (issue #5).
 name: Stage

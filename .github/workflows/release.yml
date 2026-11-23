@@ -5,7 +5,7 @@
 # Optional: publish build/pages/ on GitHub Pages (repository variable
 # PUBLISH_PAGES = true, and Settings > Pages > Source: GitHub Actions).
 # In thesite PUBLISH_PAGES stays unset: the GitHub Pages site of this repository is the
-# stage site (stage.yml, theplanet.wtf); production goes to Cloudflare Pages (issue #2).
+# stage site (stage.yml, theplanet.wtf); production goes to a Cloudflare Worker (issue #2).
 #
 # Major versions are never automatic: only the `release:major` label on the pull
 # request, or a manual run with bump = major, and only on an explicit request of the

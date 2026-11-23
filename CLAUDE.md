@@ -24,8 +24,8 @@ owner on 2026-11-23 following issue #2:
 
 | Environment | Branch | Where | How | State |
 |---|---|---|---|---|
-| Stage | `stage` | `https://theplanet.wtf/`, GitHub Pages of this repository | `.github/workflows/stage.yml` on every push to `stage` | DNS broken (issue #6), environment rule for `stage` missing (issue #7) |
-| Production | `master` | `https://theplanet.observer/`, Cloudflare Pages | not automated yet (issue #2) | Cloudflare project, token and DNS to set up (issues #6, #7) |
+| Stage | `stage` | `https://theplanet.wtf/`, GitHub Pages of this repository | `.github/workflows/stage.yml` on every push to `stage` | DNS broken (issue #6) |
+| Production | `master` | `https://theplanet.observer/`, a Cloudflare Worker serving `build/pages/` as static assets | not automated yet (issue #2) | token, secrets and custom domain to set up (issues #6, #7) |
 
 What the site shows and how it links the other repositories of the organization are decided
 by the owner, request by request.
@@ -57,7 +57,9 @@ Dated, in the owner's words where possible. Add every new standing instruction h
 - 2026-11-23, "voglio creare anche stage e pubblicare [...] master su theplanet.observer e
   stage su theplanet.wtf": production at `theplanet.observer`, stage at `theplanet.wtf`
   (Section 1). Told that GitHub Pages serves one domain per repository, the owner chose the
-  split of issue #2: stage on GitHub Pages, production on Cloudflare Pages.
+  split of issue #2: stage on GitHub Pages, production on Cloudflare.
+- 2026-11-23, "per master voglio usare una cf worker non page": production is a Cloudflare
+  Worker with static assets, deployed by `wrangler deploy`, not a Cloudflare Pages project.
 - 2026-11-23, "voglio poi usare la skill [ui-ux-pro-max] per migliorare la pagina e apportare
   dei cambiamenti che ti dirò": the plugin is enabled in `.claude/settings.json` (Section 10);
   the changes to the page come from the owner, request by request.
@@ -301,8 +303,7 @@ harness) comes from thebox, which is versioned and released like any other repos
 - **GitHub Pages** (GitHub API, `GET /repos/theplanet-earth/thesite/pages` and
   `.../environments/github-pages`, 2026-11-23): build type *GitHub Actions*, custom domain
   `theplanet.wtf`, the stage site. The `github-pages` environment accepts deployments from
-  `master`, `glob_coverage` and `hyde_theme`, **not from `stage`**: until the owner changes it
-  (issue #7), the deploy job of `stage.yml` is refused. The last deployment came from
+  `stage` only (set by the owner on 2026-11-23, issue #7). The last deployment came from
   `hyde_theme` (commit `ec8acac`, now in the history of `dev`) on 2024-03-27.
 - **The stage domain does not reach the site** (checked on 2026-11-23): `https://theplanet.wtf/`
   answers HTTP 403 from Cloudflare with the page "DNS points to prohibited IP"
@@ -322,8 +323,12 @@ harness) comes from thebox, which is versioned and released like any other repos
 Open points:
 
 - [ ] Owner: the Cloudflare side of both environments, issue #6; the GitHub side, issue #7.
-- [ ] Production deploy (issue #2): `release.yml` uploads `build/pages/` to Cloudflare Pages
-  once the project, the token and the secrets of issues #6 and #7 exist.
+- [ ] Production deploy (issue #2): a `wrangler.jsonc` for the Worker `thesite` (static
+  assets from `build/pages/`, custom domain `theplanet.observer`), and `release.yml` running
+  `wrangler deploy` through the GitHub environment `production`, once the token and the
+  secrets of issues #6 and #7 exist
+  ([Workers static assets](https://developers.cloudflare.com/workers/static-assets/),
+  [GitHub Actions](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/)).
 - [ ] Clean up the site in `docs/` (owner, 2026-11-23): the demo text and links of Hyde
   (`about.md`, `docs/README.md`, the sidebar, `_config.yml`), `docs/CNAME`, `new_0/`, the
   fonts loaded over `http`, the relative links to `public/`, the warning on `jekyll-paginate`,
