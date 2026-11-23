@@ -29,6 +29,7 @@
     },
     { "label": "Check: unit tests", "type": "npm", "script": "test", "group": "test", "problemMatcher": [] },
     { "label": "Check: confidentiality", "type": "npm", "script": "check:confidential", "group": "test", "problemMatcher": [] },
+    { "label": "Check: site (build/pages/)", "detail": "Every local link and resource of the built site exists (npm run build first)", "type": "npm", "script": "check:site", "group": "test", "problemMatcher": [] },
     { "label": "Check: TEMPLATE markers left", "type": "shell", "command": "npm run check:template -- --list", "group": "test", "problemMatcher": [] },
     { "label": "Python: set up .venv", "type": "npm", "script": "setup:python", "problemMatcher": [] },
     { "label": "Release: next version", "type": "npm", "script": "version:next", "problemMatcher": [] },

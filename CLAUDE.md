@@ -83,6 +83,12 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   (Tobias Ahlin, GitHub, 2020), credited on the site; a model of the mascot of the logo,
   generated with the API of [Meshy](https://docs.meshy.ai/en/api/image-to-3d), follows. The
   key of Meshy lives only in the environment (`MESHY_API_KEY`), never in a file.
+- 2026-11-23, the owner's answers on that plan: production gets "the prototype plus two
+  fixes" (the style of `/about/` and the tiles of the map; the rest of the cleanup and the
+  globe go to stage after the first release); the globe **replaces** the Leaflet map on the
+  home of stage (the coverage of issue #1 will come as points and arcs on the globe); Meshy
+  on a **paid plan**, so the generated models belong to the organization (Meshy terms, 3.2),
+  "procedi"; nothing done yet on issues #6 and #7.
 
 Rules of the organization, carried over from thebox or from its issues (keep them unless the
 owner decides otherwise):
@@ -135,9 +141,10 @@ owner decides otherwise):
 | `scripts/install-skills.sh` | Claude Code skills installed for the user, pinned to a commit (Section 10) |
 | `scripts/check-confidential.py` | Confidentiality guard (pre-commit hook and `npm run check`) |
 | `scripts/check-template.sh` | Lists the `TEMPLATE` markers left |
+| `scripts/check-site.py` | Check of the built site: every local link and resource of `build/pages/` exists (`npm run check:site`) |
 | `scripts/version.py` | Version, next version and release notes from the tags and the commits |
 | `scripts/setup-python.sh` | `.venv/` from `requirements.txt`, reinstalled only when it changes |
-| `tests/` | `unittest` checks of the harness scripts (standard library only) |
+| `tests/` | `unittest` checks of the harness scripts and of `check-site.py` (standard library only) |
 | `.devcontainer/` | `Dockerfile`, `devcontainer.json`, `post-create.sh` (Section 10) |
 | `.vscode/` | Recommended extensions, settings, and every command as a task |
 | `.mcp.json` | Project MCP servers for Claude Code: Playwright |
@@ -369,16 +376,20 @@ harness) comes from thebox, which is versioned and released like any other repos
 - **`PUBLISH_PAGES` stays unset** in this repository: the GitHub Pages site here is the stage
   site, and `release.yml` would publish `master` on it.
 - **What the preview shows** (`npm run serve`, Playwright at 1280x800 and 390x844,
-  2026-11-23; screenshots in `.playwright-mcp/baseline/`, git-ignored):
-  - the tiles of the map, `https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/`
-    in `docs/assets/js/map.js`, answer HTTP 200 with an image that reads "API KEY REQUIRED,
-    carto.com/basemaps/apikey": the basemap is not shown;
+  2026-11-23; screenshots in `.playwright-mcp/`, git-ignored):
+  - fixed on 2026-11-23: the tiles of CARTO (`cartodb-basemaps-{s}.global.ssl.fastly.net`,
+    and `basemaps.cartocdn.com` alike) answered HTTP 200 with an image that reads "API KEY
+    REQUIRED" ([CARTO](https://carto.com/basemaps/apikey): a key is now needed); the map uses
+    the standard tiles of OpenStreetMap, as its
+    [tile usage policy](https://operations.osmfoundation.org/policies/tiles/) asks. `/about/`
+    loaded no style, because `_includes/head.html` linked `public/` relatively and the build
+    passes an empty `baseurl`; the links use `relative_url` now, and `npm run check:site`
+    fails on such a link;
   - a click anywhere on the map leads to `https://enjoy.theplanet.wtf`, whose name does not
     resolve (no DNS record);
-  - `/about/` loads no style of the theme: `_includes/head.html` links `public/css/*.css` and
-    `public/favicon.ico` relatively, so from `/about/` they become `/about/public/...` and
-    answer 404 (four console errors); its text is still the demo of Hyde;
-  - the home has no console error and no horizontal scroll at either size, and no link to
+  - the text of `/about/` is still the demo of Hyde, and its title is dark grey on the dark
+    grey of the content (low contrast);
+  - no console error and no horizontal scroll at either size; the home has no link to
     `/about/`; the font PT Sans is requested over `http` and upgraded by the browser.
 - **Merge settings of the repository** (GitHub API, 2026-11-23): squash, merge commits and
   rebase all allowed; squash title `COMMIT_OR_PR_TITLE` and message `COMMIT_MESSAGES`.
@@ -396,7 +407,7 @@ Open points:
   [GitHub Actions](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/)).
 - [ ] Clean up the site in `docs/` (owner, 2026-11-23): the demo text and links of Hyde
   (`about.md`, `docs/README.md`, the sidebar, `_config.yml`), `docs/CNAME`, `new_0/`, the
-  fonts loaded over `http`, the relative links to `public/`, the warning on `jekyll-paginate`,
+  fonts loaded over `http`, the click towards `enjoy.theplanet.wtf`, the warning on `jekyll-paginate`,
   what `build/pages/` publishes (`README.md`, `LICENSE.md`); then the `TEMPLATE` markers left
   (`npm run check:template -- --list`).
 - [ ] Older issues to plan with the owner: #1 (coverage map: colours from an API,

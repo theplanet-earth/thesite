@@ -19,9 +19,11 @@ that the owner squash-merges, each followed by a merge back down the chain
 
 - The site is the 2024 Jekyll prototype in `docs/` (Hyde theme on Poole, Leaflet map), folded
   in from the branches `glob_coverage` and `hyde_theme`, which were then deleted. It still
-  carries demo text of the theme and is to be cleaned up: the page `/about/` loads no style,
-  and the basemap of the map is not shown, because its tile provider (Carto) now requires an
-  API key (`CLAUDE.md`, *Known issues and TODO*).
+  carries demo text of the theme and is to be cleaned up (`CLAUDE.md`, *Known issues and
+  TODO*). The map shows the standard tiles of
+  [OpenStreetMap](https://operations.osmfoundation.org/policies/tiles/).
+- Next, on stage: a 3D globe in place of the map on the home page, then a model of the
+  mascot of the logo (`CLAUDE.md`, Section 2).
 - On 2026-11-23 neither address reaches the site: `theplanet.wtf` answers with a Cloudflare
   error, "DNS points to prohibited IP", and `theplanet.observer` has no DNS record yet. The
   steps for the owner are in issues #6 (Cloudflare) and #7 (GitHub).

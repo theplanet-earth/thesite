@@ -35,6 +35,7 @@ call the shell scripts in `scripts/`, so they also run without npm.
 | `npm run check` | Tests, confidentiality, `TEMPLATE` markers and the checks of this repository: **run it before every pull request** |
 | `npm run check:confidential` | Confidentiality guard on every tracked file |
 | `npm run check:template -- --list` | The `TEMPLATE` markers still to resolve, with their line |
+| `npm run check:site` | Every local link and resource of the built site (`build/pages/`) exists; part of `npm run check` once the site is built, and a step of CI after its build |
 | `npm run setup:python` | `.venv/` from `requirements.txt`, when the repository has one |
 | `npm run version:current` / `version:next` / `release:notes` | Version of this build, of the next release, and the notes of the next release |
 | `npm run clean` | Remove `build/` |

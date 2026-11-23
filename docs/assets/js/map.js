@@ -1,11 +1,12 @@
 var map = L.map('mapid').setView([41.8908, 12.4749], 15);
-// L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_nolabels/{z}/{x}/{y}.png', {
-    // attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    attribution: 'Map tiles by Carto, under CC BY 3.0. Data by OpenStreetMap, under ODbL.',
+// The standard tiles of OpenStreetMap, used as its tile usage policy asks: this exact URL, no
+// {s} subdomains, the attribution visible on the map, and the browser's own Referer
+// (https://operations.osmfoundation.org/policies/tiles/). The CARTO basemaps used until
+// 2026-11 now answer with an "API key required" image (https://carto.com/basemaps/apikey).
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 18,
     minZoom: 3,
-    subdomains: 'abc',
 }).addTo(map);
 var polygon = L.polygon([
   [41.89208, 12.47340],

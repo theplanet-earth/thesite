@@ -47,6 +47,10 @@ jobs:
       - name: Build
         run: npm run build
 
+      # The check of the built site (npm run check skips it before the build).
+      - name: Site check
+        run: npm run check:site
+
       - name: Version and release notes
         env:
           LABELS: ${{ join(github.event.pull_request.labels.*.name, ' ') }}
