@@ -1,5 +1,34 @@
 # thesite
 
+> [!CAUTION]
+> **What a Codespace of this repository is allowed to do.** Creating a Codespace from this
+> repository asks GitHub for the permissions below, written in
+> [.devcontainer/devcontainer.json](.devcontainer/devcontainer.json). GitHub shows them and
+> grants them **only if you click to authorize**; "Continue without authorizing" creates a
+> Codespace that can reach this repository only. They apply to new Codespaces only: a
+> rebuild does not add or remove them
+> ([GitHub documentation](https://docs.github.com/en/codespaces/managing-your-codespaces/managing-repository-access-for-your-codespaces)).
+> A local devcontainer ignores them and works with your own Git credentials.
+>
+> | Where | Granted | What it allows, to you and to any assistant working in the Codespace |
+> |---|---|---|
+> | This repository | Read and write, the default of every Codespace ([source](https://docs.github.com/en/codespaces/reference/security-in-github-codespaces)) | Push to any branch that is not protected, open pull requests and issues |
+> | Every other repository of `theplanet-earth` | **Write** on `issues` | **Open, edit, comment and close issues, in your name**, in every repository of the organization |
+> | Every other repository of `theplanet-earth` | Read on `actions`, `checks`, `contents`, `deployments`, `discussions`, `packages`, `pages`, `pull_requests`, `repository_projects`, `statuses` | Read the code, the pull requests, the workflow runs, the packages and the rest of every repository |
+> | Every other repository of `theplanet-earth` | Not granted: write on `contents`, `pull_requests`, `workflows`, administration, secrets | No push to another repository (no branch, no commit), no pull request, no change to its settings, no access to its secrets |
+>
+> So the Codespace of one repository talks to the others through issues only
+> ([CONTRIBUTING.md](CONTRIBUTING.md#branches-and-pull-requests)). The rules of
+> [CLAUDE.md](CLAUDE.md) also forbid an assistant to push to `stage` or `master` of this
+> repository, to merge into them or to force-push; the token of this repository does not,
+> and no ruleset protects its branches yet (issue #7): those rules are the only guard here.
+>
+> The Codespace also: enables the git hooks of `.githooks/` (the confidentiality guard),
+> installs the npm, Python and Ruby dependencies, the Chromium of the Playwright MCP server
+> (headless, run with `--no-sandbox`, `.mcp.json`) and the Claude Code skills of the user
+> (`scripts/install-skills.sh`), and installs Node, the GitHub CLI, Claude Code and Ruby as
+> devcontainer features.
+
 The project site of the GitHub organization **theplanet-earth**.
 
 ![The Pipeline](/docs/assets/images/theplanetearth.png)

@@ -12,9 +12,11 @@ of the GitHub organization **theplanet-earth**; what is specific to this reposit
    Container*). `.devcontainer/post-create.sh` enables the git hooks, installs the Node,
    Python and Ruby dependencies, the Chromium of the Playwright MCP server and the Claude Code
    skills of the user, and runs a first build.
-   When GitHub asks, at the creation of the Codespace, to authorize read access to the other
-   repositories of the organization (`theplanet-earth/*`), accept: assistants working in the
-   Codespace use it to read the repositories this one depends on.
+   When GitHub asks, at the creation of the Codespace, to authorize access to the other
+   repositories of the organization (`theplanet-earth/*`: read on everything, write on
+   issues), read the caution at the top of `README.md` first: assistants working in the
+   Codespace use that access to read the repositories this one depends on and to open
+   issues in them.
 2. Build with `npm run build` (or *Terminal, Run Task, Build*, `Ctrl+Shift+B`), check with
    `npm run check`.
 
@@ -85,6 +87,11 @@ call the shell scripts in `scripts/`, so they also run without npm.
 - The pull request template (`.github/pull_request_template.md`) is the checklist: build and
   checks green, tests, documentation aligned, no confidential material, screenshots when the
   appearance changed.
+- **Changes another repository needs.** From a Codespace of this repository, another
+  repository of the organization is never pushed to (the Codespace may not): the change is
+  asked with an issue opened there, which says what is needed and why and links back to
+  what needs it here. The owner, or an assistant in a Codespace of that repository, makes
+  the change there.
 
 ## Commits
 
