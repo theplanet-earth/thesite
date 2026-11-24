@@ -1,0 +1,12 @@
+{
+  // Keep identical to customizations.vscode.extensions in .devcontainer/devcontainer.json.
+  // TEMPLATE: the extensions of the tools of this repository.
+  "recommendations": [
+    "anthropic.claude-code",
+    "mhutchie.git-graph",
+    "github.vscode-github-actions",
+    "bierner.markdown-mermaid",
+    "streetsidesoftware.code-spell-checker",
+    "ms-python.python"
+  ]
+}

@@ -1,0 +1,69 @@
+# Stage: on every push to stage (the merge of a pull request from dev), build the site with
+# the command CI runs (npm run build) and deploy build/pages/ to the GitHub Pages site of
+# this repository, served at theplanet.wtf (CLAUDE.md, Section 1). Production, from master,
+# goes to a Cloudflare Worker at theplanet.observer (issue #2), never to this GitHub Pages
+# site: PUBLISH_PAGES stays unset in this repository.
+#
+# It replaces the 2024 workflow jekyll.yml of the branch hyde_theme (issue #5).
+name: Stage
+
+on:
+  push:
+    branches: [stage]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deployment at a time; a queued one waits for the running one to finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # A manual run deploys stage only, whatever branch it is started from.
+    if: github.ref == 'refs/heads/stage'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0   # tags and history, to compute the version
+
+      # No dependency cache in a workflow that publishes (release.yml).
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
+        with:
+          ruby-version: "3.3"
+          bundler-cache: false
+
+      - name: Toolchain
+        run: |
+          npm ci --no-audit --no-fund
+          npm run setup:python
+
+      - uses: actions/configure-pages@v6
+
+      - name: Build
+        run: npm run build
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: build/pages
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v5

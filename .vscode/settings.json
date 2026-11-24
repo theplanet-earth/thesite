@@ -1,0 +1,17 @@
+{
+  // The project commands are npm scripts and tasks (Terminal, Run Task). Python: the Python
+  // extension chooses by itself the .venv/ of the workspace (npm run setup:python, when the
+  // repository has a requirements.txt), otherwise the python3 of the system. Do not set
+  // python.defaultInterpreterPath to .venv/: while .venv/ does not exist it warns at every
+  // start (CLAUDE.md, Known issues).
+  // TEMPLATE: the settings of the tools of this repository.
+  "files.exclude": {
+    "**/.venv": true,
+    "**/node_modules": true,
+    "**/.playwright-mcp": true,
+    "**/__pycache__": true
+  },
+  "[markdown]": { "editor.wordWrap": "on" },
+  "cSpell.language": "en,en-GB",
+  "cSpell.words": ["thesite", "thebox", "theplanet", "devcontainer", "Codespace", "Codespaces", "githooks", "venv", "semver", "SHA256SUMS"]
+}

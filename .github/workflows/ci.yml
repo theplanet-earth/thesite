@@ -1,0 +1,83 @@
+# CI: on every pull request to stage or master (dev into stage, stage into master), run
+# every check and the build.
+# The job summary shows the version and the release notes that merging would publish,
+# and the TEMPLATE markers still to resolve.
+name: CI
+
+on:
+  pull_request:
+    branches: [stage, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0   # tags and history, to compute the version
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      # Ruby for the site (Jekyll), the same minor version as the devcontainer; the gems
+      # are installed by npm run build from docs/Gemfile.lock.
+      - uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
+        with:
+          ruby-version: "3.3"
+          bundler-cache: false
+
+      - name: Toolchain
+        run: |
+          npm ci --no-audit --no-fund
+          npm run setup:python
+
+      - name: Checks
+        run: npm run check
+
+      - name: Build
+        run: npm run build
+
+      # The check of the built site (npm run check skips it before the build).
+      - name: Site check
+        run: npm run check:site
+
+      - name: Version and release notes
+        env:
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ' ') }}
+        run: |
+          BUMP=""
+          for kind in major minor patch; do
+            if [[ " $LABELS " == *" release:$kind "* ]]; then BUMP="$kind"; break; fi
+          done
+          {
+            echo "## Next version"
+            echo
+            echo "\`$(python3 scripts/version.py next ${BUMP:+--bump "$BUMP"} 2> /dev/null || echo 'none: no changes')\`"
+            echo
+            python3 scripts/version.py notes ${BUMP:+--bump "$BUMP"}
+            echo
+            echo "## TEMPLATE markers"
+            echo
+            echo '```'
+            bash scripts/check-template.sh --list
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build
+          retention-days: 7
+          if-no-files-found: ignore
+          path: |
+            build/release/
+            build/pages/
