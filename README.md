@@ -49,8 +49,8 @@ that the owner squash-merges, each followed by a merge back down the chain
 - The site is Jekyll in `docs/` (the Hyde theme on Poole), grown from the 2024 prototype of
   the branches `glob_coverage` and `hyde_theme`. Released first as that prototype with its
   Leaflet map (`v0.1.0`, pull request #11); on `dev`, and next on stage, its home page is a
-  3D globe with the latest edits to OpenStreetMap (`CLAUDE.md`, Section 2), and the demo
-  text of the theme is gone.
+  3D globe with the latest edits to OpenStreetMap, kept current by the browser, explained on
+  `/globe/` (`CLAUDE.md`, Section 2), and the demo text of the theme is gone.
 - The mascot of the logo in 3D is kept in [`media/mascot/`](media/mascot/README.md), not used
   by the site.
 - On 2026-11-23 neither address reaches the site: `theplanet.wtf` answers with a Cloudflare
@@ -90,7 +90,10 @@ unset: the GitHub Pages site of this repository is the stage site.
   [Meshy](https://www.meshy.ai/) on a paid plan, so that it belongs to the organization
   ([terms of use](https://www.meshy.ai/terms-of-use), 3.2).
 - The latest edits to [OpenStreetMap](https://www.openstreetmap.org/), the orange spikes and
-  arcs: data © OpenStreetMap contributors, [ODbL](https://www.openstreetmap.org/copyright).
+  arcs, read by the build and then by the browser from the replication of changesets: data ©
+  OpenStreetMap contributors, [ODbL](https://www.openstreetmap.org/copyright).
+- The icon of GitHub in the sidebar: `mark-github` of
+  [Octicons](https://github.com/primer/octicons) 19.43.0, MIT licence.
 
 ## License
 
