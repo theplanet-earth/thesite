@@ -19,14 +19,17 @@
   <link rel="stylesheet" href="{{ '/public/css/syntax.css' | relative_url }}">
   <link rel="stylesheet" href="{{ '/public/css/hyde.css' | relative_url }}">
 
-  <!-- Fonts: PT Sans for the text (the theme), Roboto Mono for the logotype of the sidebar. -->
+  <!-- Fonts, as the prototype loads them (over https): PT Sans and Abril Fatface of the theme,
+       Roboto Mono for the logotype of the sidebar. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400&family=Roboto+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap">
 
   <!-- The project's own styles. -->
-  <link rel="stylesheet" href="{{ '/assets/css/theplanet.css' | relative_url }}">
-  <link rel="stylesheet" href="{{ '/assets/css/globe.css' | relative_url }}">
+  <!-- ?v= changes at every build, so that no browser keeps older styles. -->
+  <link rel="stylesheet" href="{{ '/assets/css/theplanet.css' | relative_url }}?v={{ site.time | date: '%s' }}">
+  <link rel="stylesheet" href="{{ '/assets/css/globe.css' | relative_url }}?v={{ site.time | date: '%s' }}">
 
   <link rel="apple-touch-icon" sizes="144x144" href="{{ '/public/apple-touch-icon.png' | relative_url }}">
   <link rel="icon" href="{{ '/public/favicon.ico' | relative_url }}">

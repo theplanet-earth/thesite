@@ -38,7 +38,7 @@ The project site of the GitHub organization **theplanet-earth**.
 | Environment | Branch | Address | Published by |
 |---|---|---|---|
 | Stage | `stage` | <https://theplanet.wtf/> | `.github/workflows/stage.yml`, on GitHub Pages, at every merge into `stage` |
-| Production | `master` | <https://theplanet.observer/> | A Cloudflare Worker with static assets, at every merge into `master` (not automated yet, issue #2) |
+| Production | `master` | <https://theplanet.observer/> | A Cloudflare Worker with static assets (`wrangler.jsonc`, `worker/`), at every merge into `master` (the deploy is not automated yet, issue #2) |
 
 Work happens on `dev`; `dev` goes into `stage`, and `stage` into `master`, by pull requests
 that the owner squash-merges, each followed by a merge back down the chain

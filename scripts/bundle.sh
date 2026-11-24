@@ -18,10 +18,9 @@ cd "$ROOT"
 # The MIT licence of three.js asks for its notice in every copy: published next to the bundle.
 mkdir -p docs/assets/bundle
 cp node_modules/three/LICENSE docs/assets/bundle/three.LICENSE.txt
-args=(src/globe/main.js --bundle --format=esm --target=es2020 --minify --legal-comments=eof
-  --outfile=docs/assets/bundle/globe.js --log-level=warning)
+# The options of esbuild, and the touch after each build of the watch: scripts/bundle.mjs.
 if [[ "${1:-}" == "--watch" ]]; then
-  exec "$ESBUILD" "${args[@]}" --watch=forever
+  exec node scripts/bundle.mjs --watch
 fi
-"$ESBUILD" "${args[@]}"
+node scripts/bundle.mjs
 log "bundle: docs/assets/bundle/globe.js ($(wc -c < docs/assets/bundle/globe.js) bytes)"

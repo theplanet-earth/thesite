@@ -35,4 +35,5 @@ body_class: home
 </section>
 <script type="application/json" id="coverage">{{ site.data.coverage | jsonify }}</script>
 <script type="application/json" id="activity">{{ site.data.activity | jsonify }}</script>
-<script type="module" src="{{ '/assets/bundle/globe.js' | relative_url }}"></script>
+<!-- ?v= changes at every build, so that no browser keeps an older bundle. -->
+<script type="module" src="{{ '/assets/bundle/globe.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>

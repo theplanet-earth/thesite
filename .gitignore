@@ -25,6 +25,8 @@ private/
 /docs/assets/bundle/
 # The latest edits to OpenStreetMap, read at every build by scripts/osm-activity.py
 /docs/_data/activity.json
+# wrangler: its local state, and the bundle of npm run worker:check
+/.wrangler/
 # Jekyll and Bundler, when run by hand in docs/ (the scripts write to build/ only)
 /docs/_site/
 /docs/.jekyll-cache/

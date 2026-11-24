@@ -11,10 +11,11 @@ anywhere, each taller the more it changed. Arcs join them in the order they were
 orange ring marks the Isola Tiberina, in Rome, where the map of the 2024 prototype began. Drag
 the globe, or use the arrow keys, to turn it.
 
-**The edits** come with the site, read when it is built, then from your browser once a minute
-while the globe is in view: the new files of the
-[replication of changesets](https://planet.openstreetmap.org/replication/changesets/), served by
-OpenStreetMap and a mirror on Amazon S3, never its editing API, which is not for reading
+**The edits** come with the site, read when it is built, then again every 19 minutes while
+the globe is in view: from the server of this site, which reads the
+[replication of changesets](https://planet.openstreetmap.org/replication/changesets/) once for
+every visitor, or, where there is none, by your browser from the replication itself (served by
+OpenStreetMap and a mirror on Amazon S3); never from the editing API, which is not for reading
 ([usage policy](https://operations.osmfoundation.org/policies/api/)). Of each changeset only
 the centre (to about 1 km), the number of changes and the time are kept, never the mapper.
 
