@@ -31,7 +31,7 @@
 
 The project site of the GitHub organization **theplanet-earth**.
 
-![The Pipeline](/docs/assets/images/theplanetearth.png)
+![The Pipeline](media/theplanetearth.png)
 
 ## Environments
 
@@ -46,14 +46,13 @@ that the owner squash-merges, each followed by a merge back down the chain
 
 ## Status
 
-- The site is the 2024 Jekyll prototype in `docs/` (Hyde theme on Poole, Leaflet map), folded
-  in from the branches `glob_coverage` and `hyde_theme`, which were then deleted. It still
-  carries demo text of the theme and is to be cleaned up (`CLAUDE.md`, *Known issues and
-  TODO*). The map shows the standard tiles of
-  [OpenStreetMap](https://operations.osmfoundation.org/policies/tiles/).
-- Next, on stage: a 3D globe in place of the map on the home page, with the latest edits to
-  OpenStreetMap (`CLAUDE.md`, Section 2). The mascot of the logo in 3D is kept in
-  [`media/mascot/`](media/mascot/README.md), not used by the site.
+- The site is Jekyll in `docs/` (the Hyde theme on Poole), grown from the 2024 prototype of
+  the branches `glob_coverage` and `hyde_theme`. Released first as that prototype with its
+  Leaflet map (`v0.1.0`, pull request #11); on `dev`, and next on stage, its home page is a
+  3D globe with the latest edits to OpenStreetMap (`CLAUDE.md`, Section 2), and the demo
+  text of the theme is gone.
+- The mascot of the logo in 3D is kept in [`media/mascot/`](media/mascot/README.md), not used
+  by the site.
 - On 2026-11-23 neither address reaches the site: `theplanet.wtf` answers with a Cloudflare
   error, "DNS points to prohibited IP", and `theplanet.observer` has no DNS record yet. The
   steps for the owner are in issues #6 (Cloudflare) and #7 (GitHub).

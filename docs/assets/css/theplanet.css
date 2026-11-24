@@ -35,3 +35,39 @@
     font-weight: 400; /* Regular font weight */
     /* Additional styling */
 }
+/* The logo of the sidebar is the link to the home page. */
+.sidebar-logo,
+.sidebar-logo:hover,
+.sidebar-logo:focus {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.sidebar-logo img {
+    display: block;
+    max-width: 100%;
+}
+
+/* Contrast on the dark grey of the content: the theme left page titles dark grey and links
+   a blue of contrast 2.6:1; WCAG 2.2 asks 4.5:1 for text (success criterion 1.4.3). */
+.page-title {
+    color: #eee;
+}
+
+.content a {
+    color: #9cd3ff;
+}
+
+.content a:focus-visible {
+    outline: 2px solid #9ccc65;
+    outline-offset: 2px;
+}
+
+/* The sidebar is fixed on wide screens: when its logo, logotype and pages do not fit the
+   height of the window, it scrolls, so that nothing in it is out of reach. */
+@media (min-width: 48em) {
+    .sidebar {
+        overflow-y: auto;
+    }
+}

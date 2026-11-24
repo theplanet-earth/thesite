@@ -1,30 +1,34 @@
 ---
 layout: page
 title: About
+description: What this site is, what its globe shows, and the work it is made of.
 ---
 
-<p class="message">
-  Hey there! This page is included as an example. Feel free to customize it for your own use upon downloading. Carry on!
-</p>
+This is the project site of [theplanet.earth](https://github.com/theplanet-earth), an
+organization on GitHub. Its source is the public repository
+[theplanet-earth/thesite]({{ site.github.repo }}).
 
-In the novel, *The Strange Case of Dr. Jeykll and Mr. Hyde*, Mr. Poole is Dr. Jekyll's virtuous and loyal butler. Similarly, Poole is an upstanding and effective butler that helps you build Jekyll themes. It's made by [@mdo](https://twitter.com/mdo).
+## The globe
 
-There are currently two themes built on Poole:
+The home page shows the Earth as a globe of dots, built on the techniques that Tobias Ahlin
+describes in
+[How we built the GitHub globe](https://github.blog/engineering/engineering-principles/how-we-built-the-github-globe/)
+(GitHub, 2020). Where the GitHub globe draws pull requests being opened and merged, this one
+draws the latest edits to [OpenStreetMap](https://www.openstreetmap.org/): each orange spike
+is an edit, taller the more it changed, and the arcs join the edits in the order they were
+made. The edits are read when the site is built, from the
+[minutely replication of changesets](https://planet.openstreetmap.org/replication/changesets/);
+the site keeps only where, how much and when, never who. The orange ring marks the place
+where the map of the 2024 prototype of this site began: the Isola Tiberina, in Rome.
 
-* [Hyde](http://hyde.getpoole.com)
-* [Lanyon](http://lanyon.getpoole.com)
+Drag the globe, or focus it and use the arrow keys, to turn it.
 
-Learn more and contribute on [GitHub](https://github.com/poole).
+## Made with
 
-## Setup
-
-Some fun facts about the setup of this project include:
-
-* Built for [Jekyll](http://jekyllrb.com)
-* Developed on GitHub and hosted for free on [GitHub Pages](https://pages.github.com)
-* Coded with [Sublime Text 2](http://sublimetext.com), an amazing code editor
-* Designed and developed while listening to music like [Blood Bros Trilogy](https://soundcloud.com/maddecent/sets/blood-bros-series)
-
-Have questions or suggestions? Feel free to [open an issue on GitHub](https://github.com/poole/issues/new) or [ask me on Twitter](https://twitter.com/mdo).
-
-Thanks for reading!
+- [three.js](https://threejs.org/), MIT licence, for the globe;
+- [Natural Earth](https://www.naturalearthdata.com/), public domain, for the land;
+- [OpenStreetMap](https://www.openstreetmap.org/copyright), data © OpenStreetMap
+  contributors, ODbL, for the edits;
+- [Jekyll](https://jekyllrb.com/), and the [Hyde](https://github.com/poole/hyde) theme on
+  [Poole](https://github.com/poole/poole) by Mark Otto, MIT licence
+  ([licence]({{ '/public/LICENSE.md' | relative_url }})).

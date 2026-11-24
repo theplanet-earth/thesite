@@ -1,41 +1,25 @@
 <div class="sidebar">
-  <!-- <div class="container sidebar-sticky"> -->
   <div class="container">
     <div class="sidebar-about roboto-mono-sidebar">
-      <div>
-        <img src="/assets/images/theplanet.png " alt="The walkin planet" style="max-width: 100%; vertical-align: text-top;">
-      </div>
-      <h1>
-        <!-- <a href="{{ site.baseurl }}"> -->
-          <!-- {{ site.title }} -->
-          THE<br>PLA<br>NET<br>
-        <!-- </a> -->
-      </h1>
-      <!-- <p class="lead">{{ site.description }}</p> -->
+      <a href="{{ '/' | relative_url }}" class="sidebar-logo">
+        <img src="{{ '/assets/images/theplanet.png' | relative_url }}" alt="The mascot of the project: the Earth walking, with a cap and sunglasses">
+        <h1>THE<br>PLA<br>NET</h1>
+      </a>
     </div>
 
-    <!-- <nav class="sidebar-nav">
-      <a class="sidebar-nav-item{% if page.url == site.baseurl %} active{% endif %}" href="{{ site.baseurl }}">Home</a>
+    <nav class="sidebar-nav" aria-label="Pages">
+      {%- assign home = '/' | relative_url %}
+      <a class="sidebar-nav-item{% if page.url == '/' %} active{% endif %}" href="{{ home }}"{% if page.url == '/' %} aria-current="page"{% endif %}>Home</a>
+      {%- for node in site.pages %}
+        {%- if node.layout == "page" and node.title %}
+      <a class="sidebar-nav-item{% if page.url == node.url %} active{% endif %}" href="{{ node.url | relative_url }}"{% if page.url == node.url %} aria-current="page"{% endif %}>{{ node.title }}</a>
+        {%- endif %}
+      {%- endfor %}
+      <a class="sidebar-nav-item" href="{{ site.github.repo }}">Source on GitHub</a>
+    </nav>
 
-      {% comment %}
-        The code below dynamically generates a sidebar nav of pages with
-        `layout: page` in the front-matter. See readme for usage.
-      {% endcomment %}
-
-      {% assign pages_list = site.pages %}
-      {% for node in pages_list %}
-        {% if node.title != null %}
-          {% if node.layout == "page" %}
-            <a class="sidebar-nav-item{% if page.url == node.url %} active{% endif %}" href="{{ node.url }}">{{ node.title }}</a>
-          {% endif %}
-        {% endif %}
-      {% endfor %}
-
-      <a class="sidebar-nav-item" href="{{ site.github.repo }}/archive/v{{ site.version }}.zip">Download</a>
-      <a class="sidebar-nav-item" href="{{ site.github.repo }}">GitHub project</a>
-      <span class="sidebar-nav-item">Currently v{{ site.version }}</span>
-    </nav> -->
-
+    <!-- TODO: "All rights reserved" against the Apache License 2.0 of the repository is
+         reported to the owner (CLAUDE.md, Section 12), not changed here. -->
     <p>&copy; {{ site.time | date: '%Y' }}. All rights reserved.</p>
   </div>
 </div>

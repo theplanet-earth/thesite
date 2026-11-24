@@ -11,8 +11,8 @@ run() {
 
 run "unit tests"         bash scripts/test.sh
 run "confidentiality"    python3 scripts/check-confidential.py --all
-# Add --strict once every marker is resolved, so that CI fails if one comes back.
-run "template markers"   bash scripts/check-template.sh
+# Every marker is resolved (2026-11-24): --strict makes CI fail if one comes back.
+run "template markers"   bash scripts/check-template.sh --strict
 # The checks of this repository: the built site (scripts/check-site.py), which needs
 # build/pages/; CI runs its checks before its build, then this one again after it (ci.yml).
 if [[ -d "$BUILD/pages" ]]; then

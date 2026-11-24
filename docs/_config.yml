@@ -1,30 +1,13 @@
-# Dependencies
-# markdown:         redcarpet
-highlighter:      pygments
+# The site of the organization theplanet-earth (README.md). scripts/build.sh builds it with
+# an empty baseurl, for the domain root of both environments (CLAUDE.md, Section 1); every
+# local link goes through relative_url.
+title: The Planet
+tagline: Earth
+description: >-
+  The project site of theplanet.earth: a globe of the Earth with the latest edits to
+  OpenStreetMap.
 
-# Permalinks
-permalink:        pretty
-# relative_permalinks: true
-
-# Setup
-title:            The Planet
-tagline:          'Earth'
-description:      'A brazen two-column <a href="http://jekyllrb.com" target="_blank">Jekyll</a> theme that pairs a prominent sidebar with uncomplicated content. Made by <a href="https://twitter.com/mdo" target="_blank">@mdo</a>.'
-url:              http://hyde.getpoole.com
-baseurl:          /
-
-author:
-  name:           'The Team'
-  url:            https://twitter.com/theplanet-earth
-
-paginate:         5
-
-# Custom vars
-version:          2.1.0
+permalink: pretty
 
 github:
-  repo:           https://github.com/theplanet-earth/thesite
-
-# # Added by me
-#  plugins:
-#      - jekyll-leaflet
+  repo: https://github.com/theplanet-earth/thesite

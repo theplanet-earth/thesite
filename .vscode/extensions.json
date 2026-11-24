@@ -1,6 +1,7 @@
 {
   // Keep identical to customizations.vscode.extensions in .devcontainer/devcontainer.json.
-  // TEMPLATE: the extensions of the tools of this repository.
+  // The tools of this repository (Jekyll, three.js through esbuild, Python and Node tests) need
+  // no extension beyond those of the harness.
   "recommendations": [
     "anthropic.claude-code",
     "mhutchie.git-graph",
