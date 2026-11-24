@@ -91,6 +91,15 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   home of stage (the coverage of issue #1 will come as points and arcs on the globe); Meshy
   on a **paid plan**, so the generated models belong to the organization (Meshy terms, 3.2),
   "procedi"; nothing done yet on issues #6 and #7.
+- 2026-11-23, "aggiungi una issue per cambiare la licenza di questa repo (apri una issue
+  analoga per tutte le altre repo dell'org) mettendo a confronto diverse licenze papabili per
+  la repo e spiegandone il motivo e le differenze tra queste": issue #10 here; the same issue
+  in every other repository of the organization, which a Codespace may open only with the
+  permission below (Section 12).
+- 2026-11-24, "modifica il devcontainer per avere il permesso di aprire issue su tutte le repo
+  dell'org": the devcontainer asks for write on the `issues` of every repository of the
+  organization, read on the rest, and nothing more (Section 10); the caution at the top of
+  `README.md` lists what it allows. It applies to the Codespaces created after the change.
 
 Rules of the organization, carried over from thebox or from its issues (keep them unless the
 owner decides otherwise):
@@ -148,7 +157,7 @@ owner decides otherwise):
 | `scripts/check-site.py` | Check of the built site: every local link and resource of `build/pages/` exists (`npm run check:site`) |
 | `scripts/version.py` | Version, next version and release notes from the tags and the commits |
 | `scripts/setup-python.sh` | `.venv/` from `requirements.txt`, reinstalled only when it changes |
-| `tests/` | `unittest` checks of the harness scripts, of `check-site.py` and of `land-mask.py` (standard library only); `globe.test.mjs`, the pure part of the globe (`node --test`) |
+| `tests/` | `unittest` checks of the harness scripts, of `check-site.py`, of `land-mask.py` and of the permissions of the devcontainer (standard library only); `globe.test.mjs`, the pure part of the globe (`node --test`) |
 | `src/globe/` | The globe of the home page: `geometry.js` (dots of the land, starting longitude, quality tiers; no three.js), `main.js` (the three.js scene) |
 | `package.json`, `package-lock.json` | Also the dependencies of the site, pinned: three.js and esbuild (Section 10) |
 | `.devcontainer/` | `Dockerfile`, `devcontainer.json`, `post-create.sh` (Section 10) |
@@ -279,9 +288,15 @@ The rules are in `CONTRIBUTING.md`, *Confidentiality*. In addition:
   trusted; `/plugin` shows it); `scripts/install-skills.sh` copies `security-audit` of
   Cloudflare into `~/.claude/skills/`, so that nothing of it lands in the repository (issue
   #4).
-- The devcontainer requests **read access to every repository of the organization**
-  (`customizations.codespaces.repositories`), so that an assistant can read the repositories
-  this one depends on.
+- The devcontainer requests **read access to every repository of the organization and write
+  on their `issues`** (`customizations.codespaces.repositories`), so that an assistant can
+  read the repositories this one depends on and ask them for changes with issues (Section
+  2); it cannot push to them nor open pull requests there. GitHub asks the user to authorize
+  them when a Codespace is created; the caution at the top of `README.md` lists what they
+  allow, and is updated in the same change as the permissions
+  (`tests/test_devcontainer_permissions.py` checks both). thebox issue #2 proposes the same
+  for every repository, with write on `pull_requests` too, from the owner's decision of
+  2026-11-15; thesite asks for `issues` only, as the owner asked.
 - **Extensions** (`devcontainer.json` and `.vscode/extensions.json`, kept identical): Claude
   Code, Git Graph (branches and release tags), GitHub Actions, Markdown Mermaid, Code Spell
   Checker, Python.
@@ -327,7 +342,11 @@ harness) comes from thebox, which is versioned and released like any other repos
   `dev`, `stage`, `master` of issue #5, a rule of the whole organization (`ci.yml` triggers,
   `CONTRIBUTING.md`, *Branches and pull requests*, Sections 2 and 9 of this file); the
   workflow `stage.yml`; the note on `PUBLISH_PAGES` in `release.yml`; the Ruby step of the
-  workflows; `scripts/serve.sh`, `scripts/install-skills.sh` and `.claude/settings.json`.
+  workflows; `scripts/serve.sh`, `scripts/install-skills.sh` and `.claude/settings.json`;
+  the permissions of `devcontainer.json` on the organization, with the caution of
+  `README.md`, `tests/test_devcontainer_permissions.py` and the paragraphs of
+  `CONTRIBUTING.md` (*Getting started*, *Changes another repository needs*), a subset of
+  the patch of thebox issue #2, not yet in a release of thebox.
 
 ## 12. Known issues and TODO
 
@@ -337,7 +356,12 @@ harness) comes from thebox, which is versioned and released like any other repos
   a fine-grained token with read access as `GH_TOKEN`, which `gh` prefers. The token of a
   Codespace cannot list the packages of the organization on the GHCR (HTTP 403), nor see
   workflow runs older than GitHub's retention. The Codespace created on `dev` on 2026-11-23,
-  with the access authorized, reads thebox.
+  with the access authorized, reads thebox but cannot open issues there: on 2026-11-24
+  `gh issue create` in thebox answered HTTP 403, "Resource not accessible by integration".
+  Write on issues needs a Codespace created after the change of the devcontainer of
+  2026-11-24, with the access authorized: GitHub applies changed permissions to new
+  Codespaces only, "even if you rebuild the codespace"
+  ([GitHub documentation](https://docs.github.com/en/codespaces/managing-your-codespaces/managing-repository-access-for-your-codespaces)).
 - **Git LFS hooks**: Codespaces writes Git LFS hooks in `.git/hooks` that abort every push when
   `git-lfs` is not installed; `core.hooksPath .githooks` makes git ignore them.
 - **Python interpreter in VS Code**: `.vscode/settings.json` does not set
@@ -431,6 +455,11 @@ Open points:
 - [ ] Owner: the merge settings and the ruleset of the repository (issue #7), so that the
   squash along the chain takes the pull request title and no list of commits.
 - [ ] The globe on the home of the stage site (Section 2): done on the branch `globe`, whose
-  pull request into `dev` waits for the first release (`stage` into `master`), so that
-  production gets the prototype. Next: the places of issue #1 as points and arcs.
-- [ ] The mascot from Meshy (Section 2): `MESHY_API_KEY` is not set in the Codespace yet.
+  pull request into `dev` (#9) waits for the first release (`stage` into `master`, #11), so
+  that production gets the prototype. Next: the places of issue #1 as points and arcs.
+- [ ] The mascot from Meshy (Section 2): on the branch `mascot`.
+- [ ] The license of every repository (owner, 2026-11-23): issue #10 compares the candidates
+  for thesite; the same issue, "Change the license: candidate licenses compared", is still
+  to be opened in the other 15 repositories of the organization from a Codespace created
+  after 2026-11-24, then the issue of thebox, which holds the overview, links them all and
+  #10 links it. Then the owner decides, repository by repository.

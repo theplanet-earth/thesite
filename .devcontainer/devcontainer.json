@@ -36,11 +36,29 @@
     },
     "codespaces": {
       "openFiles": ["README.md", "CLAUDE.md"],
-      // Read access to every repository of the organization, granted when the Codespace is
-      // created (CLAUDE.md, Known issues).
+      // Access to every other repository of the organization, requested when a Codespace is
+      // created and granted only if the user authorizes it (the caution at the top of
+      // README.md lists what it allows). Read on everything, write on issues only: from here
+      // an assistant asks for a change in another repository with an issue, never by pushing
+      // to it (the owner's instruction of 2026-11-24, CLAUDE.md Section 2). Without write on
+      // contents it cannot push a branch there. GitHub accepts "read-all" or a list, not
+      // both; the names and values are those of
+      // https://docs.github.com/en/codespaces/managing-your-codespaces/managing-repository-access-for-your-codespaces
       "repositories": {
         "theplanet-earth/*": {
-          "permissions": "read-all"
+          "permissions": {
+            "actions": "read",
+            "checks": "read",
+            "contents": "read",
+            "deployments": "read",
+            "discussions": "read",
+            "issues": "write",
+            "packages": "read",
+            "pages": "read",
+            "pull_requests": "read",
+            "repository_projects": "read",
+            "statuses": "read"
+          }
         }
       }
     }
