@@ -9,7 +9,8 @@ title: Home
   <!-- The globe (src/globe/, bundled into /assets/bundle/globe.js): the land mask comes from
        scripts/land-mask.py, the places from _data/coverage.yml. -->
   <div class="globe" data-globe data-land="{{ '/assets/globe/land.png' | relative_url }}"
-       data-label="A globe of the Earth, with the land drawn as dots and the covered places as orange rings. Drag it, or use the arrow keys, to turn it.">
+       data-mascot="{{ '/assets/models/mascot/mascot-walking.glb' | relative_url }}"
+       data-label="The mascot of the project walking, its body a globe of the Earth with the land drawn as dots and the covered places as orange rings. Drag it, or use the arrow keys, to turn the globe.">
     <div class="globe-placeholder" aria-hidden="true"></div>
     <p class="globe-fallback">The globe needs WebGL, which this browser does not offer.</p>
   </div>
@@ -19,6 +20,8 @@ title: Home
     by Tobias Ahlin (GitHub, 2020), rebuilt with <a href="https://threejs.org/">three.js</a>
     (<a href="{{ '/assets/bundle/three.LICENSE.txt' | relative_url }}">MIT licence</a>).
     Land: <a href="https://www.naturalearthdata.com/">Natural Earth</a>, public domain.
+    The walking mascot is a model generated with <a href="https://www.meshy.ai/">Meshy</a> from
+    the logo of the project.
   </p>
 </section>
 <script type="application/json" id="coverage">{{ site.data.coverage | jsonify }}</script>

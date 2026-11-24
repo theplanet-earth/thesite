@@ -67,6 +67,63 @@ export function startLongitude(timezoneOffsetMinutes) {
 }
 
 /**
+ * Rows of dots for a globe drawn with a radius of `radiusPixels` CSS pixels: a dot every
+ * `spacing` pixels along a meridian, so that a small globe (the body of the mascot) does not
+ * crowd its dots into a moiré, within [min, max].
+ */
+export function rowsFor(radiusPixels, { spacing = 4.5, min = 48, max = 180 } = {}) {
+  const rows = Math.round((Math.PI * radiusPixels) / spacing);
+  return Math.min(max, Math.max(min, Number.isFinite(rows) ? rows : max));
+}
+
+/**
+ * The sphere that best fits points given as [x, y, z], by least squares on
+ * x² + y² + z² = 2ax + 2by + 2cz + d: { center: [a, b, c], radius }.
+ */
+export function fitSphere(points) {
+  const A = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]];
+  const b = [0, 0, 0, 0];
+  for (const [x, y, z] of points) {
+    const row = [2 * x, 2 * y, 2 * z, 1];
+    const t = x * x + y * y + z * z;
+    for (let i = 0; i < 4; i += 1) {
+      b[i] += row[i] * t;
+      for (let j = 0; j < 4; j += 1) A[i][j] += row[i] * row[j];
+    }
+  }
+  // Gaussian elimination with partial pivoting on the 4 by 4 normal equations.
+  const M = A.map((row, i) => [...row, b[i]]);
+  for (let c = 0; c < 4; c += 1) {
+    let pivot = c;
+    for (let r = c + 1; r < 4; r += 1) if (Math.abs(M[r][c]) > Math.abs(M[pivot][c])) pivot = r;
+    [M[c], M[pivot]] = [M[pivot], M[c]];
+    for (let r = 0; r < 4; r += 1) {
+      if (r === c) continue;
+      const f = M[r][c] / M[c][c];
+      for (let k = c; k < 5; k += 1) M[r][k] -= f * M[c][k];
+    }
+  }
+  const [cx, cy, cz, d] = M.map((row, i) => row[4] / row[i]);
+  return { center: [cx, cy, cz], radius: Math.sqrt(d + cx * cx + cy * cy + cz * cz) };
+}
+
+/**
+ * The sphere of the bulk of the points, when some of them belong to something else (the
+ * body of the mascot under its cap and glasses): fit, keep the points near the surface,
+ * fit again, with a tolerance that narrows at each round.
+ */
+export function fitBody(points, { rounds = 6, from = 0.2, to = 0.04 } = {}) {
+  let sphere = fitSphere(points);
+  for (let round = 0; round < rounds; round += 1) {
+    const tolerance = from + ((to - from) * round) / Math.max(1, rounds - 1);
+    const near = points.filter((p) => Math.abs(Math.hypot(p[0] - sphere.center[0], p[1] - sphere.center[1], p[2] - sphere.center[2]) - sphere.radius) < tolerance * sphere.radius);
+    if (near.length < 8) break;
+    sphere = fitSphere(near);
+  }
+  return sphere;
+}
+
+/**
  * Watches the duration of the frames and says when to lower the quality: when the last
  * `size` frames averaged fewer than `minFps` frames a second (the article: 55.5 over 50
  * frames). After a drop, the window starts again, so that the next tier gets its own chance.

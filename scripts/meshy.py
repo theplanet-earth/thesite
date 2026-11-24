@@ -7,6 +7,8 @@
 Steps (https://docs.meshy.ai/en/api/image-to-3d, https://docs.meshy.ai/en/api/rigging):
   1. Image to 3D: the logo (docs/assets/images/theplanet.png) as a data URI, a textured
      model in T-pose (easier to rig), remeshed to 30,000 triangles for the web, GLB only;
+     on 2026-11-24 the model kept the walking pose of the logo all the same, and rigging
+     worked (CLAUDE.md, Section 12);
   2. Rigging of that task (a biped skeleton), which also returns a walking and a running
      animation;
   3. the GLB files downloaded into DIR (build/meshy/<date>/ by default, git-ignored), with

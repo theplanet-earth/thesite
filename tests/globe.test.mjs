@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { FrameMonitor, TIERS, isLand, landDots, startLongitude, toCartesian } from '../src/globe/geometry.js';
+import { FrameMonitor, TIERS, fitBody, fitSphere, isLand, landDots, rowsFor, startLongitude, toCartesian } from '../src/globe/geometry.js';
 
 // A mask like the result of getImageData: land (red 255) only east of Greenwich in the north.
 function mask(width = 36, height = 18) {
@@ -77,6 +77,43 @@ test('FrameMonitor looks at the last 50 frames only', () => {
   for (let i = 0; i < 10; i += 1) dropped = monitor.record(16) || dropped;
   assert.equal(dropped, true); // the average of the window is under 55.5 frames a second
   for (let i = 0; i < 50; i += 1) assert.equal(monitor.record(16), false);
+});
+
+// Points on a sphere, spread by a golden-angle spiral (deterministic).
+function spherePoints(center, radius, count) {
+  const points = [];
+  for (let i = 0; i < count; i += 1) {
+    const y = 1 - (2 * (i + 0.5)) / count;
+    const r = Math.sqrt(1 - y * y);
+    const a = i * Math.PI * (3 - Math.sqrt(5));
+    points.push([center[0] + radius * r * Math.cos(a), center[1] + radius * y, center[2] + radius * r * Math.sin(a)]);
+  }
+  return points;
+}
+
+test('fitSphere finds the centre and the radius of points on a sphere', () => {
+  const { center, radius } = fitSphere(spherePoints([0.05, 1.13, -0.04], 0.46, 500));
+  close(+center[0].toFixed(9), 0.05); close(+center[1].toFixed(9), 1.13); close(+center[2].toFixed(9), -0.04);
+  close(+radius.toFixed(9), 0.46);
+});
+
+test('fitBody ignores a cap on top of the sphere', () => {
+  const body = spherePoints([0, 1, 0], 0.5, 2000);
+  // A cap: a dense cluster above the sphere, a third as many points.
+  const cap = spherePoints([0, 1.55, -0.1], 0.25, 700).filter((p) => p[1] > 1.45);
+  const plain = fitSphere([...body, ...cap]);
+  const robust = fitBody([...body, ...cap]);
+  const error = (s) => Math.hypot(s.center[0], s.center[1] - 1, s.center[2]) + Math.abs(s.radius - 0.5);
+  assert.ok(error(robust) < 0.01, `robust fit off by ${error(robust)}`);
+  assert.ok(error(robust) < error(plain) / 3, 'the robust fit is much closer than the plain one');
+});
+
+test('rowsFor spaces the dots by the size of the globe on screen', () => {
+  assert.equal(rowsFor(258), 180); // the globe alone, 560 px wide: the first tier
+  assert.equal(rowsFor(130), 91); // the body of the mascot
+  assert.equal(rowsFor(20), 48); // never fewer than min
+  assert.equal(rowsFor(130, { max: 60 }), 60); // never more than the tier allows
+  assert.equal(rowsFor(Number.NaN), 180);
 });
 
 test('TIERS lower the pixel ratio, then the dots', () => {
