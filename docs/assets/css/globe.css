@@ -1,8 +1,9 @@
 /* The globe of the home page (docs/index.html, src/globe/main.js). */
 .globe {
   position: relative;
-  /* As wide as the content, but never taller than most of the window. */
-  width: min(100%, 42rem, 70vh);
+  /* As wide as the content, and short enough for the heading and the caption to fit in the
+     window with it, without scrolling (the owner, 2026-11-24). */
+  width: min(100%, 42rem, calc(100svh - 12rem));
   aspect-ratio: 1;
   margin: 0 auto;
 }
@@ -51,15 +52,15 @@
   display: block;
 }
 
-.globe-credits {
-  max-width: 42rem;
-  margin: 1rem auto 2rem;
-  font-size: 0.8rem;
-  line-height: 1.5;
-  color: #bbb;
-  text-align: center;
+.globe-heading {
+  margin: 0 0 0.25rem;
 }
 
-.globe-credits a {
-  color: #9cd3ff;
+.globe-caption {
+  max-width: 42rem;
+  margin: 0.5rem auto 0;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: #bbb;
+  text-align: center;
 }

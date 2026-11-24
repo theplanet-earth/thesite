@@ -39,6 +39,7 @@ import {
 } from 'three';
 
 import { DEG, FrameMonitor, TIERS, arcControlPoints, landDots, relay, spikeHeight, startLongitude, toCartesian } from './geometry.js';
+import { liveEdits } from './live.js';
 
 const RADIUS = 1;
 const TILT = 0.35; // radians, to show a little more of the northern hemisphere
@@ -116,15 +117,28 @@ function readMask(url) {
   });
 }
 
-// The latest edits to OpenStreetMap (scripts/osm-activity.py, at build time), as { lat, lon,
-// changes, closed }; none when the build had no network.
+// The snapshot of the latest edits to OpenStreetMap, made by the build (scripts/osm-activity.py):
+// { edits: [{ lat, lon, changes, closed }], sequence }; no edits when the build had no network.
+// live.js keeps it current while the globe is shown.
 function readActivity() {
   try {
     const activity = JSON.parse(document.getElementById('activity')?.textContent || 'null');
     const edits = Array.isArray(activity?.edits) ? activity.edits : [];
-    return edits.filter((e) => Number.isFinite(e.lat) && Number.isFinite(e.lon));
+    return { edits: edits.filter((e) => Number.isFinite(e.lat) && Number.isFinite(e.lon)), sequence: activity?.sequence };
   } catch {
-    return [];
+    return { edits: [], sequence: null };
+  }
+}
+
+// The caption under the globe: how many edits, and as of when, in the time zone of the visitor.
+const CAPTION_TIME = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
+function showCaption(count, asOf) {
+  for (const element of document.querySelectorAll('[data-edits-sentence]')) element.hidden = false;
+  for (const element of document.querySelectorAll('[data-edits-missing]')) element.remove();
+  for (const element of document.querySelectorAll('[data-edits-count]')) element.textContent = String(count);
+  for (const element of document.querySelectorAll('[data-edits-time]')) {
+    element.setAttribute('datetime', asOf.toISOString());
+    element.textContent = CAPTION_TIME.format(asOf);
   }
 }
 
@@ -198,7 +212,8 @@ function spikesMesh(edits) {
 
 // The arcs between consecutive edits, drawn by growing and then withdrawing the draw range of
 // a tube along a cubic Bezier curve (the technique of the article).
-function arcsLayer(pairs, parent, reducedMotion) {
+function arcsLayer(initialPairs, parent, reducedMotion) {
+  let pairs = initialPairs;
   const material = new MeshBasicMaterial({ color: COLORS.place });
   const ringGeometry = new RingGeometry(0.012, 0.017, 40);
   const live = [];
@@ -214,9 +229,28 @@ function arcsLayer(pairs, parent, reducedMotion) {
     parent.add(mesh);
     live.push({ mesh, born: time, total, to: pair[1], landed: full, ring: null });
   };
+  const clear = () => {
+    for (const arc of live.splice(0)) {
+      parent.remove(arc.mesh);
+      arc.mesh.geometry.dispose();
+      if (arc.ring) {
+        parent.remove(arc.ring);
+        arc.ring.material.dispose();
+      }
+    }
+  };
   if (reducedMotion) pairs.slice(-ARC_STILL).forEach((pair) => spawn(pair, 0, true));
   return {
     count: () => live.length,
+    // New edits: the relay goes on through them; the arcs already drawn finish their course.
+    setPairs(nextPairs) {
+      pairs = nextPairs;
+      next = 0;
+      if (reducedMotion) {
+        clear();
+        pairs.slice(-ARC_STILL).forEach((pair) => spawn(pair, 0, true));
+      }
+    },
     update(time) {
       if (reducedMotion || !pairs.length) return;
       const seconds = time / 1000;
@@ -333,10 +367,35 @@ async function start(container) {
   spin.add(dots);
   const { group: placesMesh, rings } = placesGroup(readPlaces());
   spin.add(placesMesh);
-  const edits = readActivity();
-  if (edits.length) spin.add(spikesMesh(edits));
+  const activity = readActivity();
+  let edits = activity.edits;
+  let spikes = null;
+  const showSpikes = () => {
+    if (spikes) {
+      spin.remove(spikes);
+      spikes.geometry.dispose();
+      spikes.material.dispose();
+      spikes = null;
+    }
+    if (edits.length) spin.add((spikes = spikesMesh(edits)));
+  };
+  showSpikes();
   const arcs = arcsLayer(relay(edits), spin, reducedMotion);
   container.dataset.edits = String(edits.length);
+  const live = liveEdits({
+    initial: edits,
+    sequence: activity.sequence,
+    onUpdate(nextEdits, asOf, changed) {
+      if (changed) {
+        edits = nextEdits;
+        showSpikes();
+        arcs.setPairs(relay(edits));
+        container.dataset.edits = String(edits.length);
+      }
+      container.dataset.asOf = asOf.toISOString();
+      showCaption(edits.length, asOf);
+    },
+  });
   container.dataset.dots = String(dots.count);
   container.dataset.tier = String(tier);
 
@@ -442,6 +501,8 @@ async function start(container) {
       monitor.reset();
     }
     renderer.setAnimationLoop(active ? frame : null);
+    if (active) live.start();
+    else live.stop();
   };
   new IntersectionObserver((entries) => {
     onScreen = entries.some((entry) => entry.isIntersecting);

@@ -195,4 +195,6 @@ Applies to documentation, comments, commit messages and pull request description
 - **Third-party work** shown by the site is credited on the page that shows it and in
   `README.md`, *Credits*, with its licence; its terms of use are linked where it is read
   (the replication of OpenStreetMap, not its editing API). Personal data of third parties,
-  such as the names of the mappers, are not kept.
+  such as the names of the mappers, are not kept, whether the build or the browser reads
+  them. An attribution that its licence wants next to the data (OpenStreetMap) stays there;
+  the other credits may go on the page that explains the work.

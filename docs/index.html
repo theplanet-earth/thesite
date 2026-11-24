@@ -1,38 +1,36 @@
 ---
 layout: default
 title: Home
+body_class: home
 ---
 <section class="globe-section" aria-labelledby="globe-title">
-  <div class="glob_coverage">
-    <h1 id="globe-title">Global coverage</h1>
-  </div>
+  <h1 id="globe-title" class="globe-heading">Global reach</h1>
   <!-- The globe (src/globe/, bundled into /assets/bundle/globe.js): the land mask comes from
-       scripts/land-mask.py, the places from _data/coverage.yml. -->
+       scripts/land-mask.py, the places from _data/coverage.yml, the edits of OpenStreetMap from
+       _data/activity.json (the build), then from the replication itself (src/globe/live.js). -->
   <div class="globe" data-globe data-land="{{ '/assets/globe/land.png' | relative_url }}"
        data-label="A globe of the Earth, with the land drawn as dots, the covered places as orange rings, and the latest edits to OpenStreetMap as orange spikes joined by arcs in the order they were made. Drag it, or use the arrow keys, to turn it.">
     <div class="globe-placeholder" aria-hidden="true"></div>
     <p class="globe-fallback">The globe needs WebGL, which this browser does not offer.</p>
   </div>
-  <p class="globe-credits">
-    The globe follows the techniques described in
-    <a href="https://github.blog/engineering/engineering-principles/how-we-built-the-github-globe/">How we built the GitHub globe</a>
-    by Tobias Ahlin (GitHub, 2020), rebuilt with <a href="https://threejs.org/">three.js</a>
-    (<a href="{{ '/assets/bundle/three.LICENSE.txt' | relative_url }}">MIT licence</a>).
-    Land: <a href="https://www.naturalearthdata.com/">Natural Earth</a>, public domain.
-  </p>
   {%- assign activity = site.data.activity %}
-  <p class="globe-credits">
-    {%- if activity and activity.edits.size > 0 %}
-    The orange spikes are the latest {{ activity.edits.size }} edits to
-    <a href="https://www.openstreetmap.org/">OpenStreetMap</a>, as of
-    <time datetime="{{ activity.generated }}">{{ activity.generated | date: "%-d %B %Y, %H:%M" }} UTC</time>,
-    taller the more they changed; the arcs join them in the order they were made, as the
-    GitHub globe joins pull requests.
-    {%- else %}
-    The latest edits to <a href="https://www.openstreetmap.org/">OpenStreetMap</a> could not
-    be read when this version of the site was built.
+  {%- assign edits = activity.edits.size | default: 0 %}
+  <!-- The attribution of OpenStreetMap stays next to the globe, visible without interaction,
+       as its guidelines require (https://osmfoundation.org/wiki/Licence/Attribution_Guidelines);
+       the other credits are on /globe/. live.js updates the count and the time. -->
+  <p class="globe-caption" aria-live="polite">
+    <span data-edits-sentence{% if edits == 0 %} hidden{% endif %}>The orange spikes are the
+      latest <span data-edits-count>{{ edits }}</span> edits to
+      <a href="https://www.openstreetmap.org/">OpenStreetMap</a>, as of
+      <time data-edits-time datetime="{{ activity.generated }}">{{ activity.generated | date: "%-d %B, %H:%M" }} UTC</time>,
+      taller the more they changed; the arcs join them in the order they were made, as the
+      GitHub globe joins pull requests.</span>
+    {%- if edits == 0 %}
+    <span data-edits-missing>The latest edits to <a href="https://www.openstreetmap.org/">OpenStreetMap</a>
+      could not be read when this version of the site was built.</span>
     {%- endif %}
     Data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>, ODbL.
+    <a href="{{ '/globe/' | relative_url }}">How the globe is made</a>.
   </p>
 </section>
 <script type="application/json" id="coverage">{{ site.data.coverage | jsonify }}</script>
