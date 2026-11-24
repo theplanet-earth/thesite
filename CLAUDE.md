@@ -22,7 +22,8 @@ branches `glob_coverage` and `hyde_theme` (opened in this order, then deleted). 
 shows a 3D globe (`src/globe/`, three.js bundled by esbuild), which replaced the Leaflet map
 of the prototype on 2026-11-23, with the latest edits to OpenStreetMap as orange spikes and
 arcs (issue #1, Section 2): those of the build first, then those the browser reads once a
-minute while the globe is shown. `/globe/` explains it and credits the work it builds on. `npm run build` builds it into `build/pages/`,
+minute while the globe is shown. `/globe/` explains it and credits the work it builds on. In production a Worker
+(`wrangler.jsonc`, `worker/`) serves the site and reads the edits once for every visitor. `npm run build` builds it into `build/pages/`,
 `npm run serve` previews it. Two environments, decided by the
 owner on 2026-11-23 following issue #2:
 
@@ -119,6 +120,13 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   guidelines require; About is left to the project; a GitHub icon instead of "Source on
   GitHub"; and the edits of OpenStreetMap "in tempo reale [...] a quando sta visualizzando
   l'utente e non a build time", about as many as the build keeps (113 to 120).
+- 2026-11-24, on the edits read by every browser: "fallo, magari non ogni minuto, ma ogni 19
+  minuti": the Worker of production reads the replication at most every 19 minutes per data
+  centre and serves that copy to every visitor (`/api/osm-edits.json`); the browser asks
+  every 19 minutes, the Worker where there is one, the replication where there is none. On
+  the sidebar: "torna ai font originali, alle dimensioni del logo originali e soprattutto
+  alla scritta THEPLANET su 3 righe originale, controllando sì che non compaia la scroll
+  bar, ma neanche riducendo così tanto la spaziatura verticale", and a smaller GitHub icon.
 - 2026-11-23, "aggiungi una issue per cambiare la licenza di questa repo (apri una issue
   analoga per tutte le altre repo dell'org) mettendo a confronto diverse licenze papabili per
   la repo e spiegandone il motivo e le differenze tra queste": issue #10 here; the same issue
@@ -177,7 +185,9 @@ owner decides otherwise):
 | `scripts/lib.sh` | Helpers shared by the shell scripts: repository root, `build/`, `$PY`, `log`, `warn`, `die`, `need`, `project_version` |
 | `scripts/build.sh`, `test.sh`, `check.sh` | Build (the site into `build/pages/`), unit tests, every check (the entry points of CI) |
 | `scripts/serve.sh` | Live preview of the site at `http://localhost:4000` (`npm run serve`), with the bundle rebuilt on every change of `src/` |
-| `scripts/bundle.sh` | esbuild bundles `src/globe/main.js` and three.js into `docs/assets/bundle/globe.js` (generated, git-ignored), with the licence of three.js beside it; run by `build.sh` and `serve.sh` |
+| `scripts/bundle.sh`, `scripts/bundle.mjs` | esbuild bundles `src/globe/main.js` and three.js into `docs/assets/bundle/globe.js` (generated, git-ignored), with the licence of three.js beside it; run by `build.sh` and `serve.sh`; in watch mode it touches the bundle a second after each build (Section 12) |
+| `wrangler.jsonc`, `worker/` | The Worker of production (issue #2): static assets from `build/pages/`, custom domain `theplanet.observer`; `worker/index.js` runs only for `/api/*`, `worker/edits.js` serves `/api/osm-edits.json`, read at most every 19 minutes and cached |
+| `scripts/worker.sh` | wrangler at a pinned version: `npm run worker:check` (dry run) and `npm run worker:dev` (the site with the Worker at `http://localhost:8787`) |
 | `media/mascot/` | The mascot of the logo in 3D, not used by the site: the five files Meshy made (walking, running, rigged, without skeleton, preview; 20 MB), `provenance.json` and a `README.md` on what each may serve; kept for thegame (Section 2) |
 | `scripts/meshy.py` | The mascot of the logo as a 3D model by the API of Meshy: Image to 3D, rigging, the GLB files and their provenance in `build/meshy/<date>/` (`npm run mascot:generate`) |
 | `scripts/osm-activity.py` | The latest edits to OpenStreetMap for the globe, from the minutely replication of changesets, into `docs/_data/activity.json` (generated at every build, git-ignored; `npm run globe:activity`) |
@@ -188,8 +198,8 @@ owner decides otherwise):
 | `scripts/check-site.py` | Check of the built site: every local link and resource of `build/pages/` exists, none loads over `http`, nothing unpublishable is published (`npm run check:site`) |
 | `scripts/version.py` | Version, next version and release notes from the tags and the commits |
 | `scripts/setup-python.sh` | `.venv/` from `requirements.txt`, reinstalled only when it changes |
-| `tests/` | `unittest` checks of the harness scripts, of `check-site.py`, of `land-mask.py`, of `osm-activity.py` and of the permissions of the devcontainer (standard library only); `globe.test.mjs` and `replication.test.mjs`, the pure parts of the globe (`node --test`) |
-| `src/globe/` | The globe of the home page: `geometry.js` (dots of the land, spikes, arcs, quality tiers; no three.js), `replication.js` (the replication of changesets: paths, parsing, merging; no DOM), `live.js` (the browser reads the new files once a minute), `main.js` (the three.js scene) |
+| `tests/` | `unittest` checks of the harness scripts, of `check-site.py`, of `land-mask.py`, of `osm-activity.py` and of the permissions of the devcontainer (standard library only); `globe.test.mjs`, `replication.test.mjs` and `live.test.mjs` (the live edits and the Worker, against fakes), with `node --test` |
+| `src/globe/` | The globe of the home page: `geometry.js` (dots of the land, spikes, arcs, quality tiers; no three.js), `replication.js` (the replication of changesets: paths, parsing, merging; no DOM), `live.js` (every 19 minutes, the edits from the Worker or from the replication; shared with the Worker), `main.js` (the three.js scene) |
 | `package.json`, `package-lock.json` | Also the dependencies of the site, pinned: three.js and esbuild (Section 10) |
 | `.devcontainer/` | `Dockerfile`, `devcontainer.json`, `post-create.sh` (Section 10) |
 | `.vscode/` | Recommended extensions, settings, and every command as a task |
@@ -347,7 +357,8 @@ The rules are in `CONTRIBUTING.md`, *Confidentiality*. In addition:
 | Jekyll | 4.3.3, with the gems of `docs/Gemfile.lock` (Bundler 2.5.6) | `docs/` |
 | Mascot | Meshy Image to 3D, `ai_model: latest` (Meshy 7.1 in 2026-11), then rigging; tasks and parameters in `media/mascot/provenance.json`, 2026-11-24, 35 credits | `scripts/meshy.py` |
 | three.js | 0.187.0 (MIT), bundled by esbuild 0.28.2 (MIT); exact versions in `package.json` | `package.json`, `package-lock.json` |
-| OpenStreetMap edits | the minutely replication of changesets, `https://planet.openstreetmap.org/replication/changesets/` (redirects to a mirror on S3): the last 4 files, at most 120 edits, at every build; then the browser, once a minute, the new files, keeping the latest 120 edits (backwards from the latest file, at most 10 files, when the shown ones are older) | `scripts/osm-activity.py`, `src/globe/live.js` |
+| OpenStreetMap edits | the minutely replication of changesets, `https://planet.openstreetmap.org/replication/changesets/` (redirects to a mirror on S3): the last 4 files, at most 120 edits, at every build; then, every 19 minutes, the Worker of production for every visitor, or the browser where there is no Worker: the latest 120 edits (backwards from the latest file, at most 10 files) | `scripts/osm-activity.py`, `src/globe/live.js`, `worker/edits.js` |
+| wrangler | 4.168.0, through `npx` (not a dependency of the site); `compatibility_date` 2026-11-24 | `scripts/worker.sh`, `wrangler.jsonc` |
 | Natural Earth | v5.1.2, 1:50m land (public domain), the source of `docs/assets/globe/land.png` | `scripts/land-mask.py` |
 | Plugin `ui-ux-pro-max` | v2.15.0 of `nextlevelbuilder/ui-ux-pro-max-skill` (MIT; its manifest at that tag says 2.13.0) | `.claude/settings.json` |
 | Skill `security-audit` | commit `c1c8a8c` (2026-09-14) of `cloudflare/security-audit-skill` (MIT) | `scripts/install-skills.sh` |
@@ -432,20 +443,34 @@ harness) comes from thebox, which is versioned and released like any other repos
 - **The edits of OpenStreetMap** come from the minutely replication of changesets, not
   from the API: the API is "provided in order to edit the map data, **not** for read-only
   purposes or projects" ([API usage policy](https://operations.osmfoundation.org/policies/api/)).
-  A build reads 5 files (about 20 KB): the state and the last 4 minutes. Then the browser of
-  each visitor, while the globe is shown and the tab visible, reads `state.yaml` once a
-  minute and the new files only, one at a time (`src/globe/live.js`); the server and its
-  mirror on S3 answer `Access-Control-Allow-Origin: *` (checked on 2026-11-24). No user,
-  comment or tag is kept, only the centre of each changeset rounded to 0.01 degree, its
-  number of changes and its time; changesets spanning more than 1 degree are left out.
+  A build reads 5 files (about 20 KB): the state and the last 4 minutes. Then, every 19
+  minutes while the globe is shown and the tab visible, the browser asks
+  `/api/osm-edits.json`: in production the Worker answers from the cache of Cloudflare, and
+  reads the replication itself (about 5 files) at most every 19 minutes per data centre;
+  where there is no Worker (the stage site on GitHub Pages, the preview), the browser reads
+  the replication directly, one file at a time. The server and its mirror on S3 answer
+  `Access-Control-Allow-Origin: *` (checked on 2026-11-24). No user, comment or tag is kept,
+  only the centre of each changeset rounded to 0.01 degree, its number of changes and its
+  time; changesets spanning more than 1 degree are left out.
   - No page of OpenStreetMap says how many clients may read the replication (the front page
-    of planet.openstreetmap.org and `/replication/`, read on 2026-11-24): with many visitors,
-    the Worker of production may read it once a minute and serve it to all of them, from
-    the same origin (issue #2).
+    of planet.openstreetmap.org and `/replication/`, read on 2026-11-24): hence the Worker,
+    which reads it once for all the visitors of a data centre.
   - The attribution "© OpenStreetMap contributors" stays next to the globe, visible without
     interaction: the guidelines want it "in the vicinity of the produced work" and not behind
     an interaction ([Attribution Guidelines](https://osmfoundation.org/wiki/Licence/Attribution_Guidelines));
     the other credits, which have no such rule, are on `/globe/`.
+- **The preview kept an older bundle** (2026-11-24): Jekyll copies a file into
+  `build/serve/` only when its time of modification moves, and two builds of esbuild within
+  the same instant left the preview serving the first; the globe of the preview then did not
+  read the edits. `scripts/bundle.mjs` touches the bundle a second after each build of the
+  watch, and the pages ask for the bundle and the styles with `?v=` and the time of the
+  build, so that no browser keeps an older copy. If it happens again: `touch
+  docs/assets/bundle/globe.js`.
+- **The Worker** (checked with wrangler 4.168.0 on 2026-11-24: `deploy --dry-run`, and
+  `wrangler dev`, which read 120 edits and served the second call from the cache): the
+  runtime takes every named export of the main module for an entrypoint and refuses the
+  others ("Incorrect type for map entry"), so `worker/index.js` exports only its default
+  handler and the rest lives in `worker/edits.js`.
 - **esbuild and npm 11**: `npm ci` warns that the install script of esbuild is "not yet
   covered by allowScripts" and does not run it. esbuild works without it: its binary comes
   from the optional package of the platform (`@esbuild/linux-x64`), and the script only
@@ -490,10 +515,9 @@ harness) comes from thebox, which is versioned and released like any other repos
 Open points:
 
 - [ ] Owner: the Cloudflare side of both environments, issue #6; the GitHub side, issue #7.
-- [ ] Production deploy (issue #2): a `wrangler.jsonc` for the Worker `thesite` (static
-  assets from `build/pages/`, custom domain `theplanet.observer`), and `release.yml` running
-  `wrangler deploy` through the GitHub environment `production`, once the token and the
-  secrets of issues #6 and #7 exist
+- [ ] Production deploy (issue #2): the Worker `thesite` is ready (`wrangler.jsonc`,
+  `worker/`, checked locally); left: `release.yml` running `wrangler deploy` through the
+  GitHub environment `production`, once the token and the secrets of issues #6 and #7 exist
   ([Workers static assets](https://developers.cloudflare.com/workers/static-assets/),
   [GitHub Actions](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/)).
 - [ ] Older issues to plan with the owner: #1 (coverage map: colours from an API,

@@ -34,6 +34,8 @@
     { "label": "Globe: land mask", "detail": "docs/assets/globe/land.png from Natural Earth (npm run globe:land)", "type": "npm", "script": "globe:land", "problemMatcher": [] },
     { "label": "Mascot: generate with Meshy", "detail": "The 3D mascot from the logo, by the API of Meshy (needs MESHY_API_KEY; spends credits)", "type": "npm", "script": "mascot:generate", "problemMatcher": [] },
     { "label": "Globe: latest OpenStreetMap edits", "detail": "docs/_data/activity.json from the replication of changesets (npm run globe:activity)", "type": "npm", "script": "globe:activity", "problemMatcher": [] },
+    { "label": "Worker: check (dry run)", "detail": "Build the site, then validate and bundle the Worker of production with wrangler (npm run worker:check)", "type": "npm", "script": "worker:check", "group": "test", "problemMatcher": [] },
+    { "label": "Worker: preview at http://localhost:8787", "detail": "Build the site and serve it with the Worker in workerd (npm run worker:dev)", "type": "npm", "script": "worker:dev", "isBackground": true, "problemMatcher": [] },
     { "label": "Python: set up .venv", "type": "npm", "script": "setup:python", "problemMatcher": [] },
     { "label": "Release: next version", "type": "npm", "script": "version:next", "problemMatcher": [] },
     { "label": "Release: notes preview", "type": "npm", "script": "release:notes", "problemMatcher": [] },

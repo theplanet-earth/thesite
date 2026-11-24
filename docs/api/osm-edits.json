@@ -1,0 +1,4 @@
+{
+  "worker": false,
+  "about": "In production the Worker of the site answers here with the latest edits of OpenStreetMap (worker/edits.js); where there is no Worker, this file says so, and the browser reads the replication of changesets itself (src/globe/live.js)."
+}

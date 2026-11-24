@@ -34,8 +34,8 @@
 }
 
 .sidebar-logo img {
-    display: block;
     max-width: 100%;
+    vertical-align: text-top;
 }
 
 /* Contrast on the dark grey of the content: the theme left page titles dark grey and links
@@ -69,17 +69,16 @@
     padding-bottom: 1rem;
 }
 
-/* The source on GitHub, as its icon. */
+/* The source on GitHub, as its icon, a little larger than the text. */
 .sidebar-github {
     display: inline-block;
-    margin-top: 0.5rem;
     color: #333;
     line-height: 0;
 }
 
 .sidebar-github svg {
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 1.1em;
+    height: 1.1em;
 }
 
 .sidebar-github:hover,
@@ -87,22 +86,38 @@
     color: #000;
 }
 
-/* On wide screens the fixed sidebar fits a window 800 pixels high: a smaller logo and
-   logotype leave room for the pages, the icon and the copyright. */
+/* On wide screens the sidebar keeps the logo, the logotype and the spacing of the prototype
+   (the owner, 2026-11-24), with the pages and the icon on one row under them. Below a window
+   800 pixels high, logo and logotype shrink with its height, so that no scrollbar appears;
+   from 800 pixels up they keep their size. */
 @media (min-width: 48em) {
-    .sidebar {
-        padding-top: 1.5rem;
-        padding-bottom: 1rem;
-    }
-
     .sidebar-logo img {
-        max-width: 10rem;
-        margin: 0 auto;
+        max-height: 41vh;
     }
 
     .roboto-mono-sidebar h1 {
-        font-size: 3.5em;
-        margin-bottom: 0.75rem;
+        font-size: min(5em, 12.5vh);
+    }
+
+    .sidebar-nav {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0 1.25rem;
+    }
+
+    .sidebar-nav-item {
+        display: inline-block;
+    }
+
+    /* No room below the last line: the padding of the theme and the margin of the copyright
+       would make the sidebar scroll for blank space only. */
+    .sidebar {
+        padding-bottom: 0;
+    }
+
+    .sidebar .container > p {
+        margin-bottom: 0;
     }
 }
 
@@ -151,14 +166,6 @@
         margin: 0;
     }
 
-    .sidebar-github {
-        margin-top: 0;
-    }
-
-    .sidebar-github svg {
-        width: 1.25rem;
-        height: 1.25rem;
-    }
 
     .sidebar .container > p {
         flex-basis: 100%;
