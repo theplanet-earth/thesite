@@ -11,6 +11,7 @@ bundle check > /dev/null 2>&1 || bundle install
 # The scripts of the site (scripts/bundle.sh): built once, then rebuilt by esbuild on every
 # change of src/, which Jekyll sees as a change of docs/assets/bundle/.
 bash "$ROOT/scripts/bundle.sh"
+"$PY" "$ROOT/scripts/osm-activity.py"
 bash "$ROOT/scripts/bundle.sh" --watch &
 watcher=$!
 trap 'kill "$watcher" 2> /dev/null || true' EXIT

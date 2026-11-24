@@ -20,6 +20,9 @@ need bundle "Ruby 3.3 and Bundler are needed: open the devcontainer, or install 
 export BUNDLE_GEMFILE="$ROOT/docs/Gemfile"
 bundle check > /dev/null 2>&1 || bundle install
 bash "$ROOT/scripts/bundle.sh"
+# The latest edits to OpenStreetMap for the globe (docs/_data/activity.json, git-ignored);
+# without network the script writes an empty list and the build goes on.
+"$PY" "$ROOT/scripts/osm-activity.py"
 rm -rf "$BUILD/pages"
 log "build: site (Jekyll) into build/pages/"
 JEKYLL_ENV="${JEKYLL_ENV:-production}" bundle exec jekyll build \

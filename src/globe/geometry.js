@@ -67,6 +67,61 @@ export function startLongitude(timezoneOffsetMinutes) {
 }
 
 /**
+ * The height of the spike of an edit with `changes` changes, as a share of the radius: the
+ * spikes of the GitHub globe stand for pull requests; here an edit to OpenStreetMap, taller
+ * the more it changed, on a logarithmic scale so that a large import does not dwarf the rest.
+ */
+export function spikeHeight(changes) {
+  const n = Math.max(0, Number(changes) || 0);
+  return Math.min(0.14, 0.02 + 0.03 * Math.log10(1 + n));
+}
+
+/**
+ * The arc between two places given as [lat, lon]: the four control points of a cubic Bezier
+ * curve on a sphere of radius r, rising higher the farther apart the places are, as the arcs
+ * of the GitHub globe do. Each point is [x, y, z]. Antipodal places arc over the north pole.
+ */
+export function arcControlPoints(from, to, r = 1) {
+  const a = toCartesian(from[0], from[1], 1);
+  const b = toCartesian(to[0], to[1], 1);
+  const cos = Math.min(1, Math.max(-1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2]));
+  const angle = Math.acos(cos);
+  const along = (t) => {
+    // Spherical interpolation from a to b; a straight line through the pole when antipodal.
+    if (Math.sin(angle) < 1e-6) {
+      const mid = angle < 1 ? a : [0, 1, 0];
+      const u = t < 0.5 ? t * 2 : (1 - t) * 2;
+      const p = (t < 0.5 ? a : b).map((v, i) => v * (1 - u) + mid[i] * u);
+      const length = Math.hypot(...p) || 1;
+      return p.map((v) => v / length);
+    }
+    const k0 = Math.sin((1 - t) * angle) / Math.sin(angle);
+    const k1 = Math.sin(t * angle) / Math.sin(angle);
+    return a.map((v, i) => v * k0 + b[i] * k1);
+  };
+  const lift = r * (1 + (0.08 + (0.5 * angle) / Math.PI) * 1.33);
+  return [a.map((v) => v * r), along(0.25).map((v) => v * lift), along(0.75).map((v) => v * lift), b.map((v) => v * r)];
+}
+
+/**
+ * The arcs of a relay through the edits, in the order they were made: each edit to the next,
+ * leaving out pairs closer than `minDegrees` (an arc too short to see). Edits are
+ * { lat, lon }; the result is a list of [from, to] pairs of [lat, lon].
+ */
+export function relay(edits, { minDegrees = 3 } = {}) {
+  const pairs = [];
+  for (let i = 0; i + 1 < edits.length; i += 1) {
+    const from = [edits[i].lat, edits[i].lon];
+    const to = [edits[i + 1].lat, edits[i + 1].lon];
+    const a = toCartesian(from[0], from[1], 1);
+    const b = toCartesian(to[0], to[1], 1);
+    const angle = Math.acos(Math.min(1, Math.max(-1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2])));
+    if (angle / DEG >= minDegrees) pairs.push([from, to]);
+  }
+  return pairs;
+}
+
+/**
  * Watches the duration of the frames and says when to lower the quality: when the last
  * `size` frames averaged fewer than `minFps` frames a second (the article: 55.5 over 50
  * frames). After a drop, the window starts again, so that the next tier gets its own chance.

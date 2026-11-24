@@ -13,6 +13,7 @@
     "check:site": "python3 scripts/check-site.py",
     "globe:land": "python3 scripts/land-mask.py",
     "mascot:generate": "python3 scripts/meshy.py",
+    "globe:activity": "python3 scripts/osm-activity.py",
     "setup:python": "bash scripts/setup-python.sh",
     "version:current": "python3 scripts/version.py current",
     "version:next": "python3 scripts/version.py next",

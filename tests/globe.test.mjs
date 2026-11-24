@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { FrameMonitor, TIERS, isLand, landDots, startLongitude, toCartesian } from '../src/globe/geometry.js';
+import { FrameMonitor, TIERS, arcControlPoints, isLand, landDots, relay, spikeHeight, startLongitude, toCartesian } from '../src/globe/geometry.js';
 
 // A mask like the result of getImageData: land (red 255) only east of Greenwich in the north.
 function mask(width = 36, height = 18) {
@@ -77,6 +77,41 @@ test('FrameMonitor looks at the last 50 frames only', () => {
   for (let i = 0; i < 10; i += 1) dropped = monitor.record(16) || dropped;
   assert.equal(dropped, true); // the average of the window is under 55.5 frames a second
   for (let i = 0; i < 50; i += 1) assert.equal(monitor.record(16), false);
+});
+
+test('spikeHeight grows with the changes, slowly, within bounds', () => {
+  assert.equal(spikeHeight(0), 0.02);
+  assert.ok(spikeHeight(10) > spikeHeight(1));
+  assert.ok(spikeHeight(1000) - spikeHeight(100) < spikeHeight(10) - spikeHeight(0));
+  assert.equal(spikeHeight(1e9), 0.14);
+  assert.equal(spikeHeight('not a number'), 0.02);
+});
+
+test('arcControlPoints start and end on the sphere and rise higher for farther places', () => {
+  const length = (p) => Math.hypot(...p);
+  const near = arcControlPoints([41.9, 12.5], [48.9, 2.4]); // Rome to Paris
+  const far = arcControlPoints([41.9, 12.5], [-33.9, 151.2]); // Rome to Sydney
+  for (const arc of [near, far]) {
+    close(+length(arc[0]).toFixed(12), 1);
+    close(+length(arc[3]).toFixed(12), 1);
+    assert.ok(length(arc[1]) > 1 && length(arc[2]) > 1);
+  }
+  assert.ok(length(far[1]) > length(near[1]));
+  const start = toCartesian(41.9, 12.5, 2);
+  arcControlPoints([41.9, 12.5], [48.9, 2.4], 2)[0].forEach((v, i) => close(+v.toFixed(12), +start[i].toFixed(12)));
+});
+
+test('arcControlPoints stay finite for antipodal places', () => {
+  const arc = arcControlPoints([0, 0], [0, 180]);
+  assert.ok(arc.flat().every(Number.isFinite));
+  assert.ok(Math.hypot(...arc[1]) > 1);
+});
+
+test('relay joins the edits in order and skips arcs too short to see', () => {
+  const edits = [{ lat: 41.9, lon: 12.5 }, { lat: 41.91, lon: 12.51 }, { lat: 48.9, lon: 2.4 }, { lat: -33.9, lon: 151.2 }];
+  assert.deepEqual(relay(edits), [[[41.91, 12.51], [48.9, 2.4]], [[48.9, 2.4], [-33.9, 151.2]]]);
+  assert.deepEqual(relay([]), []);
+  assert.deepEqual(relay([edits[0]]), []);
 });
 
 test('TIERS lower the pixel ratio, then the dots', () => {

@@ -33,6 +33,7 @@
     { "label": "Check: TEMPLATE markers left", "type": "shell", "command": "npm run check:template -- --list", "group": "test", "problemMatcher": [] },
     { "label": "Globe: land mask", "detail": "docs/assets/globe/land.png from Natural Earth (npm run globe:land)", "type": "npm", "script": "globe:land", "problemMatcher": [] },
     { "label": "Mascot: generate with Meshy", "detail": "The 3D mascot from the logo, by the API of Meshy (needs MESHY_API_KEY; spends credits)", "type": "npm", "script": "mascot:generate", "problemMatcher": [] },
+    { "label": "Globe: latest OpenStreetMap edits", "detail": "docs/_data/activity.json from the replication of changesets (npm run globe:activity)", "type": "npm", "script": "globe:activity", "problemMatcher": [] },
     { "label": "Python: set up .venv", "type": "npm", "script": "setup:python", "problemMatcher": [] },
     { "label": "Release: next version", "type": "npm", "script": "version:next", "problemMatcher": [] },
     { "label": "Release: notes preview", "type": "npm", "script": "release:notes", "problemMatcher": [] },

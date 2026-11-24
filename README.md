@@ -90,6 +90,8 @@ unset: the GitHub Pages site of this repository is the stage site.
 - The mascot in `media/mascot/`: a 3D model generated from the logo by
   [Meshy](https://www.meshy.ai/) on a paid plan, so that it belongs to the organization
   ([terms of use](https://www.meshy.ai/terms-of-use), 3.2).
+- The latest edits to [OpenStreetMap](https://www.openstreetmap.org/), the orange spikes and
+  arcs: data © OpenStreetMap contributors, [ODbL](https://www.openstreetmap.org/copyright).
 
 ## License
 

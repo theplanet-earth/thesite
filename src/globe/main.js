@@ -19,6 +19,8 @@ import {
   BackSide,
   CircleGeometry,
   Color,
+  CubicBezierCurve3,
+  CylinderGeometry,
   DirectionalLight,
   Group,
   InstancedMesh,
@@ -31,11 +33,12 @@ import {
   Scene,
   ShaderMaterial,
   SphereGeometry,
+  TubeGeometry,
   Vector3,
   WebGLRenderer,
 } from 'three';
 
-import { DEG, FrameMonitor, TIERS, landDots, startLongitude, toCartesian } from './geometry.js';
+import { DEG, FrameMonitor, TIERS, arcControlPoints, landDots, relay, spikeHeight, startLongitude, toCartesian } from './geometry.js';
 
 const RADIUS = 1;
 const TILT = 0.35; // radians, to show a little more of the northern hemisphere
@@ -48,6 +51,17 @@ const COLORS = {
   place: 0xffa94d, // the orange of its glasses
 };
 const FORWARD = new Vector3(0, 0, 1);
+// The arcs of the edits to OpenStreetMap (issue #1), timed as the merged pull requests of the
+// GitHub globe: a new arc every ARC_EVERY seconds grows from one edit to the next in
+// ARC_GROW, stays ARC_HOLD, withdraws from its start in ARC_FADE; a ring grows and fades where
+// it lands. With prefers-reduced-motion, the last ARC_STILL arcs stand still instead.
+const ARC_EVERY = 0.8;
+const ARC_GROW = 1.4;
+const ARC_HOLD = 0.9;
+const ARC_FADE = 1.1;
+const ARC_STILL = 12;
+const ARC_SEGMENTS = 48;
+const ARC_SIDES = 5;
 
 // The dots fade towards the edge of the globe, where they crowd and shimmer (moiré).
 const DOT_SHADER = {
@@ -102,6 +116,18 @@ function readMask(url) {
   });
 }
 
+// The latest edits to OpenStreetMap (scripts/osm-activity.py, at build time), as { lat, lon,
+// changes, closed }; none when the build had no network.
+function readActivity() {
+  try {
+    const activity = JSON.parse(document.getElementById('activity')?.textContent || 'null');
+    const edits = Array.isArray(activity?.edits) ? activity.edits : [];
+    return edits.filter((e) => Number.isFinite(e.lat) && Number.isFinite(e.lon));
+  } catch {
+    return [];
+  }
+}
+
 function readPlaces() {
   try {
     const places = JSON.parse(document.getElementById('coverage')?.textContent || '[]');
@@ -152,6 +178,94 @@ function placesGroup(places) {
     rings.push(ring);
   }
   return { group, rings };
+}
+
+// One thin orange spike per edit, taller the more it changed (spikeHeight), in one InstancedMesh.
+function spikesMesh(edits) {
+  const geometry = new CylinderGeometry(0.0035, 0.0035, 1, 6, 1, true).translate(0, 0.5, 0).rotateX(Math.PI / 2);
+  const mesh = new InstancedMesh(geometry, new MeshBasicMaterial({ color: COLORS.place }), Math.max(1, edits.length));
+  const dummy = new Object3D();
+  edits.forEach(({ lat, lon, changes }, index) => {
+    place(dummy, lat, lon, RADIUS);
+    dummy.scale.set(1, 1, spikeHeight(changes) * RADIUS);
+    dummy.updateMatrix();
+    mesh.setMatrixAt(index, dummy.matrix);
+  });
+  mesh.count = edits.length;
+  mesh.instanceMatrix.needsUpdate = true;
+  return mesh;
+}
+
+// The arcs between consecutive edits, drawn by growing and then withdrawing the draw range of
+// a tube along a cubic Bezier curve (the technique of the article).
+function arcsLayer(pairs, parent, reducedMotion) {
+  const material = new MeshBasicMaterial({ color: COLORS.place });
+  const ringGeometry = new RingGeometry(0.012, 0.017, 40);
+  const live = [];
+  const step = ARC_SIDES * 6; // indices of one segment of the tube
+  let next = 0;
+  let lastSpawn = -Infinity;
+  const spawn = (pair, time, full) => {
+    const curve = new CubicBezierCurve3(...arcControlPoints(pair[0], pair[1], RADIUS).map((p) => new Vector3(...p)));
+    const geometry = new TubeGeometry(curve, ARC_SEGMENTS, 0.0028, ARC_SIDES, false);
+    const total = geometry.index.count;
+    geometry.setDrawRange(0, full ? total : 0);
+    const mesh = new Mesh(geometry, material);
+    parent.add(mesh);
+    live.push({ mesh, born: time, total, to: pair[1], landed: full, ring: null });
+  };
+  if (reducedMotion) pairs.slice(-ARC_STILL).forEach((pair) => spawn(pair, 0, true));
+  return {
+    count: () => live.length,
+    update(time) {
+      if (reducedMotion || !pairs.length) return;
+      const seconds = time / 1000;
+      if (seconds - lastSpawn >= ARC_EVERY) {
+        spawn(pairs[next % pairs.length], seconds, false);
+        next += 1;
+        lastSpawn = seconds;
+      }
+      for (let i = live.length - 1; i >= 0; i -= 1) {
+        const arc = live[i];
+        const age = seconds - arc.born;
+        const segments = (share) => Math.round(Math.min(1, Math.max(0, share)) * ARC_SEGMENTS) * step;
+        if (age < ARC_GROW) {
+          arc.mesh.geometry.setDrawRange(0, segments(age / ARC_GROW));
+        } else if (age < ARC_GROW + ARC_HOLD) {
+          arc.mesh.geometry.setDrawRange(0, arc.total);
+        } else if (age < ARC_GROW + ARC_HOLD + ARC_FADE) {
+          const start = segments((age - ARC_GROW - ARC_HOLD) / ARC_FADE);
+          arc.mesh.geometry.setDrawRange(start, arc.total - start);
+        } else {
+          parent.remove(arc.mesh);
+          arc.mesh.geometry.dispose();
+          if (arc.ring) {
+            parent.remove(arc.ring);
+            arc.ring.material.dispose();
+          }
+          live.splice(i, 1);
+          continue;
+        }
+        if (age >= ARC_GROW && !arc.landed) {
+          arc.landed = true;
+          arc.ring = place(new Mesh(ringGeometry, new MeshBasicMaterial({ color: COLORS.place, transparent: true, depthWrite: false })), arc.to[0], arc.to[1], RADIUS * 1.004);
+          arc.ringBorn = seconds;
+          parent.add(arc.ring);
+        }
+        if (arc.ring) {
+          const share = (seconds - arc.ringBorn) / 1.0;
+          if (share >= 1) {
+            parent.remove(arc.ring);
+            arc.ring.material.dispose();
+            arc.ring = null;
+          } else {
+            arc.ring.scale.setScalar(1 + share * 2.5);
+            arc.ring.material.opacity = 1 - share;
+          }
+        }
+      }
+    },
+  };
 }
 
 function fit(camera, width, height) {
@@ -219,6 +333,10 @@ async function start(container) {
   spin.add(dots);
   const { group: placesMesh, rings } = placesGroup(readPlaces());
   spin.add(placesMesh);
+  const edits = readActivity();
+  if (edits.length) spin.add(spikesMesh(edits));
+  const arcs = arcsLayer(relay(edits), spin, reducedMotion);
+  container.dataset.edits = String(edits.length);
   container.dataset.dots = String(dots.count);
   container.dataset.tier = String(tier);
 
@@ -303,6 +421,8 @@ async function start(container) {
         ring.material.opacity = 1 - phase;
       }
     }
+    arcs.update(time);
+    if (container.dataset.arcs !== String(arcs.count())) container.dataset.arcs = String(arcs.count());
     renderer.render(scene, camera);
     if (!shown) {
       shown = true;
