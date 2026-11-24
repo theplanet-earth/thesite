@@ -9,7 +9,7 @@ title: Home
   <!-- The globe (src/globe/, bundled into /assets/bundle/globe.js): the land mask comes from
        scripts/land-mask.py, the places from _data/coverage.yml. -->
   <div class="globe" data-globe data-land="{{ '/assets/globe/land.png' | relative_url }}"
-       data-label="A globe of the Earth, with the land drawn as dots and the covered places as orange rings. Drag it, or use the arrow keys, to turn it.">
+       data-label="A globe of the Earth, with the land drawn as dots, the covered places as orange rings, and the latest edits to OpenStreetMap as orange spikes joined by arcs in the order they were made. Drag it, or use the arrow keys, to turn it.">
     <div class="globe-placeholder" aria-hidden="true"></div>
     <p class="globe-fallback">The globe needs WebGL, which this browser does not offer.</p>
   </div>
@@ -20,6 +20,21 @@ title: Home
     (<a href="{{ '/assets/bundle/three.LICENSE.txt' | relative_url }}">MIT licence</a>).
     Land: <a href="https://www.naturalearthdata.com/">Natural Earth</a>, public domain.
   </p>
+  {%- assign activity = site.data.activity %}
+  <p class="globe-credits">
+    {%- if activity and activity.edits.size > 0 %}
+    The orange spikes are the latest {{ activity.edits.size }} edits to
+    <a href="https://www.openstreetmap.org/">OpenStreetMap</a>, as of
+    <time datetime="{{ activity.generated }}">{{ activity.generated | date: "%-d %B %Y, %H:%M" }} UTC</time>,
+    taller the more they changed; the arcs join them in the order they were made, as the
+    GitHub globe joins pull requests.
+    {%- else %}
+    The latest edits to <a href="https://www.openstreetmap.org/">OpenStreetMap</a> could not
+    be read when this version of the site was built.
+    {%- endif %}
+    Data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>, ODbL.
+  </p>
 </section>
 <script type="application/json" id="coverage">{{ site.data.coverage | jsonify }}</script>
+<script type="application/json" id="activity">{{ site.data.activity | jsonify }}</script>
 <script type="module" src="{{ '/assets/bundle/globe.js' | relative_url }}"></script>

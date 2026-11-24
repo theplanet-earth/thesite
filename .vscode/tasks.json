@@ -32,6 +32,7 @@
     { "label": "Check: site (build/pages/)", "detail": "Every local link and resource of the built site exists (npm run build first)", "type": "npm", "script": "check:site", "group": "test", "problemMatcher": [] },
     { "label": "Check: TEMPLATE markers left", "type": "shell", "command": "npm run check:template -- --list", "group": "test", "problemMatcher": [] },
     { "label": "Globe: land mask", "detail": "docs/assets/globe/land.png from Natural Earth (npm run globe:land)", "type": "npm", "script": "globe:land", "problemMatcher": [] },
+    { "label": "Globe: latest OpenStreetMap edits", "detail": "docs/_data/activity.json from the replication of changesets (npm run globe:activity)", "type": "npm", "script": "globe:activity", "problemMatcher": [] },
     { "label": "Python: set up .venv", "type": "npm", "script": "setup:python", "problemMatcher": [] },
     { "label": "Release: next version", "type": "npm", "script": "version:next", "problemMatcher": [] },
     { "label": "Release: notes preview", "type": "npm", "script": "release:notes", "problemMatcher": [] },

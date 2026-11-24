@@ -38,6 +38,7 @@ call the shell scripts in `scripts/`, so they also run without npm.
 | `npm run check:confidential` | Confidentiality guard on every tracked file |
 | `npm run check:template -- --list` | The `TEMPLATE` markers still to resolve, with their line |
 | `npm run globe:land` | The land mask of the globe, `docs/assets/globe/land.png`, from Natural Earth: run it only to change its source or size, and commit the result |
+| `npm run globe:activity` | The latest edits to OpenStreetMap for the globe, into `docs/_data/activity.json` (also run by `npm run build` and `npm run serve`; without network, an empty list) |
 | `npm run check:site` | Every local link and resource of the built site (`build/pages/`) exists; part of `npm run check` once the site is built, and a step of CI after its build |
 | `npm run setup:python` | `.venv/` from `requirements.txt`, when the repository has one |
 | `npm run version:current` / `version:next` / `release:notes` | Version of this build, of the next release, and the notes of the next release |

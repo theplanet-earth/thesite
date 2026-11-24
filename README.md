@@ -51,8 +51,9 @@ that the owner squash-merges, each followed by a merge back down the chain
   carries demo text of the theme and is to be cleaned up (`CLAUDE.md`, *Known issues and
   TODO*). The map shows the standard tiles of
   [OpenStreetMap](https://operations.osmfoundation.org/policies/tiles/).
-- Next, on stage: a 3D globe in place of the map on the home page (branch `globe`), then a
-  model of the mascot of the logo (`CLAUDE.md`, Section 2).
+- Next, on stage: a 3D globe in place of the map on the home page, with the latest edits to
+  OpenStreetMap (`CLAUDE.md`, Section 2). The mascot of the logo in 3D is kept in
+  [`media/mascot/`](media/mascot/README.md), not used by the site.
 - On 2026-11-23 neither address reaches the site: `theplanet.wtf` answers with a Cloudflare
   error, "DNS points to prohibited IP", and `theplanet.observer` has no DNS record yet. The
   steps for the owner are in issues #6 (Cloudflare) and #7 (GitHub).
@@ -86,6 +87,8 @@ unset: the GitHub Pages site of this repository is the stage site.
   (GitHub, 2020); GitHub did not publish the code of its globe, and none of it is used here.
 - [three.js](https://threejs.org/) (MIT), bundled into the site with its licence.
 - [Natural Earth](https://www.naturalearthdata.com/) (public domain), the land of the globe.
+- The latest edits to [OpenStreetMap](https://www.openstreetmap.org/), the orange spikes and
+  arcs: data © OpenStreetMap contributors, [ODbL](https://www.openstreetmap.org/copyright).
 
 ## License
 
