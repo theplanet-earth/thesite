@@ -15,9 +15,10 @@ Steps (https://docs.meshy.ai/en/api/image-to-3d, https://docs.meshy.ai/en/api/ri
      provenance.json: the parameters, the task identifiers, the credits used, never the key
      nor the signed download addresses.
 Meshy keeps the results of the API for at most 3 days
-(https://docs.meshy.ai/en/api/asset-retention): copy what the site uses into
-docs/assets/models/ before then. On a paid plan the models belong to the customer (terms of
+(https://docs.meshy.ai/en/api/asset-retention): copy what is to be kept into media/mascot/
+before then. On a paid plan the models belong to the customer (terms of
 use, 3.2, https://www.meshy.ai/terms-of-use); the owner chose a paid plan on 2026-11-23.
+The model of 2026-11-24 is kept in media/mascot/, with its README.md and provenance.json.
 The key is read from the environment only (CLAUDE.md, Section 2). Cost at 2026-11: about 30
 credits for Image to 3D with texture and 5 for rigging. Standard library only.
 """
