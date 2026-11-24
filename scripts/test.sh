@@ -6,4 +6,8 @@
 log "tests: tests/ (Python unittest)"
 "$PY" -m unittest discover -s tests
 
-# TEMPLATE: run here the tests of this repository (its test runner, with its own command).
+# The tests of the site: the pure part of the globe (src/globe/geometry.js), with the test
+# runner of Node, no dependency.
+need node "Node 22 or later is needed for the tests of the globe (CONTRIBUTING.md, Getting started)."
+log "tests: tests/*.test.mjs (node --test)"
+node --test "$ROOT/tests/"*.test.mjs

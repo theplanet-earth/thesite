@@ -22,8 +22,8 @@ that the owner squash-merges, each followed by a merge back down the chain
   carries demo text of the theme and is to be cleaned up (`CLAUDE.md`, *Known issues and
   TODO*). The map shows the standard tiles of
   [OpenStreetMap](https://operations.osmfoundation.org/policies/tiles/).
-- Next, on stage: a 3D globe in place of the map on the home page, then a model of the
-  mascot of the logo (`CLAUDE.md`, Section 2).
+- Next, on stage: a 3D globe in place of the map on the home page (branch `globe`), then a
+  model of the mascot of the logo (`CLAUDE.md`, Section 2).
 - On 2026-11-23 neither address reaches the site: `theplanet.wtf` answers with a Cloudflare
   error, "DNS points to prohibited IP", and `theplanet.observer` has no DNS record yet. The
   steps for the owner are in issues #6 (Cloudflare) and #7 (GitHub).
@@ -48,6 +48,15 @@ commands, branches, commit conventions, releases and confidentiality rules are i
 Every merge on `master` publishes a SemVer release `vX.Y.Z` computed from the conventional
 commits (`.github/workflows/release.yml`). The repository variable `PUBLISH_PAGES` stays
 unset: the GitHub Pages site of this repository is the stage site.
+
+## Credits
+
+- The globe of the home page (`src/globe/`) is a new implementation of the techniques that
+  Tobias Ahlin describes in
+  [How we built the GitHub globe](https://github.blog/engineering/engineering-principles/how-we-built-the-github-globe/)
+  (GitHub, 2020); GitHub did not publish the code of its globe, and none of it is used here.
+- [three.js](https://threejs.org/) (MIT), bundled into the site with its licence.
+- [Natural Earth](https://www.naturalearthdata.com/) (public domain), the land of the globe.
 
 ## License
 

@@ -31,6 +31,7 @@
     { "label": "Check: confidentiality", "type": "npm", "script": "check:confidential", "group": "test", "problemMatcher": [] },
     { "label": "Check: site (build/pages/)", "detail": "Every local link and resource of the built site exists (npm run build first)", "type": "npm", "script": "check:site", "group": "test", "problemMatcher": [] },
     { "label": "Check: TEMPLATE markers left", "type": "shell", "command": "npm run check:template -- --list", "group": "test", "problemMatcher": [] },
+    { "label": "Globe: land mask", "detail": "docs/assets/globe/land.png from Natural Earth (npm run globe:land)", "type": "npm", "script": "globe:land", "problemMatcher": [] },
     { "label": "Python: set up .venv", "type": "npm", "script": "setup:python", "problemMatcher": [] },
     { "label": "Release: next version", "type": "npm", "script": "version:next", "problemMatcher": [] },
     { "label": "Release: notes preview", "type": "npm", "script": "release:notes", "problemMatcher": [] },
