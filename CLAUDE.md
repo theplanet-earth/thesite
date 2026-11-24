@@ -141,6 +141,7 @@ owner decides otherwise):
 | `scripts/build.sh`, `test.sh`, `check.sh` | Build (the site into `build/pages/`), unit tests, every check (the entry points of CI) |
 | `scripts/serve.sh` | Live preview of the site at `http://localhost:4000` (`npm run serve`), with the bundle rebuilt on every change of `src/` |
 | `scripts/bundle.sh` | esbuild bundles `src/globe/main.js` and three.js into `docs/assets/bundle/globe.js` (generated, git-ignored), with the licence of three.js beside it; run by `build.sh` and `serve.sh` |
+| `scripts/meshy.py` | The mascot of the logo as a 3D model by the API of Meshy: Image to 3D, rigging, the GLB files and their provenance in `build/meshy/<date>/` (`npm run mascot:generate`) |
 | `scripts/land-mask.py` | The land mask of the globe, `docs/assets/globe/land.png`, from Natural Earth (`npm run globe:land`) |
 | `scripts/install-skills.sh` | Claude Code skills installed for the user, pinned to a commit (Section 10) |
 | `scripts/check-confidential.py` | Confidentiality guard (pre-commit hook and `npm run check`) |
@@ -433,4 +434,9 @@ Open points:
 - [ ] The globe on the home of the stage site (Section 2): done on the branch `globe`, whose
   pull request into `dev` waits for the first release (`stage` into `master`), so that
   production gets the prototype. Next: the places of issue #1 as points and arcs.
-- [ ] The mascot from Meshy (Section 2): `MESHY_API_KEY` is not set in the Codespace yet.
+- [ ] The mascot from Meshy (Section 2): `scripts/meshy.py` is ready on the branch `mascot`
+  (tested against a fake API, never run against Meshy). Owner: the key as a Codespaces
+  secret `MESHY_API_KEY` with access to this repository
+  ([GitHub Docs](https://docs.github.com/en/codespaces/managing-your-codespaces/managing-your-account-specific-secrets-for-github-codespaces)),
+  then restart the Codespace. Then `npm run mascot:generate`, about 35 credits; copy the GLB
+  the site uses into `docs/assets/models/` within 3 days, when Meshy deletes them.
