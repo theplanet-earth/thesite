@@ -21,6 +21,10 @@ __pycache__/
 private/
 # Copies of this file left by a download or an upload, such as "CLAUDE (1).md"
 /CLAUDE (*).md
+# The scripts of the site, bundled by scripts/bundle.sh from src/
+/docs/assets/bundle/
+# The latest edits to OpenStreetMap, read at every build by scripts/osm-activity.py
+/docs/_data/activity.json
 # Jekyll and Bundler, when run by hand in docs/ (the scripts write to build/ only)
 /docs/_site/
 /docs/.jekyll-cache/

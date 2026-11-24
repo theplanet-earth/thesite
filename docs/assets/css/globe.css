@@ -1,0 +1,65 @@
+/* The globe of the home page (docs/index.html, src/globe/main.js). */
+.globe {
+  position: relative;
+  /* As wide as the content, but never taller than most of the window. */
+  width: min(100%, 42rem, 70vh);
+  aspect-ratio: 1;
+  margin: 0 auto;
+}
+
+.globe canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  /* Vertical swipes still scroll the page; horizontal drags turn the globe. */
+  touch-action: pan-y;
+}
+
+.globe canvas:active {
+  cursor: grabbing;
+}
+
+.globe canvas:focus-visible {
+  outline: 2px solid #9ccc65;
+  outline-offset: 4px;
+  border-radius: 50%;
+}
+
+/* Shown until the first frame, then cross-faded into the canvas (as in the GitHub globe). */
+.globe-placeholder {
+  position: absolute;
+  inset: 9%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #3a7bd5 0%, #1f5fae 45%, #123a6b 100%);
+  box-shadow: 0 0 3rem rgba(127, 200, 255, 0.35);
+}
+
+.globe-fallback {
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  text-align: center;
+  color: #ddd;
+}
+
+.globe--failed .globe-fallback {
+  display: block;
+}
+
+.globe-credits {
+  max-width: 42rem;
+  margin: 1rem auto 2rem;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: #bbb;
+  text-align: center;
+}
+
+.globe-credits a {
+  color: #9cd3ff;
+}

@@ -31,12 +31,14 @@ call the shell scripts in `scripts/`, so they also run without npm.
 
 | Command | What it does |
 |---|---|
-| `npm run build` | Every output in `build/`: the files to attach to a release in `build/release/`, the site (Jekyll, from `docs/`) in `build/pages/` |
+| `npm run build` | Every output in `build/`: the files to attach to a release in `build/release/`, the site (Jekyll, from `docs/`, with the globe bundled from `src/` by esbuild) in `build/pages/` |
 | `npm run serve` | Preview of the site at `http://localhost:4000`, rebuilt on every change (task *Preview: site (live reload)*) |
 | `npm test` | Unit tests (`scripts/test.sh`) |
 | `npm run check` | Tests, confidentiality, `TEMPLATE` markers and the checks of this repository: **run it before every pull request** |
 | `npm run check:confidential` | Confidentiality guard on every tracked file |
 | `npm run check:template -- --list` | The `TEMPLATE` markers still to resolve, with their line |
+| `npm run globe:land` | The land mask of the globe, `docs/assets/globe/land.png`, from Natural Earth: run it only to change its source or size, and commit the result |
+| `npm run globe:activity` | The latest edits to OpenStreetMap for the globe, into `docs/_data/activity.json` (also run by `npm run build` and `npm run serve`; without network, an empty list) |
 | `npm run check:site` | Every local link and resource of the built site (`build/pages/`) exists; part of `npm run check` once the site is built, and a step of CI after its build |
 | `npm run setup:python` | `.venv/` from `requirements.txt`, when the repository has one |
 | `npm run version:current` / `version:next` / `release:notes` | Version of this build, of the next release, and the notes of the next release |
