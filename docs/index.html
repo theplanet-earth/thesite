@@ -23,8 +23,7 @@ body_class: home
       latest <span data-edits-count>{{ edits }}</span> edits to
       <a href="https://www.openstreetmap.org/">OpenStreetMap</a>, as of
       <time data-edits-time datetime="{{ activity.generated }}">{{ activity.generated | date: "%-d %B, %H:%M" }} UTC</time>,
-      taller the more they changed; the arcs join them in the order they were made, as the
-      GitHub globe joins pull requests.</span>
+      taller the more they changed; the arcs join them in the order they were made.</span>
     {%- if edits == 0 %}
     <span data-edits-missing>The latest edits to <a href="https://www.openstreetmap.org/">OpenStreetMap</a>
       could not be read when this version of the site was built.</span>
