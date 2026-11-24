@@ -4,7 +4,14 @@
   // repository has a requirements.txt), otherwise the python3 of the system. Do not set
   // python.defaultInterpreterPath to .venv/: while .venv/ does not exist it warns at every
   // start (CLAUDE.md, Known issues).
-  // TEMPLATE: the settings of the tools of this repository.
+  // The settings of this repository: search leaves out what the build generates (the bundle of
+  // the globe, the edits of OpenStreetMap) and the 3D models.
+  "search.exclude": {
+    "build/**": true,
+    "docs/assets/bundle/**": true,
+    "docs/_data/activity.json": true,
+    "media/**/*.glb": true
+  },
   "files.exclude": {
     "**/.venv": true,
     "**/node_modules": true,
@@ -13,5 +20,5 @@
   },
   "[markdown]": { "editor.wordWrap": "on" },
   "cSpell.language": "en,en-GB",
-  "cSpell.words": ["thesite", "thebox", "theplanet", "devcontainer", "Codespace", "Codespaces", "githooks", "venv", "semver", "SHA256SUMS"]
+  "cSpell.words": ["thesite", "thebox", "theplanet", "devcontainer", "Codespace", "Codespaces", "githooks", "venv", "semver", "SHA256SUMS", "esbuild", "changesets", "Meshy", "Jekyll", "Hyde"]
 }

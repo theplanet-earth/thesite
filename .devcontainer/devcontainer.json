@@ -1,8 +1,8 @@
 {
   // thesite: Ruby 3.3 for the site (Jekyll), the same minor version as the workflows
   // (ruby/setup-ruby); the preview of npm run serve on port 4000, live reload on 35729.
-  // TEMPLATE: the extensions of the tools of this repository (keep .vscode/extensions.json
-  // identical).
+  // The tools of this repository (Jekyll, three.js through esbuild, Python and Node tests) need
+  // no extension beyond those of the harness (keep .vscode/extensions.json identical).
   "name": "thesite",
   "build": {
     "dockerfile": "Dockerfile",

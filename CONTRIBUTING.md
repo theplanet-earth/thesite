@@ -176,4 +176,23 @@ Applies to documentation, comments, commit messages and pull request description
 - Something not yet done is marked explicitly, never with ad hoc text: a `TODO` comment that
   says what is missing and why, or, in a file that comes from thebox, its `TEMPLATE` marker.
 
-<!-- TEMPLATE: the conventions specific to this repository (code style, linters, naming). -->
+## Conventions of this repository
+
+- **The site** is Jekyll in `docs/`: layouts and includes in `_layouts/` and `_includes/`,
+  data in `_data/`, the project's own styles in `assets/css/`, the theme (Hyde on Poole, MIT)
+  in `public/`. Every local link goes through `relative_url`, never a bare path: the build
+  passes an empty `baseurl`, and `npm run check:site` fails on a link that does not resolve.
+- **The scripts of the site** are ES modules in `src/`, bundled by esbuild (`npm run build`,
+  `npm run serve`); no framework. What can be tested without a browser (geometry, timing,
+  data) goes in a module without three.js or the DOM, such as `src/globe/geometry.js`, with
+  its tests in `tests/*.test.mjs` (`node --test`).
+- **The scripts of the repository** are Python 3 with the standard library only, each with
+  its `unittest` tests in `tests/`; a script that reads the network is tested against fake
+  answers, never against the service.
+- **Generated files** are git-ignored and never edited by hand: `build/`,
+  `docs/assets/bundle/`, `docs/_data/activity.json`. The exception, committed as data and
+  said so where it is described, is `docs/assets/globe/land.png` (`npm run globe:land`).
+- **Third-party work** shown by the site is credited on the page that shows it and in
+  `README.md`, *Credits*, with its licence; its terms of use are linked where it is read
+  (the replication of OpenStreetMap, not its editing API). Personal data of third parties,
+  such as the names of the mappers, are not kept.

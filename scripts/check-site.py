@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check of the built site: every local link and resource of its HTML pages exists.
+"""Check of the built site: its links and resources, and what it publishes.
 
     python3 scripts/check-site.py [DIR]    # DIR defaults to build/pages (npm run build)
 
@@ -8,7 +8,10 @@ The link is resolved as a browser resolves it from the page's own address, so a 
 that works on the home page and breaks on /about/ is reported (CLAUDE.md, Section 12: that
 broke the style of /about/ until 2026-11). Links with a scheme (https:, mailto:, data:),
 protocol-relative links (//host) and links to a fragment of the same page are not checked.
-Exit status 1 when a link is broken, 2 when DIR does not exist. Standard library only.
+Also reported: a resource loaded over plain http (stylesheet, script, image, frame, media),
+which a browser on https blocks or upgrades; and a file that should not be published
+(README.md, CNAME, Gemfile, Gemfile.lock: the theme's and the demo's, removed in 2026-11).
+Exit status 1 on any problem, 2 when DIR does not exist. Standard library only.
 """
 from __future__ import annotations
 
@@ -21,6 +24,10 @@ ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_DIR = ROOT / "build" / "pages"
 # The attributes that point to another file, per element (srcset is not used by the site).
 LINK_ATTRIBUTES = {"href", "src", "poster"}
+# Elements whose href or src the browser loads with the page: over http, a mixed resource.
+RESOURCE_TAGS = {"link", "script", "img", "iframe", "source", "audio", "video", "embed"}
+# Files that a site never needs to publish.
+UNPUBLISHED = {"README.md", "CNAME", "Gemfile", "Gemfile.lock"}
 
 
 class Links(HTMLParser):
@@ -29,11 +36,14 @@ class Links(HTMLParser):
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
         self.found: list[tuple[int, str]] = []
+        self.insecure: list[tuple[int, str]] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         for name, value in attrs:
             if name in LINK_ATTRIBUTES and value is not None:
                 self.found.append((self.getpos()[0], value.strip()))
+                if tag in RESOURCE_TAGS and value.strip().lower().startswith("http:"):
+                    self.insecure.append((self.getpos()[0], value.strip()))
 
 
 def page_url(site: Path, page: Path) -> str:
@@ -72,6 +82,8 @@ def broken_links(site: Path) -> list[str]:
         parser = Links()
         parser.feed(page.read_text(encoding="utf-8", errors="replace"))
         base = page_url(site, page)
+        for line, value in parser.insecure:
+            problems.append(f"{page.relative_to(site).as_posix()}:{line}: {value} (a resource over plain http)")
         for line, value in parser.found:
             if not is_local(value):
                 continue
@@ -79,6 +91,11 @@ def broken_links(site: Path) -> list[str]:
             if target(site, path) is None:
                 problems.append(f"{page.relative_to(site).as_posix()}:{line}: {value} (resolved to {path})")
     return problems
+
+
+def unpublished(site: Path) -> list[str]:
+    """The files of the site that should not be published."""
+    return sorted(p.relative_to(site).as_posix() for p in site.rglob("*") if p.is_file() and p.name in UNPUBLISHED)
 
 
 def main(argv: list[str]) -> int:
@@ -89,11 +106,15 @@ def main(argv: list[str]) -> int:
     problems = broken_links(site)
     for problem in problems:
         print(f"site: broken link: {problem}", file=sys.stderr)
+    extra = unpublished(site)
+    for name in extra:
+        print(f"site: should not be published: {name}", file=sys.stderr)
+    problems += extra
     pages = sum(1 for _ in site.rglob("*.html"))
     if problems:
-        print(f"site: {len(problems)} broken links in {pages} pages", file=sys.stderr)
+        print(f"site: {len(problems)} problems in {pages} pages", file=sys.stderr)
         return 1
-    print(f"site: {pages} pages, every local link and resource exists")
+    print(f"site: {pages} pages, every local link and resource exists, nothing over http, nothing unpublishable")
     return 0
 
 
