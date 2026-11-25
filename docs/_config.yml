@@ -9,5 +9,8 @@ description: >-
 
 permalink: pretty
 
+# The holder of the copyright, in the notice of the sidebar (README.md, License).
+author: Andrea Gallegati
+
 github:
   repo: https://github.com/theplanet-earth/thesite

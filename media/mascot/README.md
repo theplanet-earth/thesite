@@ -19,6 +19,9 @@ made on 2026-11-24 are kept, since Meshy deletes them after 3 days:
   tasks, the parameters and the credits are in `provenance.json`.
 - **Owned by** the organization: on a paid plan of Meshy the customer owns the output
   ([terms of use](https://www.meshy.ai/terms-of-use), 3.2).
+- **Not licensed**: © Andrea Gallegati, all rights reserved. Like the logo, these files are
+  outside the MIT License of the repository and the CC BY 4.0 of the texts of the site
+  (`README.md`, *License*).
 - **Not used by the site.** The owner chose on 2026-11-24 to keep the globe in the style of
   GitHub on the home page, and to keep this model for another use, for instance an easter egg
   of [thegame](https://github.com/theplanet-earth/thegame). This folder is outside `docs/`, so
