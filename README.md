@@ -97,8 +97,10 @@ unset: the GitHub Pages site of this repository is the stage site.
 
 ## License
 
-Decided by the owner on 2026-11-25 (issue #10). The notice in the sidebar of every page links
-here.
+Decided by the owner on 2026-11-25 (issue #10). The notice in the sidebar of every page,
+"© 2024-<year of the build> Andrea Gallegati", links here; on 1 January
+`.github/workflows/new-year.yml` rebuilds the stage site, so that the year moves on without a
+commit.
 
 - **Code**: the [MIT License](LICENSE), © 2024 Andrea Gallegati. It covers everything in the
   repository that the next items do not name, its documentation included, and

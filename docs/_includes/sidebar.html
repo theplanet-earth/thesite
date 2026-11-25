@@ -23,7 +23,9 @@
     </nav>
 
     <!-- The notice links to the License section of README.md: the code under MIT, the texts
-         under CC BY 4.0, the logo and the mascot not licensed (owner, 2026-11-25). -->
-    <p><a href="{{ site.github.repo }}#license">&copy; {{ site.time | date: '%Y' }} {{ site.author }}</a></p>
+         under CC BY 4.0, the logo and the mascot not licensed (owner, 2026-11-25). It runs from
+         2024, the year of LICENSE, to the year of the build; .github/workflows/new-year.yml
+         rebuilds the site on 1 January. -->
+    <p><a href="{{ site.github.repo }}#license">&copy; 2024-{{ site.time | date: '%Y' }} {{ site.author }}</a></p>
   </div>
 </div>
