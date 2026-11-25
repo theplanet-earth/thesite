@@ -9,12 +9,17 @@ that works on the home page and breaks on /about/ is reported (CLAUDE.md, Sectio
 broke the style of /about/ until 2026-11). Links with a scheme (https:, mailto:, data:),
 protocol-relative links (//host) and links to a fragment of the same page are not checked.
 Also reported: a resource loaded over plain http (stylesheet, script, image, frame, media),
-which a browser on https blocks or upgrades; and a file that should not be published
-(README.md, CNAME, Gemfile, Gemfile.lock: the theme's and the demo's, removed in 2026-11).
+which a browser on https blocks or upgrades; a resource loaded from another host (an
+element of the page, or a url() or @import of a stylesheet), which would give the address of
+every visitor to that host, as Google Fonts did until 2026-11-25 (docs/privacy.md: the site
+loads everything from itself; what its scripts read is said there); and a file that should not
+be published (README.md, CNAME, Gemfile, Gemfile.lock: the theme's and the demo's, removed in
+2026-11).
 Exit status 1 on any problem, 2 when DIR does not exist. Standard library only.
 """
 from __future__ import annotations
 
+import re
 import sys
 from html.parser import HTMLParser
 from pathlib import Path, PurePosixPath
@@ -26,6 +31,10 @@ DEFAULT_DIR = ROOT / "build" / "pages"
 LINK_ATTRIBUTES = {"href", "src", "poster"}
 # Elements whose href or src the browser loads with the page: over http, a mixed resource.
 RESOURCE_TAGS = {"link", "script", "img", "iframe", "source", "audio", "video", "embed"}
+# Values of rel with which a <link> loads nothing (the others: stylesheet, icon, preconnect...).
+NOT_LOADED_RELS = {"alternate", "author", "canonical", "help", "license", "me"}
+# url(...) and @import "..." of a stylesheet, towards another host (with a scheme, or //host).
+CSS_REMOTE = re.compile(r"""(?:url\(\s*['"]?|@import\s+['"])\s*((?:[a-z][a-z0-9+.-]*:)?//[^'")\s]+)""", re.IGNORECASE)
 # Files that a site never needs to publish.
 UNPUBLISHED = {"README.md", "CNAME", "Gemfile", "Gemfile.lock"}
 
@@ -37,13 +46,18 @@ class Links(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.found: list[tuple[int, str]] = []
         self.insecure: list[tuple[int, str]] = []
+        self.remote: list[tuple[int, str]] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        rels = set((dict(attrs).get("rel") or "").lower().split())
+        loads = tag in RESOURCE_TAGS and not (tag == "link" and rels and rels <= NOT_LOADED_RELS)
         for name, value in attrs:
             if name in LINK_ATTRIBUTES and value is not None:
                 self.found.append((self.getpos()[0], value.strip()))
-                if tag in RESOURCE_TAGS and value.strip().lower().startswith("http:"):
+                if loads and value.strip().lower().startswith("http:"):
                     self.insecure.append((self.getpos()[0], value.strip()))
+                if loads and urlsplit(value.strip()).netloc:
+                    self.remote.append((self.getpos()[0], value.strip()))
 
 
 def page_url(site: Path, page: Path) -> str:
@@ -93,6 +107,19 @@ def broken_links(site: Path) -> list[str]:
     return problems
 
 
+def third_party(site: Path) -> list[str]:
+    """"file:line: value" for every resource a page or a stylesheet loads from another host."""
+    problems = []
+    for page in sorted(site.rglob("*.html")):
+        parser = Links()
+        parser.feed(page.read_text(encoding="utf-8", errors="replace"))
+        problems += [f"{page.relative_to(site).as_posix()}:{line}: {value}" for line, value in parser.remote]
+    for sheet in sorted(site.rglob("*.css")):
+        for number, text in enumerate(sheet.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+            problems += [f"{sheet.relative_to(site).as_posix()}:{number}: {match}" for match in CSS_REMOTE.findall(text)]
+    return problems
+
+
 def unpublished(site: Path) -> list[str]:
     """The files of the site that should not be published."""
     return sorted(p.relative_to(site).as_posix() for p in site.rglob("*") if p.is_file() and p.name in UNPUBLISHED)
@@ -106,6 +133,10 @@ def main(argv: list[str]) -> int:
     problems = broken_links(site)
     for problem in problems:
         print(f"site: broken link: {problem}", file=sys.stderr)
+    remote = third_party(site)
+    for problem in remote:
+        print(f"site: loaded from another host: {problem}", file=sys.stderr)
+    problems += remote
     extra = unpublished(site)
     for name in extra:
         print(f"site: should not be published: {name}", file=sys.stderr)
@@ -114,7 +145,7 @@ def main(argv: list[str]) -> int:
     if problems:
         print(f"site: {len(problems)} problems in {pages} pages", file=sys.stderr)
         return 1
-    print(f"site: {pages} pages, every local link and resource exists, nothing over http, nothing unpublishable")
+    print(f"site: {pages} pages, every local link and resource exists, nothing over http, nothing from another host, nothing unpublishable")
     return 0
 
 

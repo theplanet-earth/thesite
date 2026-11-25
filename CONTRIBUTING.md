@@ -41,7 +41,7 @@ call the shell scripts in `scripts/`, so they also run without npm.
 | `npm run mascot:generate` | The mascot of the logo as a 3D model, by the API of Meshy, into `build/meshy/<date>/`: it spends credits of the organization and needs `MESHY_API_KEY` in the environment (`-- --dry-run` shows the requests only) |
 | `npm run globe:activity` | The latest edits to OpenStreetMap for the globe, into `docs/_data/activity.json` (also run by `npm run build` and `npm run serve`; without network, an empty list) |
 | `npm run worker:check` / `worker:dev` | The Worker of production (`wrangler.jsonc`, `worker/`): validate and bundle it without deploying, or serve the built site with it at `http://localhost:8787`; wrangler at the version of `scripts/worker.sh`, no account needed |
-| `npm run check:site` | Every local link and resource of the built site (`build/pages/`) exists; part of `npm run check` once the site is built, and a step of CI after its build |
+| `npm run check:site` | Every local link and resource of the built site (`build/pages/`) exists, and none is loaded from another host; part of `npm run check` once the site is built, and a step of CI after its build |
 | `npm run setup:python` | `.venv/` from `requirements.txt`, when the repository has one |
 | `npm run version:current` / `version:next` / `release:notes` | Version of this build, of the next release, and the notes of the next release |
 | `npm run clean` | Remove `build/` |
@@ -199,3 +199,8 @@ Applies to documentation, comments, commit messages and pull request description
   such as the names of the mappers, are not kept, whether the build or the browser reads
   them. An attribution that its licence wants next to the data (OpenStreetMap) stays there;
   the other credits may go on the page that explains the work.
+- **The data of the visitors**: the site sets no cookie, stores nothing in the browser, and
+  loads its pages, fonts, styles, scripts and images from itself (`npm run check:site` fails
+  on a resource of another host). A change that makes the browser contact another host, or
+  that keeps anything about a visitor, changes the page *Privacy* (`docs/privacy.md`) in the
+  same pull request, before it reaches a site.

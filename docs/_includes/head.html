@@ -19,12 +19,10 @@
   <link rel="stylesheet" href="{{ '/public/css/syntax.css' | relative_url }}">
   <link rel="stylesheet" href="{{ '/public/css/hyde.css' | relative_url }}">
 
-  <!-- Fonts, as the prototype loads them (over https): PT Sans and Abril Fatface of the theme,
-       Roboto Mono for the logotype of the sidebar. -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap">
+  <!-- Fonts, served by the site itself, never by another host (the owner, 2026-11-25; the
+       privacy page, and scripts/check-site.py, which fails on a resource of another host):
+       PT Sans of the theme, Roboto Mono for the logotype of the sidebar. -->
+  <link rel="stylesheet" href="{{ '/assets/css/fonts.css' | relative_url }}?v={{ site.time | date: '%s' }}">
 
   <!-- The project's own styles. -->
   <!-- ?v= changes at every build, so that no browser keeps older styles. -->
