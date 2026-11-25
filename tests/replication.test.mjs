@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { MAX_FILES, TARGET_EDITS, lastRunOf, mergeEdits, parseChangesets, pathOf, sequenceOf } from '../src/globe/replication.js';
+import { MAX_EDITS, WINDOW_FILES, WINDOW_MINUTES, inWindow, lastRunOf, mergeEdits, parseChangesets, pathOf, sequenceOf } from '../src/globe/replication.js';
 
 const state = '---\nlast_run: 2026-11-24 19:28:00.847874000 +00:00\nsequence: 7280737\n';
 
@@ -40,11 +40,19 @@ test('mergeEdits keeps each edit once, oldest first, and the latest ones only', 
   const c = { lat: 3, lon: 3, changes: 3, closed: '2026-11-24T19:22:00Z' };
   assert.deepEqual(mergeEdits([b, a], [c, b]), [a, b, c]);
   assert.deepEqual(mergeEdits([a, b], [c], 2), [b, c]);
-  assert.equal(mergeEdits([], Array.from({ length: 300 }, (_, i) => ({ ...a, lat: i }))).length, TARGET_EDITS);
-  assert.equal(mergeEdits([], Array.from({ length: 300 }, (_, i) => ({ ...a, lat: i })), Infinity).length, 300);
+  assert.equal(mergeEdits([], Array.from({ length: 300 }, (_, i) => ({ ...a, lat: i }))).length, 300);
+  assert.equal(mergeEdits([], Array.from({ length: MAX_EDITS + 5 }, (_, i) => ({ ...a, lat: i }))).length, MAX_EDITS);
 });
 
-test('the window is about the snapshot of the build', () => {
-  assert.equal(TARGET_EDITS, 120);
-  assert.ok(MAX_FILES >= 4 && MAX_FILES <= 15);
+test('inWindow keeps the edits closed in the minutes before the last run', () => {
+  const asOf = new Date('2026-11-25T21:30:00Z');
+  const at = (closed) => ({ lat: 0, lon: 0, changes: 1, closed });
+  const edits = [at('2026-11-25T21:09:59Z'), at('2026-11-25T21:10:00Z'), at('2026-11-25T21:29:59Z')];
+  assert.deepEqual(inWindow(edits, asOf).map((e) => e.closed), ['2026-11-25T21:10:00Z', '2026-11-25T21:29:59Z']);
+  assert.deepEqual(inWindow(edits, asOf, 1).map((e) => e.closed), ['2026-11-25T21:29:59Z']);
+});
+
+test('the window is 20 minutes, read from two files more', () => {
+  assert.equal(WINDOW_MINUTES, 20);
+  assert.equal(WINDOW_FILES, WINDOW_MINUTES + 2);
 });
