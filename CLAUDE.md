@@ -205,6 +205,11 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   It stores nothing, so that the page stays true: a visit starts when the page was not
   reached from another page of the site (`document.referrer`), and a reload or a step in the
   history is not a new one; it opens again at the next visit.
+- 2026-11-25, "quando lo visualizzo da cellulare vorrei che il logo THEPLANET fosse alto tanto
+  quanto il logo. aggiustali in questo caso per fare si che mantengano le proporzioni": on
+  narrow screens the logotype is as high as the mascot, 3.5rem, and each keeps its
+  proportions: the mascot takes its width from its height, the logotype scales its text,
+  padding and border together (`docs/assets/css/theplanet.css`).
 
 Rules of the organization, carried over from thebox or from its issues (keep them unless the
 owner decides otherwise):
@@ -596,7 +601,10 @@ harness) comes from thebox, which is versioned and released like any other repos
   1440x900 and 1024x768 for the height, 2026-11-24; screenshots in `.playwright-mcp/`,
   git-ignored): the home page ("Global reach") and `/globe/` fit one window, without
   scrolling; the menu lists Home, About and Privacy, then the icon of GitHub; on narrow screens the
-  sidebar is a single row; no console error from the site, no broken link, no horizontal
+  sidebar is a single row, with the mascot and the logotype 56 pixels high and aligned
+  (2026-11-25), down to about 350 pixels (the gaps narrow below 400, so that 360 keeps one
+  row); below, as at 320, two centred rows, the mascot and the logotype, then the menu
+  (measured with Playwright, 2026-11-25); no console error from the site, no broken link, no horizontal
   scroll. Fixed on the way:
   the tiles of CARTO, which now need a key ([CARTO](https://carto.com/basemaps/apikey)),
   until the globe replaced the map; `/about/` without style (links relative to the page);
