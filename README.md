@@ -43,8 +43,13 @@
 > So the Codespace of one repository talks to the others through issues only
 > ([CONTRIBUTING.md](CONTRIBUTING.md#branches-and-pull-requests)). The rules of
 > [CLAUDE.md](CLAUDE.md) also forbid an assistant to push to `stage` or `master` of this
-> repository, to merge into them or to force-push; the token of this repository does not,
-> and no ruleset protects its branches yet (issue #25): those rules are the only guard here.
+> repository, to merge into them or to force-push; the token of this repository does not.
+> Since 2026-11-25 two rulesets enforce part of them on GitHub (issue #25,
+> [CONTRIBUTING.md](CONTRIBUTING.md#branches-and-pull-requests)): no force push and no
+> deletion of `dev`, `stage` and `master`, and `stage` and `master` change only through a
+> squash-merged pull request with CI green. The admins of the repository may bypass them,
+> and a Codespace acts as its owner, who is one: for an assistant, the rules of `CLAUDE.md`
+> remain the guard.
 >
 > The Codespace also: enables the git hooks of `.githooks/` (the confidentiality guard),
 > installs the npm, Python and Ruby dependencies, the Chromium of the Playwright MCP server

@@ -84,9 +84,21 @@ call the shell scripts in `scripts/`, so they also run without npm.
   merges picks the method on the merge button: *Squash and merge* along the chain, *Create a
   merge commit* into `dev`. The settings of the repository that go with it (*Settings,
   General, Pull Requests*: keep merge commits and squash merging, *Default to pull request
-  title* for the squash, rebase merging off) are set (issue #7); the ruleset on `stage` and
-  `master` is issue #25
-  ([GitHub documentation](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/configuring-commit-squashing-for-pull-requests)).
+  title* for the squash, rebase merging off) are set (issue #7)
+  ([GitHub documentation](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/configuring-commit-squashing-for-pull-requests));
+  the rulesets below allow only the squash into `stage` and `master`.
+- **Two rulesets** of the repository (*Settings, Rules, Rulesets*; set by the owner on
+  2026-11-25, issue #25) make GitHub enforce these rules
+  ([GitHub documentation](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets)):
+
+  | Ruleset | Branches | Rules |
+  |---|---|---|
+  | `chain` | `stage`, `master` | No deletion; no force push; changes only through a pull request, merged with *Squash and merge* only, without required approvals, once the check `check` of CI has passed (the branch need not be up to date) |
+  | `dev` | `dev` | No deletion; no force push. Direct pushes stay allowed: the work happens there |
+
+  The role *Repository admin* may bypass both, always: the merge back of `master` into
+  `stage` is a direct push and needs it. A Codespace acts as its owner, an admin, so it may
+  bypass them too; the rules of this file still apply to whoever can.
 - Every pull request to `stage` or `master` runs **CI** (`.github/workflows/ci.yml`): checks and
   build. Its job summary shows the version and the release notes that merging into `master`
   would publish, and the `TEMPLATE` markers left.

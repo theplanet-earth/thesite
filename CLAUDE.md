@@ -221,6 +221,11 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   4.0", a [static badge](https://shields.io/badges/static-badge) linking to *License*, since
   the badge that GitHub reads from `LICENSE` would say MIT only. No badge of CI: it runs on
   pull requests only. The alt text of the logo was "The Pipeline", a leftover.
+- 2026-11-25, "ho fatto anche i ruleset su dev stage e master, documenta tutto da qualche
+  parte": the owner created the rulesets `chain` (`stage`, `master`) and `dev` (`dev`) of
+  issue #25; they are described in `CONTRIBUTING.md` (*Branches and pull requests*), in the
+  caution of `README.md` and in Section 12. The same day the owner set the email records
+  against spoofing of `theplanet.observer` (issue #3).
 
 Rules of the organization, carried over from thebox or from its issues (keep them unless the
 owner decides otherwise):
@@ -387,7 +392,9 @@ The rules are in `CONTRIBUTING.md`, *Confidentiality*. In addition:
   owner asks Claude to merge a pull request, Claude squash-merges it with the subject and body
   that `CONTRIBUTING.md` describes (`gh pr merge --squash --subject ... --body ...`), then
   merges the target back down the chain. The only push to `stage` outside a pull request is
-  the merge back of `master` into it.
+  the merge back of `master` into it. The rulesets of issue #25 enforce part of this on
+  GitHub, but the token of a Codespace may bypass them as the owner
+  (`current_user_can_bypass: always`): GitHub does not stop Claude, this rule does.
 - **Before working on `dev`**, fetch and complete any merge back the chain lacks (`master`
   into `stage`, `stage` into `dev`): the owner may have squash-merged a pull request without
   merging it back. Merging them into the working branch is always allowed.
@@ -595,8 +602,10 @@ harness) comes from thebox, which is versioned and released like any other repos
   certificate at the first deploy (`v0.2.0`), and `/api/osm-edits.json` 200. Until then the
   stage domain answered Cloudflare's "DNS points to prohibited IP"
   ([Error 1000](https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1000/)).
-  The email records against spoofing of `theplanet.observer` (already on `theplanet.wtf`)
-  were deferred by the owner until the first deploy: they are in issue #3, not set yet.
+  The email records against spoofing (SPF `v=spf1 -all`, DMARC `p=reject`, an empty DKIM
+  key and a null MX, issue #3) are on both domains: on `theplanet.wtf` since 2026-11-24, on
+  `theplanet.observer` since 2026-11-25, after the first deploy as the owner chose, without
+  harm to the custom domain of the Worker (`dig` and HTTP 200, 2026-11-25).
 - **The yearly rebuild** (`.github/workflows/new-year.yml`, 2026-11-25): GitHub runs a
   schedule only from the default branch, so it works since the file reached `master` with
   `v0.2.0` (*New year* is active); the run then has the ref of `master`, and the environment
@@ -634,7 +643,16 @@ harness) comes from thebox, which is versioned and released like any other repos
   at 800x600). To decide with the owner.
 - **Merge settings of the repository** (GitHub API, 2026-11-25, issue #7, closed): squash
   and merge commits allowed, rebase off; squash title `PR_TITLE` and message `BLANK`, as
-  `CONTRIBUTING.md` expects. No ruleset exists yet (issue #25).
+  `CONTRIBUTING.md` expects.
+- **Rulesets** (GitHub API, `GET /repos/theplanet-earth/thesite/rulesets`, 2026-11-25, set by
+  the owner, issue #25): `chain` (id 28115089) on `stage` and `master`, with *deletion*,
+  *non_fast_forward*, *pull_request* (squash only, 0 approvals) and *required_status_checks*
+  (`check` of GitHub Actions, not strict); `dev` (id 28115148) on `dev`, with *deletion* and
+  *non_fast_forward*; both active, bypassed always by the role *Repository admin* (actor 5),
+  and the API answers `current_user_can_bypass: always` to the token of the Codespace.
+  **Reported, not changed**: `chain` also holds
+  `require_extra_approval_for_unattributed_changes: true`, which the table of #25 did not
+  list. Not verified yet: the first merge back of `master` into `stage` under the ruleset.
 - **The labels** `release:major`, `release:minor` and `release:patch`, read by `ci.yml` and
   `release.yml`, exist since 2026-11-25 (issue #26, closed); none is on a pull request.
 - **The data of the visitors** (2026-11-25, `docs/privacy.md`): checked on the code and on
@@ -669,10 +687,11 @@ Open points:
   Logging on the zone of `theplanet.observer`, and the page no longer needs to name it.
 - [ ] Owner: review the page *Privacy* before it reaches `stage`, in particular the sentence
   on what the controller sees in the dashboard of Cloudflare and keeps of it (nothing).
-- [ ] Owner: the ruleset `chain` on `stage` and `master` (issue #25), which needs admin
-  rights.
-- [ ] Owner: the email records against spoofing of `theplanet.observer`, due now that the
-  Worker is deployed, and the rest of the hardening of the Cloudflare zones (issue #3).
+- [ ] The first merge back of `master` into `stage` under the ruleset `chain` (issue #25):
+  check that the bypass lets it through, then close #25.
+- [ ] Owner: the rest of the hardening of the Cloudflare zones (issue #3): the proxy of
+  `theplanet.wtf`, SSL *Full (strict)*, DNSSEC, HSTS, and the rotation of the token of
+  production before about 2027-11-25.
 - [ ] Older issues to plan with the owner: #1 (coverage map: colours from an API,
   click to explore), #4 (security audit with the skill, profile `quick`, findings only as
   private advisories), #18 (a section of the site with a Leaflet map).
