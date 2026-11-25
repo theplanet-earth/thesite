@@ -659,6 +659,19 @@ harness) comes from thebox, which is versioned and released like any other repos
   list. Not verified yet: the first merge back of `master` into `stage` under the ruleset.
 - **The labels** `release:major`, `release:minor` and `release:patch`, read by `ci.yml` and
   `release.yml`, exist since 2026-11-25 (issue #26, closed); none is on a pull request.
+- **The address of the page *Privacy*** (2026-11-25, checked from outside): `privacy@theplanet.dev`
+  is forwarded by Cloudflare Email Routing (Compute, Email Service, Email Routing; a routing
+  rule *Send to an email* to the owner's verified inbox), and a test message arrived. The
+  DNS of `theplanet.dev` holds the three MX records of Cloudflare (`route1` to `route3.mx.cloudflare.net`),
+  the SPF `v=spf1 include:_spf.mx.cloudflare.net ~all`, the DKIM `cf2024-1._domainkey`, and
+  the DMARC `v=DMARC1; p=reject; sp=reject; adkim=s; aspf=s`, as on `theplanet.wtf`: nothing
+  is sent from `theplanet.dev`. Email Routing only forwards
+  ([documentation](https://developers.cloudflare.com/email-service/configuration/email-routing-addresses/)):
+  a reply leaves from the owner's own address, and sending as `privacy@` would need a
+  sending service, with its SPF and DKIM, before the DMARC lets it through. The owner
+  approved the page on 2026-11-25 ("perfetta, va benissimo"). Mail servers of Cloudflare
+  refuse SMTP connections from a Codespace (its address of Azure is on a blocklist), so an
+  address is tested by sending it a message from another account.
 - **The data of the visitors** (2026-11-25, `docs/privacy.md`): checked on the code and on
   both live sites, the site sets no cookie (no `Set-Cookie` on `theplanet.observer` nor on
   `theplanet.wtf`) and stores nothing in the browser. Until then every page loaded its fonts
@@ -684,13 +697,8 @@ harness) comes from thebox, which is versioned and released like any other repos
 
 Open points:
 
-- [ ] Owner: the address `privacy@theplanet.dev` of the page *Privacy* (Section 2):
-  Cloudflare Email Routing on `theplanet.dev`, with a rule that forwards it to a verified
-  inbox ([Email Routing](https://developers.cloudflare.com/email-routing/get-started/)),
-  before the page reaches `stage`; then a test message. Optional: turn off Network Error
-  Logging on the zone of `theplanet.observer`, and the page no longer needs to name it.
-- [ ] Owner: review the page *Privacy* before it reaches `stage`, in particular the sentence
-  on what the controller sees in the dashboard of Cloudflare and keeps of it (nothing).
+- [ ] Optional, owner: turn off Network Error Logging on the zone of `theplanet.observer`;
+  the page *Privacy* then no longer needs to name it.
 - [ ] The first merge back of `master` into `stage` under the ruleset `chain` (issue #25):
   check that the bypass lets it through, then close #25.
 - [ ] Owner: the rest of the hardening of the Cloudflare zones (issue #3): the proxy of
