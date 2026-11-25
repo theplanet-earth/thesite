@@ -112,7 +112,9 @@ moves on without a commit.
 - **Logo and mascot**: not licensed, © Andrea Gallegati, all rights reserved. The logo is
   `docs/assets/images/theplanet.png`, `media/theplanetearth.png`,
   `docs/public/apple-touch-icon.png` and `docs/public/favicon.ico`; the mascot in 3D is
-  `media/mascot/`. Neither license above covers them, nor the name of the project.
+  `media/mascot/`. Neither license above covers them, nor the name of the project. The logo
+  was generated with ChatGPT (DALL-E) and edited by hand: its provenance is in
+  `media/README.md` (issue #19).
 - **Third-party work** keeps its own license (*Credits*): the Hyde theme on Poole
   (`docs/public/css/`, MIT, `docs/public/LICENSE.md`), three.js (MIT, bundled with its
   licence), the icon of GitHub (Octicons, MIT). The data the globe shows keep their terms:
