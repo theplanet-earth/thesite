@@ -1,7 +1,8 @@
 """The deploys of the two sites (CLAUDE.md, Section 1): stage.yml publishes stage on GitHub
-Pages; production.yml publishes master on the Worker at theplanet.observer, called by
-release.yml and gated by DEPLOY_PRODUCTION; new-year.yml starts both on 1 January, so that
-the year of the notice moves on (the owner, 2026-11-25). Standard library only: the
+Pages, built for stage, with the banner "Work in progress" atop and below every page; production.yml
+publishes master on the Worker at theplanet.observer, built for production, without it,
+called by release.yml and gated by DEPLOY_PRODUCTION; new-year.yml starts both on 1 January,
+so that the year of the notice moves on (the owner, 2026-11-25). Standard library only: the
 workflows are read as text."""
 import os
 import re
@@ -39,9 +40,35 @@ class NewYearTest(unittest.TestCase):
             self.assertRegex(workflow(name), r"(?m)^\s+workflow_dispatch:", name)
 
 
+class StageTest(unittest.TestCase):
+    def setUp(self):
+        self.text = workflow("stage.yml")
+
+    def test_it_builds_for_stage_and_checks_the_banner_before_the_deploy(self):
+        self.assertRegex(self.text, r"(?m)^    env:\n      JEKYLL_ENV: stage\b")
+        build = self.text.index("run: npm run build")
+        check = self.text.index("run: npm run check:site")
+        upload = self.text.index("uses: actions/upload-pages-artifact@")
+        self.assertLess(build, check)
+        self.assertLess(check, upload)
+
+    def test_no_other_workflow_builds_for_stage(self):
+        for path in sorted(WORKFLOWS.glob("*.yml")):
+            if path.name != "stage.yml":
+                self.assertNotIn("JEKYLL_ENV", path.read_text(encoding="utf-8"), path.name)
+
+
 class ProductionTest(unittest.TestCase):
     def setUp(self):
         self.text = workflow("production.yml")
+
+    def test_the_worker_builds_for_production_and_checks_before_wrangler(self):
+        script = (ROOT / "scripts" / "worker.sh").read_text(encoding="utf-8")
+        steps = ["\nexport JEKYLL_ENV=production\n", "\nbash scripts/build.sh\n",
+                 '\n"$PY" scripts/check-site.py\n', "\ncase \"${1:-}\" in\n"]
+        positions = [script.index(step) for step in steps]
+        self.assertEqual(positions, sorted(positions), "export, build, check, then wrangler")
+        self.assertEqual(script.count("wrangler@"), script[positions[-1]:].count("wrangler@"))
 
     def test_it_deploys_master_only_once_the_owner_allows_it(self):
         self.assertIn("if: github.ref == 'refs/heads/master' && vars.DEPLOY_PRODUCTION == 'true'", self.text)

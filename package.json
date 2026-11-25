@@ -6,6 +6,7 @@
   "scripts": {
     "build": "bash scripts/build.sh",
     "serve": "bash scripts/serve.sh",
+    "serve:stage": "JEKYLL_ENV=stage bash scripts/serve.sh",
     "test": "bash scripts/test.sh",
     "check": "bash scripts/check.sh",
     "check:confidential": "python3 scripts/check-confidential.py --all",

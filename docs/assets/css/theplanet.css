@@ -89,14 +89,16 @@
 /* On wide screens the sidebar keeps the logo, the logotype and the spacing of the prototype
    (the owner, 2026-11-24), with the pages and the icon on one row under them. Below a window
    800 pixels high, logo and logotype shrink with its height, so that no scrollbar appears;
-   from 800 pixels up they keep their size. */
+   from 800 pixels up they keep their size. On the stage site the height is the one between its
+   banners (assets/css/preview.css); elsewhere the banners are 0 high, and they follow 41vh
+   and 12.5vh. */
 @media (min-width: 48em) {
     .sidebar-logo img {
-        max-height: 41vh;
+        max-height: calc(0.41 * (100vh - var(--preview-height, 0rem)));
     }
 
     .roboto-mono-sidebar h1 {
-        font-size: min(5em, 12.5vh);
+        font-size: min(5em, calc(0.125 * (100vh - var(--preview-height, 0rem))));
     }
 
     .sidebar-nav {
