@@ -8,6 +8,9 @@
 #                                  theplanet.observer: run by .github/workflows/production.yml
 # check and dev need no account of Cloudflare; deploy needs CLOUDFLARE_API_TOKEN and
 # CLOUDFLARE_ACCOUNT_ID in the environment (issues #6 and #7), never in a file.
+# The site is always built for production, whatever JEKYLL_ENV the shell holds, and checked
+# before wrangler runs: the banner of the stage site never reaches theplanet.observer (the
+# owner, 2026-11-25), nor does a broken link.
 . "$(dirname "$0")/lib.sh"
 
 WRANGLER_VERSION="4.168.0"
@@ -18,7 +21,9 @@ if [[ "${1:-}" == deploy ]]; then
   [[ -n "${CLOUDFLARE_API_TOKEN:-}" && -n "${CLOUDFLARE_ACCOUNT_ID:-}" ]] \
     || die "deploy needs CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID in the environment."
 fi
+export JEKYLL_ENV=production
 bash scripts/build.sh
+"$PY" scripts/check-site.py
 case "${1:-}" in
   check) exec npx --yes "wrangler@${WRANGLER_VERSION}" deploy --dry-run --outdir "$BUILD/worker" ;;
   dev) exec npx --yes "wrangler@${WRANGLER_VERSION}" dev --ip 127.0.0.1 --port 8787 ;;
