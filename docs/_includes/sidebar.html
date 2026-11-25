@@ -1,41 +1,31 @@
 <div class="sidebar">
-  <!-- <div class="container sidebar-sticky"> -->
   <div class="container">
     <div class="sidebar-about roboto-mono-sidebar">
-      <div>
-        <img src="/assets/images/theplanet.png " alt="The walkin planet" style="max-width: 100%; vertical-align: text-top;">
-      </div>
-      <h1>
-        <!-- <a href="{{ site.baseurl }}"> -->
-          <!-- {{ site.title }} -->
-          THE<br>PLA<br>NET<br>
-        <!-- </a> -->
-      </h1>
-      <!-- <p class="lead">{{ site.description }}</p> -->
+      <a href="{{ '/' | relative_url }}" class="sidebar-logo">
+        <div><img src="{{ '/assets/images/theplanet.png' | relative_url }}" alt="The mascot of the project: the Earth walking, with a cap and sunglasses"></div>
+        <h1>THE<br>PLA<br>NET<br></h1>
+      </a>
     </div>
 
-    <!-- <nav class="sidebar-nav">
-      <a class="sidebar-nav-item{% if page.url == site.baseurl %} active{% endif %}" href="{{ site.baseurl }}">Home</a>
+    <nav class="sidebar-nav" aria-label="Pages">
+      {%- assign home = '/' | relative_url %}
+      <a class="sidebar-nav-item{% if page.url == '/' %} active{% endif %}" href="{{ home }}"{% if page.url == '/' %} aria-current="page"{% endif %}>Home</a>
+      {%- comment %} The pages with a nav_order; /globe/ has none, and is linked under the globe. {%- endcomment %}
+      {%- assign pages = site.pages | where_exp: "node", "node.nav_order" | sort: "nav_order" %}
+      {%- for node in pages %}
+      <a class="sidebar-nav-item{% if page.url == node.url %} active{% endif %}" href="{{ node.url | relative_url }}"{% if page.url == node.url %} aria-current="page"{% endif %}>{{ node.title }}</a>
+      {%- endfor %}
+      <!-- The icon mark-github of Octicons 19.43.0 (MIT, https://github.com/primer/octicons),
+           linking to the source on GitHub, as the logos of GitHub may (https://github.com/logos). -->
+      <a class="sidebar-github" href="{{ site.github.repo }}" aria-label="Source on GitHub" title="Source on GitHub">
+        <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6.766 11.328c-2.063-.25-3.516-1.734-3.516-3.656 0-.781.281-1.625.75-2.188-.203-.515-.172-1.609.063-2.062.625-.078 1.468.25 1.968.703.594-.187 1.219-.281 1.985-.281.765 0 1.39.094 1.953.265.484-.437 1.344-.765 1.969-.687.218.422.25 1.515.046 2.047.5.593.766 1.39.766 2.203 0 1.922-1.453 3.375-3.547 3.64.531.344.89 1.094.89 1.954v1.625c0 .468.391.734.86.547C13.781 14.359 16 11.53 16 8.03 16 3.61 12.406 0 7.984 0 3.563 0 0 3.61 0 8.031a7.88 7.88 0 0 0 5.172 7.422c.422.156.828-.125.828-.547v-1.25c-.219.094-.5.156-.75.156-1.031 0-1.64-.562-2.078-1.609-.172-.422-.36-.672-.719-.719-.187-.015-.25-.093-.25-.187 0-.188.313-.328.625-.328.453 0 .844.281 1.25.86.313.452.64.655 1.031.655s.641-.14 1-.5c.266-.265.47-.5.657-.656"/></svg>
+      </a>
+    </nav>
 
-      {% comment %}
-        The code below dynamically generates a sidebar nav of pages with
-        `layout: page` in the front-matter. See readme for usage.
-      {% endcomment %}
-
-      {% assign pages_list = site.pages %}
-      {% for node in pages_list %}
-        {% if node.title != null %}
-          {% if node.layout == "page" %}
-            <a class="sidebar-nav-item{% if page.url == node.url %} active{% endif %}" href="{{ node.url }}">{{ node.title }}</a>
-          {% endif %}
-        {% endif %}
-      {% endfor %}
-
-      <a class="sidebar-nav-item" href="{{ site.github.repo }}/archive/v{{ site.version }}.zip">Download</a>
-      <a class="sidebar-nav-item" href="{{ site.github.repo }}">GitHub project</a>
-      <span class="sidebar-nav-item">Currently v{{ site.version }}</span>
-    </nav> -->
-
-    <p>&copy; {{ site.time | date: '%Y' }}. All rights reserved.</p>
+    <!-- The notice links to the License section of README.md: the code under MIT, the texts
+         under CC BY 4.0, the logo and the mascot not licensed (owner, 2026-11-25). It runs from
+         2024, the year of LICENSE, to the year of the build; .github/workflows/new-year.yml
+         rebuilds the site on 1 January. -->
+    <p><a href="{{ site.github.repo }}#license">&copy; 2024-{{ site.time | date: '%Y' }} {{ site.author }}</a></p>
   </div>
 </div>

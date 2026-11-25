@@ -1,30 +1,23 @@
 ---
 layout: page
+nav_order: 1
 title: About
+description: What this site is, and the work it is made of.
 ---
 
-<p class="message">
-  Hey there! This page is included as an example. Feel free to customize it for your own use upon downloading. Carry on!
-</p>
+<!-- TODO: the project itself (what theplanet.earth is and does, its parts), in the words of
+     the owner (2026-11-24: "about dove parleremo del progetto"); what the site shows and how
+     it links the other repositories of the organization is decided by the owner. -->
 
-In the novel, *The Strange Case of Dr. Jeykll and Mr. Hyde*, Mr. Poole is Dr. Jekyll's virtuous and loyal butler. Similarly, Poole is an upstanding and effective butler that helps you build Jekyll themes. It's made by [@mdo](https://twitter.com/mdo).
+This is the project site of [theplanet.earth](https://github.com/theplanet-earth), an
+organization on GitHub. Its source is the public repository
+[theplanet-earth/thesite]({{ site.github.repo }}). The globe of the home page has a page of its
+own: [The globe]({{ '/globe/' | relative_url }}).
 
-There are currently two themes built on Poole:
+## Made with
 
-* [Hyde](http://hyde.getpoole.com)
-* [Lanyon](http://lanyon.getpoole.com)
-
-Learn more and contribute on [GitHub](https://github.com/poole).
-
-## Setup
-
-Some fun facts about the setup of this project include:
-
-* Built for [Jekyll](http://jekyllrb.com)
-* Developed on GitHub and hosted for free on [GitHub Pages](https://pages.github.com)
-* Coded with [Sublime Text 2](http://sublimetext.com), an amazing code editor
-* Designed and developed while listening to music like [Blood Bros Trilogy](https://soundcloud.com/maddecent/sets/blood-bros-series)
-
-Have questions or suggestions? Feel free to [open an issue on GitHub](https://github.com/poole/issues/new) or [ask me on Twitter](https://twitter.com/mdo).
-
-Thanks for reading!
+- [Jekyll](https://jekyllrb.com/), and the [Hyde](https://github.com/poole/hyde) theme on
+  [Poole](https://github.com/poole/poole) by Mark Otto, MIT licence
+  ([text]({{ '/public/LICENSE.md' | relative_url }})).
+- The icon of GitHub: `mark-github` of [Octicons](https://github.com/primer/octicons), MIT
+  licence.
