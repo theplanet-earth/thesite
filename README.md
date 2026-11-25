@@ -1,4 +1,27 @@
-# thesite
+<p align="center">
+  <img src="media/theplanetearth.png" width="160"
+       alt="The logo of theplanet: the Earth walking, with a cap, sunglasses and sneakers">
+</p>
+
+<h1 align="center">
+  thesite<br>
+  <sub>The project site of <a href="https://github.com/theplanet-earth">theplanet-earth</a></sub>
+</h1>
+
+<p align="center">
+  Its home page is a 3D globe with the latest edits to OpenStreetMap.
+</p>
+
+<p align="center">
+  <a href="https://theplanet.observer/"><img alt="Production: theplanet.observer, up or down"
+     src="https://img.shields.io/website?url=https%3A%2F%2Ftheplanet.observer%2F&label=production&up_message=theplanet.observer&down_message=down"></a>
+  <a href="https://theplanet.wtf/"><img alt="Stage: theplanet.wtf, up or down"
+     src="https://img.shields.io/website?url=https%3A%2F%2Ftheplanet.wtf%2F&label=stage&up_message=theplanet.wtf&down_message=down"></a>
+  <a href="https://github.com/theplanet-earth/thesite/releases/latest"><img alt="The latest release"
+     src="https://img.shields.io/github/v/release/theplanet-earth/thesite?label=release"></a>
+  <a href="#license"><img alt="License: MIT for the code, CC BY 4.0 for the texts"
+     src="https://img.shields.io/badge/license-MIT%20%2B%20CC%20BY%204.0-blue"></a>
+</p>
 
 > [!CAUTION]
 > **What a Codespace of this repository is allowed to do.** Creating a Codespace from this
@@ -28,10 +51,6 @@
 > (headless, run with `--no-sandbox`, `.mcp.json`) and the Claude Code skills of the user
 > (`scripts/install-skills.sh`), and installs Node, the GitHub CLI, Claude Code and Ruby as
 > devcontainer features.
-
-The project site of the GitHub organization **theplanet-earth**.
-
-![The Pipeline](media/theplanetearth.png)
 
 ## Environments
 

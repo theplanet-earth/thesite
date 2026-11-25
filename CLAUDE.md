@@ -210,6 +210,17 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   narrow screens the logotype is as high as the mascot, 3.5rem, and each keeps its
   proportions: the mascot takes its width from its height, the logotype scales its text,
   padding and border together (`docs/assets/css/theplanet.css`).
+- 2026-11-25, "sistemami il README.md, rimpicciolendo il logo e mettendolo sopra a tutto,
+  migliorando il titolo e aggiungendo dei badge che ti sembrano appropriati (non a caso, non
+  necessariamente tanti)": `README.md` opens with the logo, 160 pixels wide, then the title
+  with the organization as its subtitle, one line on the globe and four badges, then the
+  caution, before every section (`tests/test_readme.py`). Each badge says something the
+  reader needs: the two sites, which [shields.io](https://shields.io/badges/website) finds up
+  or down (the address, or "down"); the latest release
+  ([GitHub release](https://shields.io/badges/git-hub-release)); the license, "MIT + CC BY
+  4.0", a [static badge](https://shields.io/badges/static-badge) linking to *License*, since
+  the badge that GitHub reads from `LICENSE` would say MIT only. No badge of CI: it runs on
+  pull requests only. The alt text of the logo was "The Pipeline", a leftover.
 
 Rules of the organization, carried over from thebox or from its issues (keep them unless the
 owner decides otherwise):
@@ -272,7 +283,7 @@ owner decides otherwise):
 | `scripts/check-site.py` | Check of the built site: every local link and resource of `build/pages/` exists, none loads over `http` or from another host, the notice of privacy is on every page but `/privacy/`, nothing unpublishable is published, and the banner of the stage site is at the top and at the bottom of every page of a build for stage and on no page of any other, by `JEKYLL_ENV` (`npm run check:site`) |
 | `scripts/version.py` | Version, next version and release notes from the tags and the commits |
 | `scripts/setup-python.sh` | `.venv/` from `requirements.txt`, reinstalled only when it changes |
-| `tests/` | `unittest` checks of the harness scripts, of `check-site.py`, of `land-mask.py`, of `osm-activity.py`, of the permissions of the devcontainer, of the license and of the deploys (standard library only); `notice.test.mjs` (when the notice of privacy opens), `globe.test.mjs`, `replication.test.mjs` and `live.test.mjs` (the live edits and the Worker, against fakes), with `node --test` |
+| `tests/` | `unittest` checks of the harness scripts, of `check-site.py`, of `land-mask.py`, of `osm-activity.py`, of the permissions of the devcontainer, of the header of `README.md`, of the license and of the deploys (standard library only); `notice.test.mjs` (when the notice of privacy opens), `globe.test.mjs`, `replication.test.mjs` and `live.test.mjs` (the live edits and the Worker, against fakes), with `node --test` |
 | `src/globe/` | The globe of the home page: `geometry.js` (dots of the land, spikes, arcs, quality tiers; no three.js), `replication.js` (the replication of changesets: paths, parsing, merging; no DOM), `live.js` (every 19 minutes, the edits from the Worker or from the replication; shared with the Worker), `main.js` (the three.js scene) |
 | `src/notice/` | The notice of privacy: `visit.js` (whether a visit starts, from the referrer and the type of navigation; no DOM), `main.js` (opens the dialog of `docs/_includes/privacy-notice.html`) |
 | `package.json`, `package-lock.json` | Also the dependencies of the site, pinned: three.js and esbuild (Section 10) |
