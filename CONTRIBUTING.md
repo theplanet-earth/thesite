@@ -31,12 +31,16 @@ call the shell scripts in `scripts/`, so they also run without npm.
 
 | Command | What it does |
 |---|---|
-| `npm run build` | Every output in `build/`: the files to attach to a release in `build/release/`, the site (Jekyll, from `docs/`) in `build/pages/` |
+| `npm run build` | Every output in `build/`: the files to attach to a release in `build/release/`, the site (Jekyll, from `docs/`, with the globe bundled from `src/` by esbuild) in `build/pages/` |
 | `npm run serve` | Preview of the site at `http://localhost:4000`, rebuilt on every change (task *Preview: site (live reload)*) |
 | `npm test` | Unit tests (`scripts/test.sh`) |
 | `npm run check` | Tests, confidentiality, `TEMPLATE` markers and the checks of this repository: **run it before every pull request** |
 | `npm run check:confidential` | Confidentiality guard on every tracked file |
 | `npm run check:template -- --list` | The `TEMPLATE` markers still to resolve, with their line |
+| `npm run globe:land` | The land mask of the globe, `docs/assets/globe/land.png`, from Natural Earth: run it only to change its source or size, and commit the result |
+| `npm run mascot:generate` | The mascot of the logo as a 3D model, by the API of Meshy, into `build/meshy/<date>/`: it spends credits of the organization and needs `MESHY_API_KEY` in the environment (`-- --dry-run` shows the requests only) |
+| `npm run globe:activity` | The latest edits to OpenStreetMap for the globe, into `docs/_data/activity.json` (also run by `npm run build` and `npm run serve`; without network, an empty list) |
+| `npm run worker:check` / `worker:dev` | The Worker of production (`wrangler.jsonc`, `worker/`): validate and bundle it without deploying, or serve the built site with it at `http://localhost:8787`; wrangler at the version of `scripts/worker.sh`, no account needed |
 | `npm run check:site` | Every local link and resource of the built site (`build/pages/`) exists; part of `npm run check` once the site is built, and a step of CI after its build |
 | `npm run setup:python` | `.venv/` from `requirements.txt`, when the repository has one |
 | `npm run version:current` / `version:next` / `release:notes` | Version of this build, of the next release, and the notes of the next release |
@@ -173,4 +177,25 @@ Applies to documentation, comments, commit messages and pull request description
 - Something not yet done is marked explicitly, never with ad hoc text: a `TODO` comment that
   says what is missing and why, or, in a file that comes from thebox, its `TEMPLATE` marker.
 
-<!-- TEMPLATE: the conventions specific to this repository (code style, linters, naming). -->
+## Conventions of this repository
+
+- **The site** is Jekyll in `docs/`: layouts and includes in `_layouts/` and `_includes/`,
+  data in `_data/`, the project's own styles in `assets/css/`, the theme (Hyde on Poole, MIT)
+  in `public/`. Every local link goes through `relative_url`, never a bare path: the build
+  passes an empty `baseurl`, and `npm run check:site` fails on a link that does not resolve.
+- **The scripts of the site** are ES modules in `src/`, bundled by esbuild (`npm run build`,
+  `npm run serve`); no framework. What can be tested without a browser (geometry, timing,
+  data) goes in a module without three.js or the DOM, such as `src/globe/geometry.js`, with
+  its tests in `tests/*.test.mjs` (`node --test`).
+- **The scripts of the repository** are Python 3 with the standard library only, each with
+  its `unittest` tests in `tests/`; a script that reads the network is tested against fake
+  answers, never against the service.
+- **Generated files** are git-ignored and never edited by hand: `build/`,
+  `docs/assets/bundle/`, `docs/_data/activity.json`. The exception, committed as data and
+  said so where it is described, is `docs/assets/globe/land.png` (`npm run globe:land`).
+- **Third-party work** shown by the site is credited on the page that shows it and in
+  `README.md`, *Credits*, with its licence; its terms of use are linked where it is read
+  (the replication of OpenStreetMap, not its editing API). Personal data of third parties,
+  such as the names of the mappers, are not kept, whether the build or the browser reads
+  them. An attribution that its licence wants next to the data (OpenStreetMap) stays there;
+  the other credits may go on the page that explains the work.

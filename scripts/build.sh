@@ -14,10 +14,15 @@ log "build: $PROJECT_NAME $VERSION ($DATE)"
 # The site: Jekyll sources in docs/ (Gemfile and Gemfile.lock pin Jekyll and its plugins),
 # built into build/pages/ for the domain root of both environments, hence the empty baseurl
 # (docs/_config.yml says "/", which would make protocol-relative links). Ruby 3.3: the
-# devcontainer installs it, CI uses ruby/setup-ruby (CLAUDE.md, Section 10).
+# devcontainer installs it, CI uses ruby/setup-ruby (CLAUDE.md, Section 10). First the
+# scripts of the site, bundled by esbuild into docs/assets/bundle/ (scripts/bundle.sh).
 need bundle "Ruby 3.3 and Bundler are needed: open the devcontainer, or install them (CONTRIBUTING.md, Getting started)."
 export BUNDLE_GEMFILE="$ROOT/docs/Gemfile"
 bundle check > /dev/null 2>&1 || bundle install
+bash "$ROOT/scripts/bundle.sh"
+# The latest edits to OpenStreetMap for the globe (docs/_data/activity.json, git-ignored);
+# without network the script writes an empty list and the build goes on.
+"$PY" "$ROOT/scripts/osm-activity.py"
 rm -rf "$BUILD/pages"
 log "build: site (Jekyll) into build/pages/"
 JEKYLL_ENV="${JEKYLL_ENV:-production}" bundle exec jekyll build \

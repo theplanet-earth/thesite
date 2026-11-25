@@ -1,0 +1,40 @@
+{
+  "generated": "2026-11-24T18:52:21+00:00",
+  "source_image": "docs/assets/images/theplanet.png",
+  "source_sha256": "b0a78ff949530b788b6f7d6ac557bf237bac1a031cff25afe71ba6c8b142ff7d",
+  "image_to_3d": {
+    "task": "01a20ee5-36a9-77f2-a95c-4ae1fd093871",
+    "parameters": {
+      "ai_model": "latest",
+      "should_texture": true,
+      "enable_pbr": false,
+      "should_remesh": true,
+      "topology": "triangle",
+      "target_polycount": 30000,
+      "pose_mode": "t-pose",
+      "target_formats": [
+        "glb"
+      ],
+      "origin_at": "bottom"
+    },
+    "credits": 30
+  },
+  "rigging": {
+    "task": "01a20ee6-81de-761f-b264-676bf3f69892",
+    "parameters": {
+      "animation_type": "biped"
+    },
+    "credits": 5
+  },
+  "files": {
+    "mascot.glb": 4262396,
+    "mascot-thumbnail.png": 154109,
+    "mascot-rigged.glb": 5416552,
+    "mascot-walking.glb": 5396988,
+    "mascot-running.glb": 5386392
+  },
+  "documentation": [
+    "https://docs.meshy.ai/en/api/image-to-3d",
+    "https://docs.meshy.ai/en/api/rigging"
+  ]
+}

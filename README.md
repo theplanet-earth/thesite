@@ -31,14 +31,14 @@
 
 The project site of the GitHub organization **theplanet-earth**.
 
-![The Pipeline](/docs/assets/images/theplanetearth.png)
+![The Pipeline](media/theplanetearth.png)
 
 ## Environments
 
 | Environment | Branch | Address | Published by |
 |---|---|---|---|
 | Stage | `stage` | <https://theplanet.wtf/> | `.github/workflows/stage.yml`, on GitHub Pages, at every merge into `stage` |
-| Production | `master` | <https://theplanet.observer/> | A Cloudflare Worker with static assets, at every merge into `master` (not automated yet, issue #2) |
+| Production | `master` | <https://theplanet.observer/> | A Cloudflare Worker with static assets (`wrangler.jsonc`, `worker/`), deployed by `.github/workflows/production.yml` after every release of `master`, once the owner sets the variable `DEPLOY_PRODUCTION` (issues #2, #6, #7) |
 
 Work happens on `dev`; `dev` goes into `stage`, and `stage` into `master`, by pull requests
 that the owner squash-merges, each followed by a merge back down the chain
@@ -46,13 +46,13 @@ that the owner squash-merges, each followed by a merge back down the chain
 
 ## Status
 
-- The site is the 2024 Jekyll prototype in `docs/` (Hyde theme on Poole, Leaflet map), folded
-  in from the branches `glob_coverage` and `hyde_theme`, which were then deleted. It still
-  carries demo text of the theme and is to be cleaned up (`CLAUDE.md`, *Known issues and
-  TODO*). The map shows the standard tiles of
-  [OpenStreetMap](https://operations.osmfoundation.org/policies/tiles/).
-- Next, on stage: a 3D globe in place of the map on the home page, then a model of the
-  mascot of the logo (`CLAUDE.md`, Section 2).
+- The site is Jekyll in `docs/` (the Hyde theme on Poole), grown from the 2024 prototype of
+  the branches `glob_coverage` and `hyde_theme`. Released first as that prototype with its
+  Leaflet map (`v0.1.0`, pull request #11); on `dev`, and next on stage, its home page is a
+  3D globe with the latest edits to OpenStreetMap, kept current by the browser, explained on
+  `/globe/` (`CLAUDE.md`, Section 2), and the demo text of the theme is gone.
+- The mascot of the logo in 3D is kept in [`media/mascot/`](media/mascot/README.md), not used
+  by the site.
 - On 2026-11-23 neither address reaches the site: `theplanet.wtf` answers with a Cloudflare
   error, "DNS points to prohibited IP", and `theplanet.observer` has no DNS record yet. The
   steps for the owner are in issues #6 (Cloudflare) and #7 (GitHub).
@@ -78,7 +78,44 @@ Every merge on `master` publishes a SemVer release `vX.Y.Z` computed from the co
 commits (`.github/workflows/release.yml`). The repository variable `PUBLISH_PAGES` stays
 unset: the GitHub Pages site of this repository is the stage site.
 
+## Credits
+
+- The globe of the home page (`src/globe/`) is a new implementation of the techniques that
+  Tobias Ahlin describes in
+  [How we built the GitHub globe](https://github.blog/engineering/engineering-principles/how-we-built-the-github-globe/)
+  (GitHub, 2020); GitHub did not publish the code of its globe, and none of it is used here.
+- [three.js](https://threejs.org/) (MIT), bundled into the site with its licence.
+- [Natural Earth](https://www.naturalearthdata.com/) (public domain), the land of the globe.
+- The mascot in `media/mascot/`: a 3D model generated from the logo by
+  [Meshy](https://www.meshy.ai/) on a paid plan, so that it belongs to the organization
+  ([terms of use](https://www.meshy.ai/terms-of-use), 3.2).
+- The latest edits to [OpenStreetMap](https://www.openstreetmap.org/), the orange spikes and
+  arcs, read by the build and then by the browser from the replication of changesets: data ©
+  OpenStreetMap contributors, [ODbL](https://www.openstreetmap.org/copyright).
+- The icon of GitHub in the sidebar: `mark-github` of
+  [Octicons](https://github.com/primer/octicons) 19.43.0, MIT licence.
+
 ## License
 
-[Apache License 2.0](LICENSE). The Hyde theme in `docs/` keeps its own MIT license
-(`docs/LICENSE.md`).
+Decided by the owner on 2026-11-25 (issue #10). The notice in the sidebar of every page,
+"© 2024-<year of the build> Andrea Gallegati", links here; on 1 January
+`.github/workflows/new-year.yml` rebuilds the stage and the production sites, so that the year
+moves on without a commit.
+
+- **Code**: the [MIT License](LICENSE), © 2024 Andrea Gallegati. It covers everything in the
+  repository that the next items do not name, its documentation included, and
+  `docs/assets/globe/land.png`, which `scripts/land-mask.py` makes from Natural Earth.
+- **Texts of the site**: the text of the pages in `docs/` (the home page, About, The globe,
+  the page not found) is under
+  [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/): reuse it with credit and a link
+  to the license. The markup and the Liquid of those files are code, under MIT.
+- **Logo and mascot**: not licensed, © Andrea Gallegati, all rights reserved. The logo is
+  `docs/assets/images/theplanet.png`, `media/theplanetearth.png`,
+  `docs/public/apple-touch-icon.png` and `docs/public/favicon.ico`; the mascot in 3D is
+  `media/mascot/`. Neither license above covers them, nor the name of the project. The logo
+  was generated with ChatGPT (DALL-E) and edited by hand: its provenance is in
+  `media/README.md` (issue #19).
+- **Third-party work** keeps its own license (*Credits*): the Hyde theme on Poole
+  (`docs/public/css/`, MIT, `docs/public/LICENSE.md`), three.js (MIT, bundled with its
+  licence), the icon of GitHub (Octicons, MIT). The data the globe shows keep their terms:
+  OpenStreetMap (ODbL, credited next to the globe) and Natural Earth (public domain).

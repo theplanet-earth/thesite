@@ -66,6 +66,19 @@ class CheckSiteTest(unittest.TestCase):
         self.assertEqual(len(problems), 1)
         self.assertIn("/assets/images/missing.png", problems[0])
 
+    def test_resource_over_http_is_reported(self) -> None:
+        self.page("index.html", '<link rel="stylesheet" href="http://fonts.example.org/a.css">'
+                                '<a href="http://example.org/">a link may be http</a>')
+        problems = self.tool.broken_links(self.site)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("a resource over plain http", problems[0])
+
+    def test_files_that_should_not_be_published(self) -> None:
+        self.write("README.md", "theme readme")
+        self.write("CNAME", "hyde.getpoole.com")
+        self.write("public/LICENSE.md", "MIT")
+        self.assertEqual(self.tool.unpublished(self.site), ["CNAME", "README.md"])
+
     def test_page_urls(self) -> None:
         self.assertEqual(self.tool.page_url(self.site, self.site / "index.html"), "/")
         self.assertEqual(self.tool.page_url(self.site, self.site / "about" / "index.html"), "/about/")
@@ -78,6 +91,10 @@ class CheckSiteTest(unittest.TestCase):
         self.page("index.html", '<link rel="stylesheet" href="/public/css/theme.css">')
         self.assertEqual(run(str(self.site)), 0)
         self.page("about/index.html", '<link rel="stylesheet" href="public/css/theme.css">')
+        self.assertEqual(run(str(self.site)), 1)
+        self.page("about/index.html", '<link rel="stylesheet" href="/public/css/theme.css">')
+        self.assertEqual(run(str(self.site)), 0)
+        self.write("CNAME", "hyde.getpoole.com")
         self.assertEqual(run(str(self.site)), 1)
         self.assertEqual(run(str(self.site / "missing")), 2)
 

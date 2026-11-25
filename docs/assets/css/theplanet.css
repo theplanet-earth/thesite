@@ -1,14 +1,3 @@
-/* .logo {
-    display: block;    
-    margin: 0 auto;
- } */
-.glob_coverage {
-    padding: 2rem 1rem;
-    /* color: rgba(255,255,255,.5); */
-    color: #ddd;
-    /* background-color: #202020; */
-    background-color: #444; /* Lighter stripe 444 */
- }
 
 .roboto-mono-sidebar {
     font-family: 'Roboto Mono', monospace;
@@ -34,4 +23,168 @@
 .roboto-mono-sidebar p, .sidebar a {
     font-weight: 400; /* Regular font weight */
     /* Additional styling */
+}
+/* The logo of the sidebar is the link to the home page. */
+.sidebar-logo,
+.sidebar-logo:hover,
+.sidebar-logo:focus {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.sidebar-logo img {
+    max-width: 100%;
+    vertical-align: text-top;
+}
+
+/* Contrast on the dark grey of the content: the theme left page titles dark grey and links
+   a blue of contrast 2.6:1; WCAG 2.2 asks 4.5:1 for text (success criterion 1.4.3). */
+.page-title,
+.content strong {
+    color: #eee;
+}
+
+.content a {
+    color: #9cd3ff;
+}
+
+.content a:focus-visible {
+    outline: 2px solid #9ccc65;
+    outline-offset: 2px;
+}
+
+/* The sidebar is fixed on wide screens: when its logo, logotype and pages do not fit the
+   height of the window, it scrolls, so that nothing in it is out of reach. */
+@media (min-width: 48em) {
+    .sidebar {
+        overflow-y: auto;
+    }
+}
+
+/* The home page and the page of the globe fit the window: less room above and below. */
+.home .content,
+.globe-page .content {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+/* The source on GitHub, as its icon, a little larger than the text. */
+.sidebar-github {
+    display: inline-block;
+    color: #333;
+    line-height: 0;
+}
+
+.sidebar-github svg {
+    width: 1.1em;
+    height: 1.1em;
+}
+
+.sidebar-github:hover,
+.sidebar-github:focus-visible {
+    color: #000;
+}
+
+/* On wide screens the sidebar keeps the logo, the logotype and the spacing of the prototype
+   (the owner, 2026-11-24), with the pages and the icon on one row under them. Below a window
+   800 pixels high, logo and logotype shrink with its height, so that no scrollbar appears;
+   from 800 pixels up they keep their size. */
+@media (min-width: 48em) {
+    .sidebar-logo img {
+        max-height: 41vh;
+    }
+
+    .roboto-mono-sidebar h1 {
+        font-size: min(5em, 12.5vh);
+    }
+
+    .sidebar-nav {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0 1.25rem;
+    }
+
+    .sidebar-nav-item {
+        display: inline-block;
+    }
+
+    /* No room below the last line: the padding of the theme and the margin of the copyright
+       would make the sidebar scroll for blank space only. */
+    .sidebar {
+        padding-bottom: 0;
+    }
+
+    .sidebar .container > p {
+        margin-bottom: 0;
+    }
+}
+
+/* On narrow screens the sidebar sits above the content: a single row of logo, logotype,
+   pages and icon instead of a full screen of logo, so that the globe shows at once. */
+@media (max-width: 47.99em) {
+    .sidebar {
+        padding: 0.5rem 1rem;
+    }
+
+    .sidebar .container {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.25rem 1rem;
+    }
+
+    .sidebar-about {
+        margin: 0;
+    }
+
+    .sidebar-logo {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .sidebar-logo img {
+        width: 3rem;
+    }
+
+    .roboto-mono-sidebar h1 {
+        height: auto;
+        margin: 0;
+        padding: 3px 5px;
+        border-width: 3px;
+        font-size: 0.7rem;
+        line-height: 0.85;
+    }
+
+    .sidebar-nav {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 0;
+    }
+
+
+    .sidebar .container > p {
+        flex-basis: 100%;
+        margin: 0;
+        font-size: 0.7rem;
+        text-align: center;
+    }
+}
+
+/* The page of the globe fits one window too (the owner, 2026-11-24): a slightly smaller text. */
+.globe-page .page {
+    margin-bottom: 0;
+    font-size: 0.85rem;
+}
+
+.globe-page .page p {
+    margin-bottom: 0.75rem;
+}
+
+.globe-page .page p:last-child {
+    margin-bottom: 0;
 }

@@ -1,0 +1,7 @@
+# The places covered by the project, shown as orange rings on the globe of the home page
+# (src/globe/main.js). The first comes from the 2024 map that the globe replaced: the
+# rectangle around the Isola Tiberina in Rome, latitudes 41.88863 to 41.89208, longitudes
+# 12.47340 to 12.48048; here its centre. Issue #1 plans the coverage from an API.
+- name: Rome, Isola Tiberina
+  lat: 41.89036
+  lon: 12.47694

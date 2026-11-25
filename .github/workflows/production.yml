@@ -1,0 +1,65 @@
+# Production: build the site and deploy it, with the Worker thesite, to theplanet.observer
+# (wrangler.jsonc, worker/, issue #2). Called by release.yml after every release of master,
+# started by new-year.yml on 1 January, or by hand (Actions, Production, Run workflow).
+#
+# It runs only from master, and only once the owner has set the repository variable
+# DEPLOY_PRODUCTION = true (Settings, Secrets and variables, Actions, Variables), after the
+# environment production exists with its secrets CLOUDFLARE_API_TOKEN and
+# CLOUDFLARE_ACCOUNT_ID (issues #6 and #7). Until then every run is skipped: no release fails
+# for it, and the environment is not created without its protection rules.
+name: Production
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: "The version just released (empty: the version of the commit)"
+        type: string
+        required: false
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deployment at a time; a queued one waits for the running one to finish.
+concurrency:
+  group: production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/master' && vars.DEPLOY_PRODUCTION == 'true'
+    runs-on: ubuntu-24.04
+    environment:
+      name: production
+      url: https://theplanet.observer/
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0   # tags and history, to compute the version
+
+      # No dependency cache in a workflow that publishes (release.yml).
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
+        with:
+          ruby-version: "3.3"
+          bundler-cache: false
+
+      - name: Toolchain
+        run: |
+          npm ci --no-audit --no-fund
+          npm run setup:python
+
+      # scripts/worker.sh deploy builds the site (npm run build), then runs wrangler deploy at
+      # its pinned version; the account and the token come from the environment, never from a
+      # file (wrangler.jsonc).
+      - name: Build and deploy
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/worker.sh deploy
