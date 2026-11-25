@@ -6,8 +6,8 @@ description: What the globe of the home page shows, how it is made, and the data
 ---
 
 The globe of the home page draws the land as dots and, as orange spikes, the latest edits to
-[OpenStreetMap](https://www.openstreetmap.org/): about 120 changesets just closed by mappers
-anywhere, each taller the more it changed. Arcs join them in the order they were made; the
+[OpenStreetMap](https://www.openstreetmap.org/): the changesets just closed by mappers
+anywhere, as many as they are, each taller the more it changed. Arcs join them in the order they were made; the
 orange ring marks the Isola Tiberina, in Rome, where the map of the 2024 prototype began. Drag
 the globe, or use the arrow keys, to turn it.
 
