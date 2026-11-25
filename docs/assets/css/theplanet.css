@@ -142,22 +142,32 @@
         margin: 0;
     }
 
+    /* The mascot and the logotype are equally high (the owner, 2026-11-25), each with its own
+       proportions: the mascot takes its width from its height, and the logotype keeps its
+       padding and border in em, so that the whole box scales with its text. */
     .sidebar-logo {
+        --logo-height: 3.5rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
     }
 
+    /* Without the margin that the theme gives every image (public/css/poole.css), which would
+       leave 1rem under the mascot and set the logotype 0.5rem lower than it. */
     .sidebar-logo img {
-        width: 3rem;
+        margin: 0;
+        width: auto;
+        height: var(--logo-height);
     }
 
+    /* Three lines of 0.85em, then 0.27em of padding and 0.27em of border above and below:
+       3.63em in all, the height of the mascot. */
     .roboto-mono-sidebar h1 {
-        height: auto;
+        height: var(--logo-height);
         margin: 0;
-        padding: 3px 5px;
-        border-width: 3px;
-        font-size: 0.7rem;
+        padding: 0.27em 0.45em;
+        border-width: 0.27em;
+        font-size: calc(var(--logo-height) / 3.63);
         line-height: 0.85;
     }
 
@@ -174,6 +184,28 @@
         margin: 0;
         font-size: 0.7rem;
         text-align: center;
+    }
+}
+
+/* With Privacy in the menu (2026-11-25) the mascot, the logotype, the three pages and the icon
+   need about 381 pixels in one row with gaps of 1rem (64 of them are the padding of the
+   sidebar and of its container), 349 with gaps of 0.5rem (measured with Playwright): below
+   400 pixels the gaps narrow, so that phones 360 pixels wide keep one row; below 360 (320
+   leaves 256 pixels for the row) the menu takes a second row, and the rows are centred, as
+   the notice under them is. */
+@media (max-width: 24.99em) {
+    .sidebar .container {
+        column-gap: 0.5rem;
+    }
+
+    .sidebar-nav {
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 22.49em) {
+    .sidebar .container {
+        justify-content: center;
     }
 }
 

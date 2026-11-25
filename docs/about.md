@@ -21,3 +21,10 @@ own: [The globe]({{ '/globe/' | relative_url }}).
   ([text]({{ '/public/LICENSE.md' | relative_url }})).
 - The icon of GitHub: `mark-github` of [Octicons](https://github.com/primer/octicons), MIT
   licence.
+- The fonts [PT Sans](https://fonts.google.com/specimen/PT+Sans) by ParaType and
+  [Roboto Mono](https://github.com/googlefonts/robotomono), served by this site, SIL Open Font
+  License 1.1 ([PT Sans]({{ '/assets/fonts/pt-sans.LICENSE.txt' | relative_url }}),
+  [Roboto Mono]({{ '/assets/fonts/roboto-mono.LICENSE.txt' | relative_url }})).
+
+What the site does with the data of its visitors is on the page
+[Privacy]({{ '/privacy/' | relative_url }}).
