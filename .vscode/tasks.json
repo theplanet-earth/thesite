@@ -13,7 +13,7 @@
     },
     {
       "label": "Preview: site as stage (live reload)",
-      "detail": "The preview of npm run serve, built as the stage site, with its banner on every page (npm run serve:stage)",
+      "detail": "The preview of npm run serve, built as the stage site, with its banners at the top and bottom of every page (npm run serve:stage)",
       "type": "npm",
       "script": "serve:stage",
       "isBackground": true,

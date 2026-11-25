@@ -30,7 +30,7 @@ on 2026-11-23 following issue #2, both live since 2026-11-25:
 
 | Environment | Branch | Where | How | State |
 |---|---|---|---|---|
-| Stage | `stage` | `https://theplanet.wtf/`, GitHub Pages of this repository | `.github/workflows/stage.yml` on every push to `stage`, built with `JEKYLL_ENV=stage`: the banner *Work in progress* on every page (Section 2) | live since 2026-11-25 (#14) |
+| Stage | `stage` | `https://theplanet.wtf/`, GitHub Pages of this repository | `.github/workflows/stage.yml` on every push to `stage`, built with `JEKYLL_ENV=stage`: the banner *Work in progress* at the top and at the bottom of every page (Section 2) | live since 2026-11-25 (#14) |
 | Production | `master` | `https://theplanet.observer/`, a Cloudflare Worker serving `build/pages/` as static assets | `.github/workflows/production.yml`, called by `release.yml` after every release while the repository variable `DEPLOY_PRODUCTION` is `true`; built with `JEKYLL_ENV=production`, without the banner | live since `v0.2.0`, 2026-11-25 (#24, issue #2) |
 
 What the site shows and how it links the other repositories of the organization are decided
@@ -172,6 +172,13 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   to `dev` with the merge back and reach `master` with the next squash.
   `scripts/check-site.py` checks both, before each deploy: the banner on every page of the
   build for stage, on no page of any other. It links the production site.
+- 2026-11-25, on seeing it: "replica lo stesso identico banner anche in fondo alla pagina.
+  aggiungi all'avviso una second frase del tipo "Here is where stunning features happen." o
+  qualcosa del genere migliorato (deve stare tutto in un'unica riga)": the same banner at the
+  top and at the bottom of every page, both checked by `check-site.py`; the text reads "Work
+  in progress: only a preview of theplanet.observer. New features take shape here first."
+  (no "stunning", which the writing style of `CONTRIBUTING.md` excludes), on one line from a
+  window 768 pixels wide, on two on a phone 390 pixels wide.
 
 Rules of the organization, carried over from thebox or from its issues (keep them unless the
 owner decides otherwise):
@@ -220,7 +227,7 @@ owner decides otherwise):
 | `package.json` | The command surface: every command is an npm script (`CONTRIBUTING.md`, *Commands*) |
 | `scripts/lib.sh` | Helpers shared by the shell scripts: repository root, `build/`, `$PY`, `log`, `warn`, `die`, `need`, `project_version` |
 | `scripts/build.sh`, `test.sh`, `check.sh` | Build (the site into `build/pages/`), unit tests, every check (the entry points of CI) |
-| `scripts/serve.sh` | Live preview of the site at `http://localhost:4000` (`npm run serve`; `npm run serve:stage` as the stage site, with its banner), with the bundle rebuilt on every change of `src/` |
+| `scripts/serve.sh` | Live preview of the site at `http://localhost:4000` (`npm run serve`; `npm run serve:stage` as the stage site, with its banners), with the bundle rebuilt on every change of `src/` |
 | `scripts/bundle.sh`, `scripts/bundle.mjs` | esbuild bundles `src/globe/main.js` and three.js into `docs/assets/bundle/globe.js` (generated, git-ignored), with the licence of three.js beside it; run by `build.sh` and `serve.sh`; in watch mode it touches the bundle a second after each build (Section 12) |
 | `wrangler.jsonc`, `worker/` | The Worker of production (issue #2): static assets from `build/pages/`, custom domain `theplanet.observer`; `worker/index.js` runs only for `/api/*`, `worker/edits.js` serves `/api/osm-edits.json`, read at most every 19 minutes and cached |
 | `scripts/worker.sh` | wrangler at a pinned version: `npm run worker:check` (dry run), `npm run worker:dev` (the site with the Worker at `http://localhost:8787`), and `deploy`, run by `production.yml` with the token and the account in the environment; each builds the site with `JEKYLL_ENV=production` and runs `check-site.py` before wrangler |
@@ -231,7 +238,7 @@ owner decides otherwise):
 | `scripts/install-skills.sh` | Claude Code skills installed for the user, pinned to a commit (Section 10) |
 | `scripts/check-confidential.py` | Confidentiality guard (pre-commit hook and `npm run check`) |
 | `scripts/check-template.sh` | Lists the `TEMPLATE` markers left; none since 2026-11-24, so `npm run check` runs it with `--strict` |
-| `scripts/check-site.py` | Check of the built site: every local link and resource of `build/pages/` exists, none loads over `http`, nothing unpublishable is published, and the banner of the stage site is on every page of a build for stage and on none of any other, by `JEKYLL_ENV` (`npm run check:site`) |
+| `scripts/check-site.py` | Check of the built site: every local link and resource of `build/pages/` exists, none loads over `http`, nothing unpublishable is published, and the banner of the stage site is at the top and at the bottom of every page of a build for stage and on no page of any other, by `JEKYLL_ENV` (`npm run check:site`) |
 | `scripts/version.py` | Version, next version and release notes from the tags and the commits |
 | `scripts/setup-python.sh` | `.venv/` from `requirements.txt`, reinstalled only when it changes |
 | `tests/` | `unittest` checks of the harness scripts, of `check-site.py`, of `land-mask.py`, of `osm-activity.py`, of the permissions of the devcontainer, of the license and of the deploys (standard library only); `globe.test.mjs`, `replication.test.mjs` and `live.test.mjs` (the live edits and the Worker, against fakes), with `node --test` |
@@ -278,7 +285,7 @@ For the site: `npm run serve` (or the task *Preview: site (live reload)*), then 
 `http://localhost:4000` with the Playwright MCP server, the home page with its globe (drag it,
 turn it with the arrow keys) and `/about/` at least. A change of the layout is looked at with
 `npm run serve:stage` too (task *Preview: site as stage (live reload)*): the stage site has
-its banner above the pages. After `npm run build`, `npm run check:site` checks the links and
+its banners above and below the pages. After `npm run build`, `npm run check:site` checks the links and
 resources of `build/pages/`, that nothing loads over `http`, that nothing unpublishable
 (`README.md`, `CNAME`, `Gemfile`) is published, and the banner of the stage site: run it with
 the `JEKYLL_ENV` of the build (`JEKYLL_ENV=stage npm run build`, then
@@ -558,14 +565,16 @@ harness) comes from thebox, which is versioned and released like any other repos
   the click towards `https://enjoy.theplanet.wtf`, a name with no DNS record, gone with the
   map; the demo text of Hyde; the title of the pages and the links, of low contrast on the
   dark grey; the fonts over `http`; `maximum-scale=1`, which stopped zooming on phones.
-  The stage site (`npm run serve:stage`, 2026-11-25, the same four sizes): the banner is one
-  line 2rem high on wide screens, where the sidebar starts under it and the home page and
-  `/globe/` give it their vertical padding (the text of `/globe/` had 11 pixels left at
-  1024x768), and two lines on 390x844, scrolling away with the row of the sidebar; still no
-  scroll, no scrollbar in the sidebar, no console error. **Found on the way, not fixed**:
-  below about 650 pixels of height the sidebar of the production site scrolls a little (17
-  pixels at 1280x640, 26 at 1024x600); the stage site does the same with the height of its
-  banner less (2 pixels at 800x600). To decide with the owner.
+  The stage site (`npm run serve:stage`, 2026-11-25, the same four sizes and 768x1024): on
+  wide screens each banner is one line 2rem high at its edge of the window, 22 pixels in a
+  window less than 800 pixels high; the sidebar fits between them, and the home page and
+  `/globe/` give them their vertical padding (the text of `/globe/` had 11 pixels left at
+  1024x768). On 390x844 each takes two lines, the top one scrolling away with the row of the
+  sidebar, the bottom one ending the page. Still no scroll, no scrollbar in the sidebar, no
+  console error. **Found on the way, not fixed**: below about 720 pixels of height the
+  sidebar of the production site scrolls a little (7 pixels at 1024x688, 17 at 1280x640, 26
+  at 1024x600); the stage site does the same with the height of its banners less (4 pixels
+  at 800x600). To decide with the owner.
 - **Merge settings of the repository** (GitHub API, 2026-11-25, issue #7, closed): squash
   and merge commits allowed, rebase off; squash title `PR_TITLE` and message `BLANK`, as
   `CONTRIBUTING.md` expects. No ruleset exists yet (issue #25).

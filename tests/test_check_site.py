@@ -85,28 +85,41 @@ class CheckSiteTest(unittest.TestCase):
         self.assertEqual(self.tool.page_url(self.site, self.site / "about" / "index.html"), "/about/")
         self.assertEqual(self.tool.page_url(self.site, self.site / "404.html"), "/404.html")
 
-    def banner_page(self, name: str) -> None:
-        self.write(name, '<!DOCTYPE html>\n<html class="preview"><head></head><body>\n'
-                         '<aside class="preview-banner" aria-label="Preview" data-preview-banner>'
-                         '<p>Work in progress</p></aside>\n</body></html>\n')
+    def banner_page(self, name: str, positions: tuple[str, ...] = ("top", "bottom")) -> None:
+        def banner(position: str) -> str:
+            return (f'<aside class="preview-banner preview-banner--{position}" aria-label="Preview"'
+                    f' data-preview-banner="{position}"><p>Work in progress</p></aside>\n')
 
-    def test_a_build_for_stage_has_the_banner_on_every_page(self) -> None:
+        top = "".join(banner(p) for p in positions if p == "top")
+        bottom = "".join(banner(p) for p in positions if p != "top")
+        self.write(name, '<!DOCTYPE html>\n<html class="preview"><head></head><body>\n'
+                         f'{top}<div class="content"></div>\n{bottom}</body></html>\n')
+
+    def test_a_build_for_stage_has_the_banner_at_the_top_and_bottom_of_every_page(self) -> None:
         self.banner_page("index.html")
-        self.banner_page("404.html")
+        self.banner_page("404.html", ("top",))
         self.page("about/index.html", "")
-        self.assertEqual(self.tool.preview_banner(self.site, "stage"),
-                         ["about/index.html (without the preview banner, JEKYLL_ENV=stage)"])
+        self.assertEqual(self.tool.preview_banner(self.site, "stage"), [
+            "404.html (banners: top; expected: top, bottom; JEKYLL_ENV=stage)",
+            "about/index.html (banners: none; expected: top, bottom; JEKYLL_ENV=stage)",
+        ])
+        self.banner_page("404.html")
         self.banner_page("about/index.html")
         self.assertEqual(self.tool.preview_banner(self.site, "stage"), [])
+
+    def test_a_banner_twice_at_the_same_edge_is_reported(self) -> None:
+        self.banner_page("index.html", ("top", "top", "bottom"))
+        self.assertEqual(self.tool.preview_banner(self.site, "stage"),
+                         ["index.html (banners: top, top, bottom; expected: top, bottom; JEKYLL_ENV=stage)"])
 
     def test_any_other_build_has_it_on_no_page(self) -> None:
         self.page("index.html", "")
         self.page("about/index.html", "")
         self.assertEqual(self.tool.preview_banner(self.site, "production"), [])
         self.assertEqual(self.tool.preview_banner(self.site, "development"), [])
-        self.banner_page("404.html")
+        self.banner_page("404.html", ("bottom",))
         self.assertEqual(self.tool.preview_banner(self.site, "production"),
-                         ["404.html (with the preview banner, JEKYLL_ENV=production)"])
+                         ["404.html (banners: bottom; expected: none; JEKYLL_ENV=production)"])
 
     def test_exit_status_follows_jekyll_env(self) -> None:
         def run(environment: str | None) -> int:

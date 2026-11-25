@@ -1,5 +1,5 @@
 """The deploys of the two sites (CLAUDE.md, Section 1): stage.yml publishes stage on GitHub
-Pages, built for stage, with the banner "Work in progress" on every page; production.yml
+Pages, built for stage, with the banner "Work in progress" atop and below every page; production.yml
 publishes master on the Worker at theplanet.observer, built for production, without it,
 called by release.yml and gated by DEPLOY_PRODUCTION; new-year.yml starts both on 1 January,
 so that the year of the notice moves on (the owner, 2026-11-25). Standard library only: the

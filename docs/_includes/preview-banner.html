@@ -1,9 +1,12 @@
-<!-- The banner of the stage site, https://theplanet.wtf/ (the owner, 2026-11-25): the layout
-     includes it only in a build with JEKYLL_ENV=stage, which .github/workflows/stage.yml runs at
-     every merge into stage; the production site, built with JEKYLL_ENV=production, never has
-     it. scripts/check-site.py finds it by data-preview-banner, on every page of the one and on
-     none of the other. Its style is assets/css/preview.css. It links the production site,
-     https://theplanet.observer/ (wrangler.jsonc). -->
-<aside class="preview-banner" aria-label="Preview" data-preview-banner>
-  <p><strong>Work in progress:</strong> this version of the site is only a preview of <a href="https://theplanet.observer/">theplanet.observer</a>.</p>
+{%- comment %}
+The banner of the stage site, https://theplanet.wtf/ (the owner, 2026-11-25), at the top and
+at the bottom of every page: the layout includes it twice, with position="top" and
+position="bottom", only in a build with JEKYLL_ENV=stage, which .github/workflows/stage.yml
+runs at every merge into stage; the production site, built with JEKYLL_ENV=production, never
+has it. scripts/check-site.py finds both by data-preview-banner, on every page of the one and
+on none of the other. Its style is assets/css/preview.css; it links the production site,
+https://theplanet.observer/ (wrangler.jsonc). One line on wide screens: keep the text short.
+{%- endcomment %}
+<aside class="preview-banner preview-banner--{{ include.position }}" aria-label="Preview{% if include.position == 'bottom' %}, end of the page{% endif %}" data-preview-banner="{{ include.position }}">
+  <p><strong>Work in progress:</strong> only a preview of <a href="https://theplanet.observer/">theplanet.observer</a>. New features take shape here first.</p>
 </aside>

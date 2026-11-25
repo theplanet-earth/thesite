@@ -13,8 +13,8 @@ which a browser on https blocks or upgrades; and a file that should not be publi
 (README.md, CNAME, Gemfile, Gemfile.lock: the theme's and the demo's, removed in 2026-11).
 And the banner of the stage site (docs/_includes/preview-banner.html): JEKYLL_ENV says which
 site was built, as it says it to Jekyll (scripts/build.sh, production when unset); a build
-for stage has the banner on every page, any other build on none, so that the production
-site never shows it (the owner, 2026-11-25).
+for stage has it at the top and at the bottom of every page, any other build on no page, so
+that the production site never shows it (the owner, 2026-11-25).
 Exit status 1 on any problem, 2 when DIR does not exist. Standard library only.
 """
 from __future__ import annotations
@@ -33,8 +33,10 @@ LINK_ATTRIBUTES = {"href", "src", "poster"}
 RESOURCE_TAGS = {"link", "script", "img", "iframe", "source", "audio", "video", "embed"}
 # Files that a site never needs to publish.
 UNPUBLISHED = {"README.md", "CNAME", "Gemfile", "Gemfile.lock"}
-# The attribute of the banner of the stage site, and the environment that shows it.
+# The attribute of the banner of the stage site, its values on every page of the stage site,
+# and the environment that shows it.
 PREVIEW_ATTRIBUTE = "data-preview-banner"
+PREVIEW_POSITIONS = ("top", "bottom")
 PREVIEW_ENVIRONMENT = "stage"
 
 
@@ -55,15 +57,16 @@ class Links(HTMLParser):
 
 
 class Preview(HTMLParser):
-    """Whether a page has the banner of the stage site."""
+    """The positions of the banners of the stage site on a page, in their order."""
 
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
-        self.found = False
+        self.found: list[str] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        if any(name == PREVIEW_ATTRIBUTE for name, _ in attrs):
-            self.found = True
+        for name, value in attrs:
+            if name == PREVIEW_ATTRIBUTE:
+                self.found.append(value or "")
 
 
 def page_url(site: Path, page: Path) -> str:
@@ -119,16 +122,19 @@ def unpublished(site: Path) -> list[str]:
 
 
 def preview_banner(site: Path, environment: str) -> list[str]:
-    """The pages that break the rule of the banner: without it in a build for stage, with it
-    in a build for any other environment."""
-    stage = environment == PREVIEW_ENVIRONMENT
+    """The pages that break the rule of the banner: in a build for stage, those without it at
+    the top and at the bottom, once each; in a build for any other environment, those with
+    it anywhere."""
+    expected = list(PREVIEW_POSITIONS) if environment == PREVIEW_ENVIRONMENT else []
     problems = []
     for page in sorted(site.rglob("*.html")):
         parser = Preview()
         parser.feed(page.read_text(encoding="utf-8", errors="replace"))
-        if parser.found != stage:
-            state = "without the preview banner" if stage else "with the preview banner"
-            problems.append(f"{page.relative_to(site).as_posix()} ({state}, JEKYLL_ENV={environment})")
+        if parser.found != expected:
+            found = ", ".join(parser.found) or "none"
+            wanted = ", ".join(expected) or "none"
+            problems.append(f"{page.relative_to(site).as_posix()} (banners: {found}; expected: {wanted};"
+                            f" JEKYLL_ENV={environment})")
     return problems
 
 
@@ -154,7 +160,7 @@ def main(argv: list[str]) -> int:
             print("site: check with the JEKYLL_ENV the site was built with (scripts/build.sh)", file=sys.stderr)
         print(f"site: {len(problems)} problems in {pages} pages", file=sys.stderr)
         return 1
-    where = "on every page" if environment == PREVIEW_ENVIRONMENT else "on no page"
+    where = "at the top and at the bottom of every page" if environment == PREVIEW_ENVIRONMENT else "on no page"
     print(f"site: {pages} pages, every local link and resource exists, nothing over http, nothing unpublishable,"
           f" the preview banner {where} ({environment})")
     return 0
