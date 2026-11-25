@@ -187,6 +187,11 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   in progress: only a preview of theplanet.observer. New features take shape here first."
   (no "stunning", which the writing style of `CONTRIBUTING.md` excludes), on one line from a
   window 768 pixels wide, on two on a phone 390 pixels wide.
+- 2026-11-25, "quando lo visualizzo da cellulare vorrei che il logo THEPLANET fosse alto tanto
+  quanto il logo. aggiustali in questo caso per fare si che mantengano le proporzioni": on
+  narrow screens the logotype is as high as the mascot, 3.5rem, and each keeps its
+  proportions: the mascot takes its width from its height, the logotype scales its text,
+  padding and border together (`docs/assets/css/theplanet.css`).
 
 Rules of the organization, carried over from thebox or from its issues (keep them unless the
 owner decides otherwise):
@@ -575,7 +580,8 @@ harness) comes from thebox, which is versioned and released like any other repos
   1440x900 and 1024x768 for the height, 2026-11-24; screenshots in `.playwright-mcp/`,
   git-ignored): the home page ("Global reach") and `/globe/` fit one window, without
   scrolling; the menu lists Home and About, then the icon of GitHub; on narrow screens the
-  sidebar is a single row; no console error from the site, no broken link, no horizontal
+  sidebar is a single row, down to 320 pixels, where the mascot and the logotype are 56
+  pixels high and aligned (2026-11-25); no console error from the site, no broken link, no horizontal
   scroll. Fixed on the way:
   the tiles of CARTO, which now need a key ([CARTO](https://carto.com/basemaps/apikey)),
   until the globe replaced the map; `/about/` without style (links relative to the page);
