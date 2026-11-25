@@ -187,6 +187,24 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   in progress: only a preview of theplanet.observer. New features take shape here first."
   (no "stunning", which the writing style of `CONTRIBUTING.md` excludes), on one line from a
   window 768 pixels wide, on two on a phone 390 pixels wide.
+- 2026-11-25, "forse è il caso di aggiungere un tab "Privacy" con l'informativa sulla privacy,
+  cookies ai sensi del GDPR e di tutte le altre normative applicabili?", and the owner's
+  answers on the plan: a page *Privacy* in the menu, in English only (`docs/privacy.md`);
+  the fonts served by the site instead of Google Fonts, so that no resource comes from
+  another host; as the address of the controller, "privacy@theplanet.dev visto che possiedo
+  anche quel dominio, li faremo delle configurazioni per creare anche altri indirizzi mail
+  con le regole di cf": the addresses of the project live on `theplanet.dev`, routed by
+  Cloudflare Email Routing (Section 12). The site sets no cookie, so it shows no consent
+  banner.
+- 2026-11-25, after seeing the page in a preview, "perfetta, va benissimo, prima di mergiare
+  su dev aggiungi comunque un popoup (in stile arancione, come il banner wip) che costringa il
+  lettore a leggere brevemente che c'è una sezione privacy apposta e a chiudere questo popup
+  prima di poter fare nulla sul sito [...] giusto per far vedeer che non si è ignorata la
+  questione": the notice of privacy, a modal dialog on every page but `/privacy/`
+  (`docs/_includes/privacy-notice.html`, `src/notice/`), opened at the start of a visit.
+  It stores nothing, so that the page stays true: a visit starts when the page was not
+  reached from another page of the site (`document.referrer`), and a reload or a step in the
+  history is not a new one; it opens again at the next visit.
 - 2026-11-25, "quando lo visualizzo da cellulare vorrei che il logo THEPLANET fosse alto tanto
   quanto il logo. aggiustali in questo caso per fare si che mantengano le proporzioni": on
   narrow screens the logotype is as high as the mascot, 3.5rem, and each keeps its
@@ -241,7 +259,7 @@ owner decides otherwise):
 | `scripts/lib.sh` | Helpers shared by the shell scripts: repository root, `build/`, `$PY`, `log`, `warn`, `die`, `need`, `project_version` |
 | `scripts/build.sh`, `test.sh`, `check.sh` | Build (the site into `build/pages/`), unit tests, every check (the entry points of CI) |
 | `scripts/serve.sh` | Live preview of the site at `http://localhost:4000` (`npm run serve`; `npm run serve:stage` as the stage site, with its banners), with the bundle rebuilt on every change of `src/` |
-| `scripts/bundle.sh`, `scripts/bundle.mjs` | esbuild bundles `src/globe/main.js` and three.js into `docs/assets/bundle/globe.js` (generated, git-ignored), with the licence of three.js beside it; run by `build.sh` and `serve.sh`; in watch mode it touches the bundle a second after each build (Section 12) |
+| `scripts/bundle.sh`, `scripts/bundle.mjs` | esbuild bundles `src/globe/main.js` and three.js into `docs/assets/bundle/globe.js`, and `src/notice/main.js` into `docs/assets/bundle/notice.js` (generated, git-ignored), with the licence of three.js beside it; run by `build.sh` and `serve.sh`; in watch mode it touches the bundle a second after each build (Section 12) |
 | `wrangler.jsonc`, `worker/` | The Worker of production (issue #2): static assets from `build/pages/`, custom domain `theplanet.observer`; `worker/index.js` runs only for `/api/*`, `worker/edits.js` serves `/api/osm-edits.json`, read at most every 19 minutes and cached |
 | `scripts/worker.sh` | wrangler at a pinned version: `npm run worker:check` (dry run), `npm run worker:dev` (the site with the Worker at `http://localhost:8787`), and `deploy`, run by `production.yml` with the token and the account in the environment; each builds the site with `JEKYLL_ENV=production` and runs `check-site.py` before wrangler |
 | `media/mascot/` | The mascot of the logo in 3D, not used by the site: the five files Meshy made (walking, running, rigged, without skeleton, preview; 20 MB), `provenance.json` and a `README.md` on what each may serve; kept for thegame (Section 2) |
@@ -251,11 +269,12 @@ owner decides otherwise):
 | `scripts/install-skills.sh` | Claude Code skills installed for the user, pinned to a commit (Section 10) |
 | `scripts/check-confidential.py` | Confidentiality guard (pre-commit hook and `npm run check`) |
 | `scripts/check-template.sh` | Lists the `TEMPLATE` markers left; none since 2026-11-24, so `npm run check` runs it with `--strict` |
-| `scripts/check-site.py` | Check of the built site: every local link and resource of `build/pages/` exists, none loads over `http`, nothing unpublishable is published, and the banner of the stage site is at the top and at the bottom of every page of a build for stage and on no page of any other, by `JEKYLL_ENV` (`npm run check:site`) |
+| `scripts/check-site.py` | Check of the built site: every local link and resource of `build/pages/` exists, none loads over `http` or from another host, the notice of privacy is on every page but `/privacy/`, nothing unpublishable is published, and the banner of the stage site is at the top and at the bottom of every page of a build for stage and on no page of any other, by `JEKYLL_ENV` (`npm run check:site`) |
 | `scripts/version.py` | Version, next version and release notes from the tags and the commits |
 | `scripts/setup-python.sh` | `.venv/` from `requirements.txt`, reinstalled only when it changes |
-| `tests/` | `unittest` checks of the harness scripts, of `check-site.py`, of `land-mask.py`, of `osm-activity.py`, of the permissions of the devcontainer, of the license and of the deploys (standard library only); `globe.test.mjs`, `replication.test.mjs` and `live.test.mjs` (the live edits and the Worker, against fakes), with `node --test` |
+| `tests/` | `unittest` checks of the harness scripts, of `check-site.py`, of `land-mask.py`, of `osm-activity.py`, of the permissions of the devcontainer, of the license and of the deploys (standard library only); `notice.test.mjs` (when the notice of privacy opens), `globe.test.mjs`, `replication.test.mjs` and `live.test.mjs` (the live edits and the Worker, against fakes), with `node --test` |
 | `src/globe/` | The globe of the home page: `geometry.js` (dots of the land, spikes, arcs, quality tiers; no three.js), `replication.js` (the replication of changesets: paths, parsing, merging; no DOM), `live.js` (every 19 minutes, the edits from the Worker or from the replication; shared with the Worker), `main.js` (the three.js scene) |
+| `src/notice/` | The notice of privacy: `visit.js` (whether a visit starts, from the referrer and the type of navigation; no DOM), `main.js` (opens the dialog of `docs/_includes/privacy-notice.html`) |
 | `package.json`, `package-lock.json` | Also the dependencies of the site, pinned: three.js and esbuild (Section 10) |
 | `.devcontainer/` | `Dockerfile`, `devcontainer.json`, `post-create.sh` (Section 10) |
 | `.vscode/` | Recommended extensions, settings, and every command as a task |
@@ -275,11 +294,11 @@ The site, cleaned up on 2026-11-24 (`CONTRIBUTING.md`, *Conventions of this repo
 
 | Path | Content |
 |---|---|
-| `docs/` | Jekyll 4.3 site: `_config.yml`, `Gemfile` and `Gemfile.lock` (Jekyll, and the three gems Ruby 3.3 warns about), `_layouts/` (`default`, `page`), `_includes/` (`head`, `sidebar`, `preview-banner`, the banner of the stage site), `index.html` (the globe), `globe.md` (how the globe is made, linked under it, not in the menu), `about.md`, `404.html`; the menu lists the pages with a `nav_order` |
+| `docs/` | Jekyll 4.3 site: `_config.yml`, `Gemfile` and `Gemfile.lock` (Jekyll, and the three gems Ruby 3.3 warns about), `_layouts/` (`default`, `page`), `_includes/` (`head`, `sidebar`, `preview-banner`, the banner of the stage site, `privacy-notice`), `index.html` (the globe), `globe.md` (how the globe is made, linked under it, not in the menu), `about.md`, `privacy.md` (the notice under the GDPR, Section 2), `404.html`; the menu lists the pages with a `nav_order` |
 | `docs/_data/coverage.yml` | The places shown as orange rings on the globe (issue #1) |
 | `docs/_data/activity.json` | The latest edits to OpenStreetMap, the orange spikes and arcs of the globe: generated at every build by `scripts/osm-activity.py`, git-ignored |
 | `docs/public/` | The Hyde theme on Poole, third-party, MIT, with the dark colours of the project: its CSS, icons and `LICENSE.md`, published with them as the licence asks |
-| `docs/assets/` | The project's own CSS (`theplanet.css`, `globe.css`, and `preview.css`, loaded by the stage site only), the logo, `globe/land.png` (generated by `scripts/land-mask.py` and **committed** as data of the site: it changes only with its source), and `bundle/` (generated by `scripts/bundle.sh`, git-ignored) |
+| `docs/assets/` | The project's own CSS (`theplanet.css`, `globe.css`, `fonts.css`, `notice.css`, and `preview.css`, loaded by the stage site only), the fonts (`fonts/`: PT Sans and Roboto Mono, OFL 1.1, with their licence texts; third-party, committed), the logo, `globe/land.png` (generated by `scripts/land-mask.py` and **committed** as data of the site: it changes only with its source), and `bundle/` (generated by `scripts/bundle.sh`, git-ignored) |
 | `media/` | Files of the repository that the site does not publish: `theplanetearth.png` (the image of `README.md`), `mascot/`, and `README.md`, the provenance of the logo (issue #19) |
 
 ## 5. Checks before reporting a change as done
@@ -299,7 +318,8 @@ For the site: `npm run serve` (or the task *Preview: site (live reload)*), then 
 turn it with the arrow keys) and `/about/` at least. A change of the layout is looked at with
 `npm run serve:stage` too (task *Preview: site as stage (live reload)*): the stage site has
 its banners above and below the pages. After `npm run build`, `npm run check:site` checks the links and
-resources of `build/pages/`, that nothing loads over `http`, that nothing unpublishable
+resources of `build/pages/`, that nothing loads over `http` or from another host, that the
+notice of privacy is on every page but `/privacy/`, that nothing unpublishable
 (`README.md`, `CNAME`, `Gemfile`) is published, and the banner of the stage site: run it with
 the `JEKYLL_ENV` of the build (`JEKYLL_ENV=stage npm run build`, then
 `JEKYLL_ENV=stage npm run check:site`).
@@ -418,6 +438,7 @@ The rules are in `CONTRIBUTING.md`, *Confidentiality*. In addition:
 | Jekyll | 4.3.3, with the gems of `docs/Gemfile.lock` (Bundler 2.5.6) | `docs/` |
 | Mascot | Meshy Image to 3D, `ai_model: latest` (Meshy 7.1 in 2026-11), then rigging; tasks and parameters in `media/mascot/provenance.json`, 2026-11-24, 35 credits | `scripts/meshy.py` |
 | three.js | 0.187.0 (MIT), bundled by esbuild 0.28.2 (MIT); exact versions in `package.json` | `package.json`, `package-lock.json` |
+| Fonts | PT Sans 400, 400 italic, 700 and Roboto Mono 400, 700, latin and latin-ext, from `@fontsource/pt-sans` and `@fontsource/roboto-mono` 5.3.0 (`npm pack`, not dependencies), OFL 1.1 | `docs/assets/fonts/`, `docs/assets/css/fonts.css` |
 | OpenStreetMap edits | the minutely replication of changesets, `https://planet.openstreetmap.org/replication/changesets/` (redirects to a mirror on S3): the edits closed in the 20 minutes before its last run (`WINDOW_MINUTES`), read from the files of 22 minutes, at most 3000: at every build, then every 19 minutes the Worker of production for every visitor, or the browser where there is no Worker (only the files not read yet) | `scripts/osm-activity.py`, `src/globe/live.js`, `worker/edits.js` |
 | wrangler | 4.168.0, through `npx` (not a dependency of the site); `compatibility_date` 2026-11-24 | `scripts/worker.sh`, `wrangler.jsonc` |
 | Natural Earth | v5.1.2, 1:50m land (public domain), the source of `docs/assets/globe/land.png` | `scripts/land-mask.py` |
@@ -579,9 +600,11 @@ harness) comes from thebox, which is versioned and released like any other repos
 - **What the preview shows** (`npm run serve`, Playwright at 1280x800 and 390x844, and at
   1440x900 and 1024x768 for the height, 2026-11-24; screenshots in `.playwright-mcp/`,
   git-ignored): the home page ("Global reach") and `/globe/` fit one window, without
-  scrolling; the menu lists Home and About, then the icon of GitHub; on narrow screens the
-  sidebar is a single row, down to 320 pixels, where the mascot and the logotype are 56
-  pixels high and aligned (2026-11-25); no console error from the site, no broken link, no horizontal
+  scrolling; the menu lists Home, About and Privacy, then the icon of GitHub; on narrow screens the
+  sidebar is a single row, with the mascot and the logotype 56 pixels high and aligned
+  (2026-11-25), down to about 350 pixels (the gaps narrow below 400, so that 360 keeps one
+  row); below, as at 320, two centred rows, the mascot and the logotype, then the menu
+  (measured with Playwright, 2026-11-25); no console error from the site, no broken link, no horizontal
   scroll. Fixed on the way:
   the tiles of CARTO, which now need a key ([CARTO](https://carto.com/basemaps/apikey)),
   until the globe replaced the map; `/about/` without style (links relative to the page);
@@ -603,9 +626,38 @@ harness) comes from thebox, which is versioned and released like any other repos
   `CONTRIBUTING.md` expects. No ruleset exists yet (issue #25).
 - **The labels** `release:major`, `release:minor` and `release:patch`, read by `ci.yml` and
   `release.yml`, exist since 2026-11-25 (issue #26, closed); none is on a pull request.
+- **The data of the visitors** (2026-11-25, `docs/privacy.md`): checked on the code and on
+  both live sites, the site sets no cookie (no `Set-Cookie` on `theplanet.observer` nor on
+  `theplanet.wtf`) and stores nothing in the browser. Until then every page loaded its fonts
+  from Google Fonts, which received the address of every visitor: the Landgericht of Munich
+  awarded damages for that on 20 January 2022 (3 O 17493/20,
+  [text](https://www.gesetze-bayern.de/Content/Document/Y-300-Z-GRURRS-B-2022-N-612)),
+  because the fonts could be served by the site; now they are, and `check-site.py` fails on
+  any resource of another host. What other hosts still receive is said on the page: the
+  servers of the site (Cloudflare, GitHub Pages), the reports of Network Error Logging that
+  Cloudflare asks of browsers (`NEL` and `Report-To` headers on `theplanet.observer`), and
+  the replication of OpenStreetMap, read by the browser on stage (it redirects to the bucket
+  `osm-planet-eu-central-1` on Amazon S3, Frankfurt) and in production only when the Worker
+  does not answer the first time. Found on the way, and reported rather than kept:
+  - the prototype loaded **Abril Fatface** from Google, but no rule uses it (`hyde.css` has
+    it commented out): it is not served any more;
+  - Google Fonts served the Cyrillic subsets of PT Sans and Roboto Mono too; the site, in
+    English, serves latin and latin-ext only;
+  - **inconsistency, reported**: the licence of Roboto Mono is the SIL Open Font License 1.1
+    in the repository of Google Fonts (`ofl/robotomono/OFL.txt` of `google/fonts`) and in
+    the package `@fontsource/roboto-mono` 5.3.0, while older third-party pages give the
+    Apache License 2.0, under which Google first published it; the site follows the
+    repository of Google Fonts.
 
 Open points:
 
+- [ ] Owner: the address `privacy@theplanet.dev` of the page *Privacy* (Section 2):
+  Cloudflare Email Routing on `theplanet.dev`, with a rule that forwards it to a verified
+  inbox ([Email Routing](https://developers.cloudflare.com/email-routing/get-started/)),
+  before the page reaches `stage`; then a test message. Optional: turn off Network Error
+  Logging on the zone of `theplanet.observer`, and the page no longer needs to name it.
+- [ ] Owner: review the page *Privacy* before it reaches `stage`, in particular the sentence
+  on what the controller sees in the dashboard of Cloudflare and keeps of it (nothing).
 - [ ] Owner: the ruleset `chain` on `stage` and `master` (issue #25), which needs admin
   rights.
 - [ ] Owner: the email records against spoofing of `theplanet.observer`, due now that the

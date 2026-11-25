@@ -1,0 +1,71 @@
+/* The notice of privacy (docs/_includes/privacy-notice.html), a modal dialog in the style of the
+   banner of the stage site: a frame striped as caution tape, in the orange of the globe
+   (#ffa94d, src/globe/main.js) and a dark grey, around a solid panel. Contrast on #202020:
+   the text #eee 14.0:1, the title #ffa94d 8.6:1, the link #9cd3ff 10.2:1; the button, #202020
+   on #ffa94d 8.6:1 and on #ffc078 10.1:1 (WCAG 2.2, success criterion 1.4.3, at least 4.5:1). */
+.privacy-notice {
+  width: min(28rem, calc(100vw - 2rem));
+  max-width: none;
+  padding: 0.5rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: repeating-linear-gradient(-45deg, #ffa94d 0 0.75rem, #202020 0.75rem 1.5rem);
+  color: #eee;
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.6);
+}
+
+.privacy-notice::backdrop {
+  background: rgba(16, 16, 16, 0.72);
+}
+
+.privacy-notice form {
+  margin: 0;
+  padding: 1.25rem 1.5rem 1.5rem;
+  border-radius: 0.25rem;
+  background: #202020;
+}
+
+.privacy-notice h2 {
+  margin: 0 0 0.75rem;
+  color: #ffa94d;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.privacy-notice p {
+  margin: 0 0 1.25rem;
+  line-height: 1.5;
+}
+
+.privacy-notice a {
+  color: #9cd3ff;
+}
+
+.privacy-notice button {
+  display: block;
+  margin-left: auto;
+  padding: 0.5rem 1.25rem;
+  border: 0;
+  border-radius: 0.25rem;
+  background: #ffa94d;
+  color: #202020;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.privacy-notice button:hover {
+  background: #ffc078;
+}
+
+.privacy-notice a:focus-visible,
+.privacy-notice button:focus-visible {
+  outline: 2px solid #9ccc65;
+  outline-offset: 2px;
+}

@@ -55,6 +55,14 @@ that the owner squash-merges, each followed by a merge back down the chain
   by the site.
 - Since 2026-11-25 both addresses serve the site, each deployed by its workflow (issues #2,
   #6 and #7, closed).
+- The page *Privacy* (`docs/privacy.md`, `/privacy/`) is the notice of the site under the GDPR:
+  no cookies and no tracking, so no consent banner; it names what the servers of Cloudflare,
+  GitHub and OpenStreetMap receive. The site loads nothing from another host, its fonts
+  included, and `npm run check:site` fails if it does. Its address,
+  `privacy@theplanet.dev`, is to be routed by the owner with Cloudflare Email Routing
+  (`CLAUDE.md`, Section 12). At the start of a visit every other page opens a short notice
+  in orange that points to it and must be closed before the site can be used; it stores
+  nothing, so it opens again at the next visit.
 
 ## Getting started
 
@@ -94,6 +102,11 @@ unset: the GitHub Pages site of this repository is the stage site.
   OpenStreetMap contributors, [ODbL](https://www.openstreetmap.org/copyright).
 - The icon of GitHub in the sidebar: `mark-github` of
   [Octicons](https://github.com/primer/octicons) 19.43.0, MIT licence.
+- The fonts, served by the site (`docs/assets/fonts/`): [PT Sans](https://fonts.google.com/specimen/PT+Sans)
+  by ParaType and [Roboto Mono](https://github.com/googlefonts/robotomono), both under the
+  [SIL Open Font License 1.1](https://openfontlicense.org/), published with their texts;
+  the files come from the npm packages `@fontsource/pt-sans` and `@fontsource/roboto-mono`
+  5.3.0.
 
 ## License
 
@@ -117,5 +130,6 @@ moves on without a commit.
   `media/README.md` (issue #19).
 - **Third-party work** keeps its own license (*Credits*): the Hyde theme on Poole
   (`docs/public/css/`, MIT, `docs/public/LICENSE.md`), three.js (MIT, bundled with its
-  licence), the icon of GitHub (Octicons, MIT). The data the globe shows keep their terms:
+  licence), the icon of GitHub (Octicons, MIT), the fonts PT Sans and Roboto Mono (SIL Open
+  Font License 1.1, `docs/assets/fonts/`). The data the globe shows keep their terms:
   OpenStreetMap (ODbL, credited next to the globe) and Natural Earth (public domain).
