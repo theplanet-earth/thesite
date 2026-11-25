@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Confidentiality guard: blocks a commit that adds private files or a term listed in
+# confidential-terms.local (see scripts/check-confidential.py). Enabled by
+# `git config core.hooksPath .githooks` (.devcontainer/post-create.sh). Never bypass it
+# with --no-verify.
+exec python3 "$(git rev-parse --show-toplevel)/scripts/check-confidential.py" --staged
