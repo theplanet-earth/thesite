@@ -97,5 +97,21 @@ unset: the GitHub Pages site of this repository is the stage site.
 
 ## License
 
-[Apache License 2.0](LICENSE). The Hyde theme in `docs/` keeps its own MIT license
-(`docs/LICENSE.md`).
+Decided by the owner on 2026-11-25 (issue #10). The notice in the sidebar of every page links
+here.
+
+- **Code**: the [MIT License](LICENSE), © 2024 Andrea Gallegati. It covers everything in the
+  repository that the next items do not name, its documentation included, and
+  `docs/assets/globe/land.png`, which `scripts/land-mask.py` makes from Natural Earth.
+- **Texts of the site**: the text of the pages in `docs/` (the home page, About, The globe,
+  the page not found) is under
+  [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/): reuse it with credit and a link
+  to the license. The markup and the Liquid of those files are code, under MIT.
+- **Logo and mascot**: not licensed, © Andrea Gallegati, all rights reserved. The logo is
+  `docs/assets/images/theplanet.png`, `media/theplanetearth.png`,
+  `docs/public/apple-touch-icon.png` and `docs/public/favicon.ico`; the mascot in 3D is
+  `media/mascot/`. Neither license above covers them, nor the name of the project.
+- **Third-party work** keeps its own license (*Credits*): the Hyde theme on Poole
+  (`docs/public/css/`, MIT, `docs/public/LICENSE.md`), three.js (MIT, bundled with its
+  licence), the icon of GitHub (Octicons, MIT). The data the globe shows keep their terms:
+  OpenStreetMap (ODbL, credited next to the globe) and Natural Earth (public domain).

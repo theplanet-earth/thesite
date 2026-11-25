@@ -136,6 +136,12 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   dell'org": the devcontainer asks for write on the `issues` of every repository of the
   organization, read on the rest, and nothing more (Section 10); the caution at the top of
   `README.md` lists what it allows. It applies to the Codespaces created after the change.
+- 2026-11-25, on the alternatives of issue #10: "andiamo con A. MIT per il codice, CC BY 4.0
+  per i testi, logo e mascotte riservati", without cluttering the sidebar, and as the holder
+  "proprio il mio nome e basta": `LICENSE` is the MIT License, © 2024 Andrea Gallegati; the
+  texts of the pages are CC BY 4.0; the logo and the mascot are not licensed (`README.md`,
+  *License*). The sidebar keeps one line, the notice, which links to that section;
+  `author` in `docs/_config.yml` holds the name.
 
 Rules of the organization, carried over from thebox or from its issues (keep them unless the
 owner decides otherwise):
@@ -198,7 +204,7 @@ owner decides otherwise):
 | `scripts/check-site.py` | Check of the built site: every local link and resource of `build/pages/` exists, none loads over `http`, nothing unpublishable is published (`npm run check:site`) |
 | `scripts/version.py` | Version, next version and release notes from the tags and the commits |
 | `scripts/setup-python.sh` | `.venv/` from `requirements.txt`, reinstalled only when it changes |
-| `tests/` | `unittest` checks of the harness scripts, of `check-site.py`, of `land-mask.py`, of `osm-activity.py` and of the permissions of the devcontainer (standard library only); `globe.test.mjs`, `replication.test.mjs` and `live.test.mjs` (the live edits and the Worker, against fakes), with `node --test` |
+| `tests/` | `unittest` checks of the harness scripts, of `check-site.py`, of `land-mask.py`, of `osm-activity.py`, of the permissions of the devcontainer and of the license (standard library only); `globe.test.mjs`, `replication.test.mjs` and `live.test.mjs` (the live edits and the Worker, against fakes), with `node --test` |
 | `src/globe/` | The globe of the home page: `geometry.js` (dots of the land, spikes, arcs, quality tiers; no three.js), `replication.js` (the replication of changesets: paths, parsing, merging; no DOM), `live.js` (every 19 minutes, the edits from the Worker or from the replication; shared with the Worker), `main.js` (the three.js scene) |
 | `package.json`, `package-lock.json` | Also the dependencies of the site, pinned: three.js and esbuild (Section 10) |
 | `.devcontainer/` | `Dockerfile`, `devcontainer.json`, `post-create.sh` (Section 10) |
@@ -211,8 +217,9 @@ owner decides otherwise):
 | `.github/copilot-instructions.md` | Points GitHub Copilot to these conventions |
 | `build/` | Every output (git-ignored): `build/release/`, `build/pages/` |
 
-`LICENSE` is the Apache License 2.0 of thesite (thebox itself is MIT: the license is not part
-of the harness).
+`LICENSE` is the MIT License of thesite, © 2024 Andrea Gallegati; the texts of the pages are
+CC BY 4.0, the logo and the mascot are not licensed, third-party work keeps its own license
+(`README.md`, *License*, Section 2, 2026-11-25). The license is not part of the harness.
 
 The site, cleaned up on 2026-11-24 (`CONTRIBUTING.md`, *Conventions of this repository*):
 
@@ -490,10 +497,6 @@ harness) comes from thebox, which is versioned and released like any other repos
   while `https://theplanet-earth.github.io/thesite/` answers 301 to `https://theplanet.wtf/`:
   GitHub Pages works, the DNS records on Cloudflare do not (issue #6).
   `theplanet.observer` has no A, AAAA or CNAME record yet.
-- **Inconsistency, reported and not fixed**: the sidebar of every page says "© 2026. All
-  rights reserved.", from the prototype, while `LICENSE` puts the repository under the Apache
-  License 2.0. Which applies to the content of the site (the logo, the texts) is the
-  owner's decision; a `TODO` in `docs/_includes/sidebar.html` points here.
 - **`PUBLISH_PAGES` stays unset** in this repository: the GitHub Pages site here is the stage
   site, and `release.yml` would publish `master` on it.
 - **What the preview shows** (`npm run serve`, Playwright at 1280x800 and 390x844, and at
@@ -534,8 +537,10 @@ Open points:
 - [ ] The mascot from Meshy (Section 2): kept in `media/mascot/` for thegame. Owner: whether to
   keep the other files of `build/meshy/2026-11-24/` (the running clip, the rigged model), and
   whether thegame wants it: an issue there needs a Codespace created after 2026-11-24.
-- [ ] The license of every repository (owner, 2026-11-23): issue #10 compares the candidates
-  for thesite; the same issue, "Change the license: candidate licenses compared", is still
-  to be opened in the other 15 repositories of the organization from a Codespace created
-  after 2026-11-24, then the issue of thebox, which holds the overview, links them all and
-  #10 links it. Then the owner decides, repository by repository.
+- [ ] The license of every repository (owner, 2026-11-23): thesite decided on 2026-11-25
+  (Section 2, issue #10). The same issue, "Change the license: candidate licenses
+  compared", is still to be opened in the other 15 repositories of the organization from a
+  Codespace created after 2026-11-24; then the issue of thebox, which holds the overview,
+  links them all and #10 links it. The script and the texts are kept in a private artifact
+  of the owner, "License Issues Kit" (https://claude.ai/artifact/XMVTBxhuJ8Zkizv2DELHtH,
+  files under `kit/`). Then the owner decides, repository by repository.
