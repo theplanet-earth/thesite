@@ -30,7 +30,7 @@ owner on 2026-11-23 following issue #2:
 | Environment | Branch | Where | How | State |
 |---|---|---|---|---|
 | Stage | `stage` | `https://theplanet.wtf/`, GitHub Pages of this repository | `.github/workflows/stage.yml` on every push to `stage` | DNS broken (issue #6) |
-| Production | `master` | `https://theplanet.observer/`, a Cloudflare Worker serving `build/pages/` as static assets | not automated yet (issue #2) | token, secrets and custom domain to set up (issues #6, #7) |
+| Production | `master` | `https://theplanet.observer/`, a Cloudflare Worker serving `build/pages/` as static assets | `.github/workflows/production.yml`, called by `release.yml` after every release, once `DEPLOY_PRODUCTION` is `true` (issue #2) | token, secrets and custom domain to set up (issues #6, #7) |
 
 What the site shows and how it links the other repositories of the organization are decided
 by the owner, request by request.
@@ -146,6 +146,12 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   che buildi per aggiornare la data all'inizio di ciascun anno, sennò rimane vecchia": the
   notice reads "© 2024-<year of the build>", and `.github/workflows/new-year.yml` starts a
   build of the published sites on 1 January (Section 12).
+- 2026-11-25, on that workflow, which could rebuild only stage: "bravo aggiungila" (the
+  production): `.github/workflows/production.yml` builds `master` and deploys it with the
+  Worker (`scripts/worker.sh deploy`); `release.yml` calls it after every release and
+  `new-year.yml` starts it on 1 January. It runs only once the owner sets the repository
+  variable `DEPLOY_PRODUCTION` to `true`, after the environment `production` and its secrets
+  exist (issues #6, #7).
 
 Rules of the organization, carried over from thebox or from its issues (keep them unless the
 owner decides otherwise):
@@ -197,7 +203,7 @@ owner decides otherwise):
 | `scripts/serve.sh` | Live preview of the site at `http://localhost:4000` (`npm run serve`), with the bundle rebuilt on every change of `src/` |
 | `scripts/bundle.sh`, `scripts/bundle.mjs` | esbuild bundles `src/globe/main.js` and three.js into `docs/assets/bundle/globe.js` (generated, git-ignored), with the licence of three.js beside it; run by `build.sh` and `serve.sh`; in watch mode it touches the bundle a second after each build (Section 12) |
 | `wrangler.jsonc`, `worker/` | The Worker of production (issue #2): static assets from `build/pages/`, custom domain `theplanet.observer`; `worker/index.js` runs only for `/api/*`, `worker/edits.js` serves `/api/osm-edits.json`, read at most every 19 minutes and cached |
-| `scripts/worker.sh` | wrangler at a pinned version: `npm run worker:check` (dry run) and `npm run worker:dev` (the site with the Worker at `http://localhost:8787`) |
+| `scripts/worker.sh` | wrangler at a pinned version: `npm run worker:check` (dry run), `npm run worker:dev` (the site with the Worker at `http://localhost:8787`), and `deploy`, run by `production.yml` with the token and the account in the environment |
 | `media/mascot/` | The mascot of the logo in 3D, not used by the site: the five files Meshy made (walking, running, rigged, without skeleton, preview; 20 MB), `provenance.json` and a `README.md` on what each may serve; kept for thegame (Section 2) |
 | `scripts/meshy.py` | The mascot of the logo as a 3D model by the API of Meshy: Image to 3D, rigging, the GLB files and their provenance in `build/meshy/<date>/` (`npm run mascot:generate`) |
 | `scripts/osm-activity.py` | The latest edits to OpenStreetMap for the globe, from the minutely replication of changesets, into `docs/_data/activity.json` (generated at every build, git-ignored; `npm run globe:activity`) |
@@ -208,7 +214,7 @@ owner decides otherwise):
 | `scripts/check-site.py` | Check of the built site: every local link and resource of `build/pages/` exists, none loads over `http`, nothing unpublishable is published (`npm run check:site`) |
 | `scripts/version.py` | Version, next version and release notes from the tags and the commits |
 | `scripts/setup-python.sh` | `.venv/` from `requirements.txt`, reinstalled only when it changes |
-| `tests/` | `unittest` checks of the harness scripts, of `check-site.py`, of `land-mask.py`, of `osm-activity.py`, of the permissions of the devcontainer and of the license (standard library only); `globe.test.mjs`, `replication.test.mjs` and `live.test.mjs` (the live edits and the Worker, against fakes), with `node --test` |
+| `tests/` | `unittest` checks of the harness scripts, of `check-site.py`, of `land-mask.py`, of `osm-activity.py`, of the permissions of the devcontainer, of the license and of the deploys (standard library only); `globe.test.mjs`, `replication.test.mjs` and `live.test.mjs` (the live edits and the Worker, against fakes), with `node --test` |
 | `src/globe/` | The globe of the home page: `geometry.js` (dots of the land, spikes, arcs, quality tiers; no three.js), `replication.js` (the replication of changesets: paths, parsing, merging; no DOM), `live.js` (every 19 minutes, the edits from the Worker or from the replication; shared with the Worker), `main.js` (the three.js scene) |
 | `package.json`, `package-lock.json` | Also the dependencies of the site, pinned: three.js and esbuild (Section 10) |
 | `.devcontainer/` | `Dockerfile`, `devcontainer.json`, `post-create.sh` (Section 10) |
@@ -216,7 +222,7 @@ owner decides otherwise):
 | `.mcp.json` | Project MCP servers for Claude Code: Playwright |
 | `.claude/settings.json` | Project settings of Claude Code: the plugin marketplaces and plugins of the repository (Section 10) |
 | `.githooks/pre-commit` | Confidentiality guard, enabled by `post-create.sh` |
-| `.github/workflows/` | `ci.yml` (pull requests to `stage` and `master`), `stage.yml` (push to `stage`: the stage site on GitHub Pages), `release.yml` (merge on `master`), `new-year.yml` (1 January: starts `stage.yml` on `stage`, so that the year of the notice moves on) |
+| `.github/workflows/` | `ci.yml` (pull requests to `stage` and `master`), `stage.yml` (push to `stage`: the stage site on GitHub Pages), `release.yml` (merge on `master`; its job `production` calls `production.yml`), `production.yml` (the Worker at `theplanet.observer`, once `DEPLOY_PRODUCTION` is `true`), `new-year.yml` (1 January: starts `stage.yml` on `stage` and `production.yml` on `master`, so that the year of the notice moves on) |
 | `.github/pull_request_template.md` | Checklist of every pull request |
 | `.github/copilot-instructions.md` | Points GitHub Copilot to these conventions |
 | `build/` | Every output (git-ignored): `build/release/`, `build/pages/` |
@@ -398,7 +404,7 @@ harness) comes from thebox, which is versioned and released like any other repos
   (and to propose to thebox where they are useful to every repository): the branch model
   `dev`, `stage`, `master` of issue #5, a rule of the whole organization (`ci.yml` triggers,
   `CONTRIBUTING.md`, *Branches and pull requests*, Sections 2 and 9 of this file); the
-  workflows `stage.yml` and `new-year.yml`; the note on `PUBLISH_PAGES` in `release.yml`; the Ruby step of the
+  workflows `stage.yml`, `production.yml` and `new-year.yml`; the note on `PUBLISH_PAGES` and the job `production` in `release.yml`; the Ruby step of the
   workflows; `scripts/serve.sh`, `scripts/install-skills.sh` and `.claude/settings.json`;
   the permissions of `devcontainer.json` on the organization, with the caution of
   `README.md`, `tests/test_devcontainer_permissions.py` and the paragraphs of
@@ -505,8 +511,8 @@ harness) comes from thebox, which is versioned and released like any other repos
   schedule only from the default branch, so it works once the file reaches `master` (the
   first release after it); the run then has the ref of `master`, and the environment
   `github-pages` accepts `stage` only, so it starts `stage.yml` on `stage` by
-  `workflow_dispatch`, which the `GITHUB_TOKEN` may trigger. Production is not rebuilt yet:
-  nothing deploys `master` until issue #2 (a `TODO` in the workflow). In a public repository
+  `workflow_dispatch`, which the `GITHUB_TOKEN` may trigger; it starts `production.yml` on
+  `master` too, which deploys only once `DEPLOY_PRODUCTION` is `true`. In a public repository
   GitHub disables a schedule after 60 days without activity: after a quiet autumn, check in
   *Actions* that *New year* is enabled, or run it by hand on 1 January
   ([GitHub Docs](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)).
@@ -531,9 +537,12 @@ harness) comes from thebox, which is versioned and released like any other repos
 Open points:
 
 - [ ] Owner: the Cloudflare side of both environments, issue #6; the GitHub side, issue #7.
-- [ ] Production deploy (issue #2): the Worker `thesite` is ready (`wrangler.jsonc`,
-  `worker/`, checked locally); left: `release.yml` running `wrangler deploy` through the
-  GitHub environment `production`, once the token and the secrets of issues #6 and #7 exist
+- [ ] Production deploy (issue #2): the Worker `thesite` (`wrangler.jsonc`, `worker/`,
+  checked locally) and its deploy (`production.yml`, called by `release.yml`, 2026-11-25) are
+  ready. Owner: the token and the Account ID (#6); the environment `production`, limited to
+  `master`, with the secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` (#7, step
+  5); then the repository variable `DEPLOY_PRODUCTION` = `true`; the first deploy creates
+  the Worker and its custom domain
   ([Workers static assets](https://developers.cloudflare.com/workers/static-assets/),
   [GitHub Actions](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/)).
 - [ ] Older issues to plan with the owner: #1 (coverage map: colours from an API,

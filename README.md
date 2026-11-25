@@ -38,7 +38,7 @@ The project site of the GitHub organization **theplanet-earth**.
 | Environment | Branch | Address | Published by |
 |---|---|---|---|
 | Stage | `stage` | <https://theplanet.wtf/> | `.github/workflows/stage.yml`, on GitHub Pages, at every merge into `stage` |
-| Production | `master` | <https://theplanet.observer/> | A Cloudflare Worker with static assets (`wrangler.jsonc`, `worker/`), at every merge into `master` (the deploy is not automated yet, issue #2) |
+| Production | `master` | <https://theplanet.observer/> | A Cloudflare Worker with static assets (`wrangler.jsonc`, `worker/`), deployed by `.github/workflows/production.yml` after every release of `master`, once the owner sets the variable `DEPLOY_PRODUCTION` (issues #2, #6, #7) |
 
 Work happens on `dev`; `dev` goes into `stage`, and `stage` into `master`, by pull requests
 that the owner squash-merges, each followed by a merge back down the chain
@@ -99,8 +99,8 @@ unset: the GitHub Pages site of this repository is the stage site.
 
 Decided by the owner on 2026-11-25 (issue #10). The notice in the sidebar of every page,
 "© 2024-<year of the build> Andrea Gallegati", links here; on 1 January
-`.github/workflows/new-year.yml` rebuilds the stage site, so that the year moves on without a
-commit.
+`.github/workflows/new-year.yml` rebuilds the stage and the production sites, so that the year
+moves on without a commit.
 
 - **Code**: the [MIT License](LICENSE), © 2024 Andrea Gallegati. It covers everything in the
   repository that the next items do not name, its documentation included, and
