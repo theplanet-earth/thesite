@@ -654,9 +654,10 @@ harness) comes from thebox, which is versioned and released like any other repos
   (`check` of GitHub Actions, not strict); `dev` (id 28115148) on `dev`, with *deletion* and
   *non_fast_forward*; both active, bypassed always by the role *Repository admin* (actor 5),
   and the API answers `current_user_can_bypass: always` to the token of the Codespace.
-  **Reported, not changed**: `chain` also holds
-  `require_extra_approval_for_unattributed_changes: true`, which the table of #25 did not
-  list. Not verified yet: the first merge back of `master` into `stage` under the ruleset.
+  `chain` also held `require_extra_approval_for_unattributed_changes: true`, which the table
+  of #25 did not list; reported, the owner turned it off the same day (`false`, ruleset
+  updated at 22:47 UTC). Not verified yet: the first merge back of `master` into `stage`
+  under the ruleset.
 - **The labels** `release:major`, `release:minor` and `release:patch`, read by `ci.yml` and
   `release.yml`, exist since 2026-11-25 (issue #26, closed); none is on a pull request.
 - **The address of the page *Privacy*** (2026-11-25, checked from outside): `privacy@theplanet.dev`
