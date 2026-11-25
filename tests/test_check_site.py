@@ -35,8 +35,12 @@ class CheckSiteTest(unittest.TestCase):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8")
 
-    def page(self, name: str, head: str) -> None:
-        self.write(name, f"<!DOCTYPE html>\n<html><head>{head}</head><body></body></html>\n")
+    def page(self, name: str, head: str, notice: bool | None = None) -> None:
+        # Every page has the notice of privacy, as the layout makes it, but the page Privacy.
+        if notice is None:
+            notice = name != "privacy/index.html"
+        body = "<dialog data-privacy-notice></dialog>" if notice else ""
+        self.write(name, f"<!DOCTYPE html>\n<html><head>{head}</head><body>{body}</body></html>\n")
 
     def test_relative_link_breaks_on_a_page_in_a_folder(self) -> None:
         # The fault of /about/: public/css/ works from / and not from /about/.
@@ -107,6 +111,22 @@ class CheckSiteTest(unittest.TestCase):
             "public/css/theme.css:3: https://fonts.example.org/a.woff2",
         ])
 
+    def test_notice_of_privacy_on_every_page_but_the_page_privacy(self) -> None:
+        self.page("index.html", "")
+        self.page("about/index.html", "")
+        self.page("privacy/index.html", "")
+        self.page("404.html", "")
+        self.assertEqual(self.tool.notices(self.site), [])
+
+    def test_page_without_the_notice_and_page_privacy_with_it(self) -> None:
+        self.page("index.html", "")
+        self.page("about/index.html", "", notice=False)
+        self.page("privacy/index.html", "", notice=True)
+        self.assertEqual(self.tool.notices(self.site), [
+            "about/index.html: without the notice of privacy",
+            "privacy/index.html: has the notice of privacy, which points to this page",
+        ])
+
     def test_files_that_should_not_be_published(self) -> None:
         self.write("README.md", "theme readme")
         self.write("CNAME", "hyde.getpoole.com")
@@ -132,6 +152,8 @@ class CheckSiteTest(unittest.TestCase):
         self.assertEqual(run(str(self.site)), 1)
         (self.site / "CNAME").unlink()
         self.page("index.html", '<link rel="stylesheet" href="https://fonts.example.org/a.css">')
+        self.assertEqual(run(str(self.site)), 1)
+        self.page("index.html", "", notice=False)
         self.assertEqual(run(str(self.site)), 1)
         self.assertEqual(run(str(self.site / "missing")), 2)
 

@@ -203,4 +203,6 @@ Applies to documentation, comments, commit messages and pull request description
   loads its pages, fonts, styles, scripts and images from itself (`npm run check:site` fails
   on a resource of another host). A change that makes the browser contact another host, or
   that keeps anything about a visitor, changes the page *Privacy* (`docs/privacy.md`) in the
-  same pull request, before it reaches a site.
+  same pull request, before it reaches a site. Every page but that one opens, at the start
+  of a visit, the notice of privacy (`docs/_includes/privacy-notice.html`, `src/notice/`),
+  which stores nothing either; `npm run check:site` fails on a page without it.

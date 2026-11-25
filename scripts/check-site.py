@@ -14,7 +14,8 @@ element of the page, or a url() or @import of a stylesheet), which would give th
 every visitor to that host, as Google Fonts did until 2026-11-25 (docs/privacy.md: the site
 loads everything from itself; what its scripts read is said there); and a file that should not
 be published (README.md, CNAME, Gemfile, Gemfile.lock: the theme's and the demo's, removed in
-2026-11).
+2026-11). The notice of privacy (docs/_includes/privacy-notice.html, found by
+data-privacy-notice) must be on every page but the page Privacy, and not on that one.
 Exit status 1 on any problem, 2 when DIR does not exist. Standard library only.
 """
 from __future__ import annotations
@@ -35,6 +36,9 @@ RESOURCE_TAGS = {"link", "script", "img", "iframe", "source", "audio", "video", 
 NOT_LOADED_RELS = {"alternate", "author", "canonical", "help", "license", "me"}
 # url(...) and @import "..." of a stylesheet, towards another host (with a scheme, or //host).
 CSS_REMOTE = re.compile(r"""(?:url\(\s*['"]?|@import\s+['"])\s*((?:[a-z][a-z0-9+.-]*:)?//[^'")\s]+)""", re.IGNORECASE)
+# The marker of the notice of privacy, and the page that has none: the one it points to.
+NOTICE = "data-privacy-notice"
+PRIVACY_PAGE = "privacy/index.html"
 # Files that a site never needs to publish.
 UNPUBLISHED = {"README.md", "CNAME", "Gemfile", "Gemfile.lock"}
 
@@ -120,6 +124,19 @@ def third_party(site: Path) -> list[str]:
     return problems
 
 
+def notices(site: Path) -> list[str]:
+    """The pages without the notice of privacy, and the page Privacy if it has it."""
+    problems = []
+    for page in sorted(site.rglob("*.html")):
+        name = page.relative_to(site).as_posix()
+        has = NOTICE in page.read_text(encoding="utf-8", errors="replace")
+        if name == PRIVACY_PAGE and has:
+            problems.append(f"{name}: has the notice of privacy, which points to this page")
+        elif name != PRIVACY_PAGE and not has:
+            problems.append(f"{name}: without the notice of privacy")
+    return problems
+
+
 def unpublished(site: Path) -> list[str]:
     """The files of the site that should not be published."""
     return sorted(p.relative_to(site).as_posix() for p in site.rglob("*") if p.is_file() and p.name in UNPUBLISHED)
@@ -137,6 +154,10 @@ def main(argv: list[str]) -> int:
     for problem in remote:
         print(f"site: loaded from another host: {problem}", file=sys.stderr)
     problems += remote
+    missing = notices(site)
+    for problem in missing:
+        print(f"site: {problem}", file=sys.stderr)
+    problems += missing
     extra = unpublished(site)
     for name in extra:
         print(f"site: should not be published: {name}", file=sys.stderr)
@@ -145,7 +166,7 @@ def main(argv: list[str]) -> int:
     if problems:
         print(f"site: {len(problems)} problems in {pages} pages", file=sys.stderr)
         return 1
-    print(f"site: {pages} pages, every local link and resource exists, nothing over http, nothing from another host, nothing unpublishable")
+    print(f"site: {pages} pages, every local link and resource exists, nothing over http, nothing from another host, the notice of privacy where due, nothing unpublishable")
     return 0
 
 

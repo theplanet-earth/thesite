@@ -60,7 +60,9 @@ that the owner squash-merges, each followed by a merge back down the chain
   GitHub and OpenStreetMap receive. The site loads nothing from another host, its fonts
   included, and `npm run check:site` fails if it does. Its address,
   `privacy@theplanet.dev`, is to be routed by the owner with Cloudflare Email Routing
-  (`CLAUDE.md`, Section 12).
+  (`CLAUDE.md`, Section 12). At the start of a visit every other page opens a short notice
+  in orange that points to it and must be closed before the site can be used; it stores
+  nothing, so it opens again at the next visit.
 
 ## Getting started
 

@@ -60,8 +60,10 @@ act on; nothing of it is copied or kept elsewhere.
 
 ## Cookies and similar technologies
 
-None: no cookies, no local storage, no fingerprinting, no tracking pixels. For this reason
-the site shows no consent banner: under the
+None: no cookies, no local storage, no fingerprinting, no tracking pixels. The notice that
+opens at the start of a visit, and points here, stores nothing either: it does not remember
+that you closed it, so it opens again at your next visit, though not on the other pages of
+the same visit. For this reason the site asks for no consent: under the
 [guidelines of the Italian Data Protection Authority](https://www.garanteprivacy.it/home/docweb/-/docweb-display/docweb/9677876)
 of 10 June 2021, consent is needed only for cookies and trackers that are not technical, and
 this site uses no cookie or tracker of any kind.

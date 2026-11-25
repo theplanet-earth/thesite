@@ -11,5 +11,11 @@
       {{ content }}
     </div>
 
+    {%- comment %} The notice of privacy, opened at the start of a visit (the owner, 2026-11-25),
+    on every page but the page Privacy, which it points to. {% endcomment %}
+    {%- unless page.url == '/privacy/' %}
+    {% include privacy-notice.html %}
+    {%- endunless %}
+
   </body>
 </html>

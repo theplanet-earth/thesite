@@ -176,6 +176,15 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   con le regole di cf": the addresses of the project live on `theplanet.dev`, routed by
   Cloudflare Email Routing (Section 12). The site sets no cookie, so it shows no consent
   banner.
+- 2026-11-25, after seeing the page in a preview, "perfetta, va benissimo, prima di mergiare
+  su dev aggiungi comunque un popoup (in stile arancione, come il banner wip) che costringa il
+  lettore a leggere brevemente che c'è una sezione privacy apposta e a chiudere questo popup
+  prima di poter fare nulla sul sito [...] giusto per far vedeer che non si è ignorata la
+  questione": the notice of privacy, a modal dialog on every page but `/privacy/`
+  (`docs/_includes/privacy-notice.html`, `src/notice/`), opened at the start of a visit.
+  It stores nothing, so that the page stays true: a visit starts when the page was not
+  reached from another page of the site (`document.referrer`), and a reload or a step in the
+  history is not a new one; it opens again at the next visit.
 
 Rules of the organization, carried over from thebox or from its issues (keep them unless the
 owner decides otherwise):
@@ -225,7 +234,7 @@ owner decides otherwise):
 | `scripts/lib.sh` | Helpers shared by the shell scripts: repository root, `build/`, `$PY`, `log`, `warn`, `die`, `need`, `project_version` |
 | `scripts/build.sh`, `test.sh`, `check.sh` | Build (the site into `build/pages/`), unit tests, every check (the entry points of CI) |
 | `scripts/serve.sh` | Live preview of the site at `http://localhost:4000` (`npm run serve`), with the bundle rebuilt on every change of `src/` |
-| `scripts/bundle.sh`, `scripts/bundle.mjs` | esbuild bundles `src/globe/main.js` and three.js into `docs/assets/bundle/globe.js` (generated, git-ignored), with the licence of three.js beside it; run by `build.sh` and `serve.sh`; in watch mode it touches the bundle a second after each build (Section 12) |
+| `scripts/bundle.sh`, `scripts/bundle.mjs` | esbuild bundles `src/globe/main.js` and three.js into `docs/assets/bundle/globe.js`, and `src/notice/main.js` into `docs/assets/bundle/notice.js` (generated, git-ignored), with the licence of three.js beside it; run by `build.sh` and `serve.sh`; in watch mode it touches the bundle a second after each build (Section 12) |
 | `wrangler.jsonc`, `worker/` | The Worker of production (issue #2): static assets from `build/pages/`, custom domain `theplanet.observer`; `worker/index.js` runs only for `/api/*`, `worker/edits.js` serves `/api/osm-edits.json`, read at most every 19 minutes and cached |
 | `scripts/worker.sh` | wrangler at a pinned version: `npm run worker:check` (dry run), `npm run worker:dev` (the site with the Worker at `http://localhost:8787`), and `deploy`, run by `production.yml` with the token and the account in the environment |
 | `media/mascot/` | The mascot of the logo in 3D, not used by the site: the five files Meshy made (walking, running, rigged, without skeleton, preview; 20 MB), `provenance.json` and a `README.md` on what each may serve; kept for thegame (Section 2) |
@@ -235,11 +244,12 @@ owner decides otherwise):
 | `scripts/install-skills.sh` | Claude Code skills installed for the user, pinned to a commit (Section 10) |
 | `scripts/check-confidential.py` | Confidentiality guard (pre-commit hook and `npm run check`) |
 | `scripts/check-template.sh` | Lists the `TEMPLATE` markers left; none since 2026-11-24, so `npm run check` runs it with `--strict` |
-| `scripts/check-site.py` | Check of the built site: every local link and resource of `build/pages/` exists, none loads over `http` or from another host, nothing unpublishable is published (`npm run check:site`) |
+| `scripts/check-site.py` | Check of the built site: every local link and resource of `build/pages/` exists, none loads over `http` or from another host, the notice of privacy is on every page but `/privacy/`, nothing unpublishable is published (`npm run check:site`) |
 | `scripts/version.py` | Version, next version and release notes from the tags and the commits |
 | `scripts/setup-python.sh` | `.venv/` from `requirements.txt`, reinstalled only when it changes |
-| `tests/` | `unittest` checks of the harness scripts, of `check-site.py`, of `land-mask.py`, of `osm-activity.py`, of the permissions of the devcontainer, of the license and of the deploys (standard library only); `globe.test.mjs`, `replication.test.mjs` and `live.test.mjs` (the live edits and the Worker, against fakes), with `node --test` |
+| `tests/` | `unittest` checks of the harness scripts, of `check-site.py`, of `land-mask.py`, of `osm-activity.py`, of the permissions of the devcontainer, of the license and of the deploys (standard library only); `notice.test.mjs` (when the notice of privacy opens), `globe.test.mjs`, `replication.test.mjs` and `live.test.mjs` (the live edits and the Worker, against fakes), with `node --test` |
 | `src/globe/` | The globe of the home page: `geometry.js` (dots of the land, spikes, arcs, quality tiers; no three.js), `replication.js` (the replication of changesets: paths, parsing, merging; no DOM), `live.js` (every 19 minutes, the edits from the Worker or from the replication; shared with the Worker), `main.js` (the three.js scene) |
+| `src/notice/` | The notice of privacy: `visit.js` (whether a visit starts, from the referrer and the type of navigation; no DOM), `main.js` (opens the dialog of `docs/_includes/privacy-notice.html`) |
 | `package.json`, `package-lock.json` | Also the dependencies of the site, pinned: three.js and esbuild (Section 10) |
 | `.devcontainer/` | `Dockerfile`, `devcontainer.json`, `post-create.sh` (Section 10) |
 | `.vscode/` | Recommended extensions, settings, and every command as a task |
@@ -259,11 +269,11 @@ The site, cleaned up on 2026-11-24 (`CONTRIBUTING.md`, *Conventions of this repo
 
 | Path | Content |
 |---|---|
-| `docs/` | Jekyll 4.3 site: `_config.yml`, `Gemfile` and `Gemfile.lock` (Jekyll, and the three gems Ruby 3.3 warns about), `_layouts/` (`default`, `page`), `_includes/` (`head`, `sidebar`), `index.html` (the globe), `globe.md` (how the globe is made, linked under it, not in the menu), `about.md`, `privacy.md` (the notice under the GDPR, Section 2), `404.html`; the menu lists the pages with a `nav_order` |
+| `docs/` | Jekyll 4.3 site: `_config.yml`, `Gemfile` and `Gemfile.lock` (Jekyll, and the three gems Ruby 3.3 warns about), `_layouts/` (`default`, `page`), `_includes/` (`head`, `sidebar`, `privacy-notice`), `index.html` (the globe), `globe.md` (how the globe is made, linked under it, not in the menu), `about.md`, `privacy.md` (the notice under the GDPR, Section 2), `404.html`; the menu lists the pages with a `nav_order` |
 | `docs/_data/coverage.yml` | The places shown as orange rings on the globe (issue #1) |
 | `docs/_data/activity.json` | The latest edits to OpenStreetMap, the orange spikes and arcs of the globe: generated at every build by `scripts/osm-activity.py`, git-ignored |
 | `docs/public/` | The Hyde theme on Poole, third-party, MIT, with the dark colours of the project: its CSS, icons and `LICENSE.md`, published with them as the licence asks |
-| `docs/assets/` | The project's own CSS (`theplanet.css`, `globe.css`, `fonts.css`), the fonts (`fonts/`: PT Sans and Roboto Mono, OFL 1.1, with their licence texts; third-party, committed), the logo, `globe/land.png` (generated by `scripts/land-mask.py` and **committed** as data of the site: it changes only with its source), and `bundle/` (generated by `scripts/bundle.sh`, git-ignored) |
+| `docs/assets/` | The project's own CSS (`theplanet.css`, `globe.css`, `fonts.css`, `notice.css`), the fonts (`fonts/`: PT Sans and Roboto Mono, OFL 1.1, with their licence texts; third-party, committed), the logo, `globe/land.png` (generated by `scripts/land-mask.py` and **committed** as data of the site: it changes only with its source), and `bundle/` (generated by `scripts/bundle.sh`, git-ignored) |
 | `media/` | Files of the repository that the site does not publish: `theplanetearth.png` (the image of `README.md`), `mascot/`, and `README.md`, the provenance of the logo (issue #19) |
 
 ## 5. Checks before reporting a change as done
