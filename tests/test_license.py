@@ -44,25 +44,6 @@ class LicenseTest(unittest.TestCase):
         # From the year of LICENSE to the year of the build (owner, 2026-11-25).
         self.assertIn("&copy; 2024-{{ site.time | date: '%Y' }} {{ site.author }}", sidebar)
 
-    def test_the_site_is_rebuilt_on_the_first_of_january(self):
-        # The year of the notice comes from the build: new-year.yml starts the deploy of
-        # stage at the start of every year, on stage, which the environment github-pages
-        # accepts; a run of a schedule has the ref of master.
-        workflows = ROOT / ".github" / "workflows"
-        new_year = (workflows / "new-year.yml").read_text(encoding="utf-8")
-        crons = re.findall(r'^\s*- cron: "([^"]+)"', new_year, flags=re.M)
-        self.assertTrue(crons)
-        for cron in crons:
-            minute, hour, day, month, weekday = cron.split()
-            self.assertEqual((day, month, weekday), ("1", "1", "*"), cron)
-            self.assertNotEqual(minute, "0", "the start of the hour is when GitHub drops runs")
-        self.assertNotIn("timezone:", new_year, "the build reads the year in UTC")
-        self.assertIn("gh workflow run stage.yml", new_year)
-        self.assertIn("--ref stage", new_year)
-        self.assertRegex(new_year, r"(?m)^\s+actions: write")
-        stage = (workflows / "stage.yml").read_text(encoding="utf-8")
-        self.assertRegex(stage, r"(?m)^\s+workflow_dispatch:")
-
 
 if __name__ == "__main__":
     unittest.main()

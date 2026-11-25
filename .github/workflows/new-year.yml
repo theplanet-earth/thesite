@@ -6,9 +6,10 @@
 # How, from the documentation of GitHub
 # (https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule):
 # - "Scheduled workflows will only run on the default branch": this file works once it is on
-#   master, and its run has the ref of master. The environment github-pages accepts
-#   deployments from stage only, so this workflow does not deploy: it starts stage.yml on
-#   stage, by workflow_dispatch, one of the events that the GITHUB_TOKEN may trigger.
+#   master, and its run has the ref of master. This workflow does not deploy: it starts the
+#   deploys by workflow_dispatch, one of the events that the GITHUB_TOKEN may trigger.
+#   stage.yml on stage, since the environment github-pages accepts deployments from stage
+#   only; production.yml on master, which deploys once DEPLOY_PRODUCTION = true (issue #2).
 # - The schedule runs in UTC, as the build does: at 00:17 UTC of 1 January the year of the
 #   build is already the new one. "High load times include the start of every hour", and
 #   then "some queued jobs may be dropped": hence minute 17, and a second run at noon.
@@ -23,7 +24,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  actions: write   # to start stage.yml
+  actions: write   # to start stage.yml and production.yml
 
 jobs:
   rebuild:
@@ -34,5 +35,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run stage.yml --repo "$GITHUB_REPOSITORY" --ref stage
 
-      # TODO: rebuild production too (master, theplanet.observer) once its deploy exists
-      # (issue #2): until then nothing deploys master, so there is nothing to start here.
+      - name: Rebuild production (production.yml on master)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run production.yml --repo "$GITHUB_REPOSITORY" --ref master
