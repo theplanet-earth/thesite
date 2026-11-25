@@ -464,8 +464,14 @@ harness) comes from thebox, which is versioned and released like any other repos
   2026-11-24, with the access authorized: GitHub applies changed permissions to new
   Codespaces only, "even if you rebuild the codespace"
   ([GitHub documentation](https://docs.github.com/en/codespaces/managing-your-codespaces/managing-repository-access-for-your-codespaces)).
-  The Codespace created on 2026-11-25 has it: a request without a title to the issues of
-  thegame answered HTTP 422 ("title wasn't supplied"), not 403, and created nothing.
+  **Correction of 2026-11-25**: this note said that a Codespace created on 2026-11-25 had
+  it, from one request to thegame. The Codespace in use then was the one of 2026-11-23,
+  rebuilt (its clone dates from 2026-11-23 23:18; `creation.log` records the rebuild at
+  21:07), and requests without a title, which create nothing, show what its token may do:
+  HTTP 422 ("title wasn't supplied") in the public repositories (thesite, thegame,
+  theaction, mixamo-in-playcanvas), HTTP 403 "Resource not accessible by integration" in the
+  private ones (thebox, thestory, thejungle, thepipeline, thedeal). Issues in the private
+  repositories still need a Codespace **created**, not rebuilt, after the change.
 - **Git LFS hooks**: Codespaces writes Git LFS hooks in `.git/hooks` that abort every push when
   `git-lfs` is not installed; `core.hooksPath .githooks` makes git ignore them.
 - **Python interpreter in VS Code**: `.vscode/settings.json` does not set
@@ -606,14 +612,15 @@ Open points:
   the click towards `explore.<domain>`, a site that does not exist yet.
 - [ ] The mascot from Meshy (Section 2): kept in `media/mascot/` for thegame. Owner: whether to
   keep the other files of `build/meshy/2026-11-24/` (the running clip, the rigged model), and
-  whether thegame wants it: the issue there is still to open. The Codespace created on
-  2026-11-25 may open it (a request without a title to the issues of thegame answered 422,
-  not 403).
+  whether thegame wants it: asked in thegame#11 (2026-11-25), the easter egg of the mascot
+  walking, with the files, how to load them and their rights.
 - [ ] The license of every repository (owner, 2026-11-23): thesite decided on 2026-11-25
   (Section 2) and released it in `v0.2.0` (issue #10, closed). The same issue, "Change the
-  license: candidate licenses compared", is still to be opened in the other 15 repositories
-  of the organization, which the Codespace created on 2026-11-25 may do; then the issue of
-  thebox, which holds the overview, links them all and a comment on #10 links it. The
+  license: candidate licenses compared", is open since 2026-11-25 in the public
+  repositories (theaction#9, thegame#10, mixamo-in-playcanvas#3); the 12 private ones need
+  a Codespace created after 2026-11-24 (Section 12, access). Then the issue of thebox,
+  which holds the overview, links them all, the script turns the mention of thebox in the
+  issues opened before it into a link, and a comment on #10 links it. The
   script and the texts are kept in a private artifact of the owner, "License Issues Kit"
   (https://claude.ai/artifact/XMVTBxhuJ8Zkizv2DELHtH, files under `kit/`). Then the owner
   decides, repository by repository.
