@@ -226,6 +226,13 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   issue #25; they are described in `CONTRIBUTING.md` (*Branches and pull requests*), in the
   caution of `README.md` and in Section 12. The same day the owner set the email records
   against spoofing of `theplanet.observer` (issue #3).
+- 2026-11-25, on what was left of issue #3: HSTS, "rimandiamolo, segnalo"; Always Use HTTPS
+  on `theplanet.observer` and DNSSEC on the three domains, "facciamoli", done by the owner
+  the same day (Section 12). The proxy of `theplanet.wtf` (the orange cloud) stays off: it
+  serves neither of the two, since Always Use HTTPS acts only on the traffic that crosses
+  Cloudflare ([documentation](https://developers.cloudflare.com/ssl/edge-certificates/additional-options/always-use-https/))
+  and DNSSEC signs every record of the zone; it comes back with HSTS, which on
+  `theplanet.wtf` needs it.
 
 Rules of the organization, carried over from thebox or from its issues (keep them unless the
 owner decides otherwise):
@@ -515,7 +522,11 @@ harness) comes from thebox, which is versioned and released like any other repos
   HTTP 422 ("title wasn't supplied") in the public repositories (thesite, thegame,
   theaction, mixamo-in-playcanvas), HTTP 403 "Resource not accessible by integration" in the
   private ones (thebox, thestory, thejungle, thepipeline, thedeal). Issues in the private
-  repositories still need a Codespace **created**, not rebuilt, after the change.
+  repositories need a Codespace **created**, not rebuilt, after the change: confirmed on
+  2026-11-25 by a Codespace created after commit `94c6aa0` (its clone and `creation.log`
+  both start at 22:05 UTC that day, with a single creation of the container), whose token
+  answered HTTP 422 in thebox and opened the issues of the 12 private repositories (the
+  license of every repository, in the open points below).
 - **Git LFS hooks**: Codespaces writes Git LFS hooks in `.git/hooks` that abort every push when
   `git-lfs` is not installed; `core.hooksPath .githooks` makes git ignore them.
 - **Python interpreter in VS Code**: `.vscode/settings.json` does not set
@@ -606,6 +617,18 @@ harness) comes from thebox, which is versioned and released like any other repos
   key and a null MX, issue #3) are on both domains: on `theplanet.wtf` since 2026-11-24, on
   `theplanet.observer` since 2026-11-25, after the first deploy as the owner chose, without
   harm to the custom domain of the Worker (`dig` and HTTP 200, 2026-11-25).
+- **HTTPS and DNSSEC of the domains** (issue #3, checked from outside on 2026-11-25 with
+  `curl` and DNS over HTTPS through `1.1.1.1` and `8.8.8.8`): `http://theplanet.observer/`
+  answered 200 in plain HTTP until the owner turned on *Always Use HTTPS* in its zone; it
+  now answers 301 to `https://`, the path and the query kept, and the site and
+  `/api/osm-edits.json` still 200. `http://theplanet.wtf/` answers 301 from GitHub Pages
+  (*Enforce HTTPS*). DNSSEC is on for `theplanet.observer`, `theplanet.wtf` and
+  `theplanet.dev`: each zone answers its DNSKEY (algorithm 13) and a CDS record; the three
+  are registered with Cloudflare Registrar (RDAP), which reads the CDS and sends the DS
+  record to the registry within one to two days
+  ([documentation](https://developers.cloudflare.com/registrar/get-started/enable-dnssec/)).
+  Until the registry publishes the DS, resolvers do not validate the answers. No site sends
+  `Strict-Transport-Security`: HSTS is postponed (Section 2).
 - **The yearly rebuild** (`.github/workflows/new-year.yml`, 2026-11-25): GitHub runs a
   schedule only from the default branch, so it works since the file reached `master` with
   `v0.2.0` (*New year* is active); the run then has the ref of `master`, and the environment
@@ -650,11 +673,25 @@ harness) comes from thebox, which is versioned and released like any other repos
   (`check` of GitHub Actions, not strict); `dev` (id 28115148) on `dev`, with *deletion* and
   *non_fast_forward*; both active, bypassed always by the role *Repository admin* (actor 5),
   and the API answers `current_user_can_bypass: always` to the token of the Codespace.
-  **Reported, not changed**: `chain` also holds
-  `require_extra_approval_for_unattributed_changes: true`, which the table of #25 did not
-  list. Not verified yet: the first merge back of `master` into `stage` under the ruleset.
+  `chain` also held `require_extra_approval_for_unattributed_changes: true`, which the table
+  of #25 did not list; reported, the owner turned it off the same day (`false`, ruleset
+  updated at 22:47 UTC). Not verified yet: the first merge back of `master` into `stage`
+  under the ruleset.
 - **The labels** `release:major`, `release:minor` and `release:patch`, read by `ci.yml` and
   `release.yml`, exist since 2026-11-25 (issue #26, closed); none is on a pull request.
+- **The address of the page *Privacy*** (2026-11-25, checked from outside): `privacy@theplanet.dev`
+  is forwarded by Cloudflare Email Routing (Compute, Email Service, Email Routing; a routing
+  rule *Send to an email* to the owner's verified inbox), and a test message arrived. The
+  DNS of `theplanet.dev` holds the three MX records of Cloudflare (`route1` to `route3.mx.cloudflare.net`),
+  the SPF `v=spf1 include:_spf.mx.cloudflare.net ~all`, the DKIM `cf2024-1._domainkey`, and
+  the DMARC `v=DMARC1; p=reject; sp=reject; adkim=s; aspf=s`, as on `theplanet.wtf`: nothing
+  is sent from `theplanet.dev`. Email Routing only forwards
+  ([documentation](https://developers.cloudflare.com/email-service/configuration/email-routing-addresses/)):
+  a reply leaves from the owner's own address, and sending as `privacy@` would need a
+  sending service, with its SPF and DKIM, before the DMARC lets it through. The owner
+  approved the page on 2026-11-25 ("perfetta, va benissimo"). Mail servers of Cloudflare
+  refuse SMTP connections from a Codespace (its address of Azure is on a blocklist), so an
+  address is tested by sending it a message from another account.
 - **The data of the visitors** (2026-11-25, `docs/privacy.md`): checked on the code and on
   both live sites, the site sets no cookie (no `Set-Cookie` on `theplanet.observer` nor on
   `theplanet.wtf`) and stores nothing in the browser. Until then every page loaded its fonts
@@ -680,18 +717,18 @@ harness) comes from thebox, which is versioned and released like any other repos
 
 Open points:
 
-- [ ] Owner: the address `privacy@theplanet.dev` of the page *Privacy* (Section 2):
-  Cloudflare Email Routing on `theplanet.dev`, with a rule that forwards it to a verified
-  inbox ([Email Routing](https://developers.cloudflare.com/email-routing/get-started/)),
-  before the page reaches `stage`; then a test message. Optional: turn off Network Error
-  Logging on the zone of `theplanet.observer`, and the page no longer needs to name it.
-- [ ] Owner: review the page *Privacy* before it reaches `stage`, in particular the sentence
-  on what the controller sees in the dashboard of Cloudflare and keeps of it (nothing).
+- [ ] Optional, owner: turn off Network Error Logging on the zone of `theplanet.observer`;
+  the page *Privacy* then no longer needs to name it.
 - [ ] The first merge back of `master` into `stage` under the ruleset `chain` (issue #25):
   check that the bypass lets it through, then close #25.
-- [ ] Owner: the rest of the hardening of the Cloudflare zones (issue #3): the proxy of
-  `theplanet.wtf`, SSL *Full (strict)*, DNSSEC, HSTS, and the rotation of the token of
-  production before about 2027-11-25.
+- [ ] From 2026-11-27: check that the registry publishes the DS record of
+  `theplanet.observer`, `theplanet.wtf` and `theplanet.dev` (a DS query through `1.1.1.1`
+  answers, with the flag AD), then record it on issue #3 and in Section 12. If it is
+  still missing after a few more days, the owner looks at *Manage Domains* in the
+  dashboard.
+- [ ] Owner, postponed (Section 2): HSTS, first without `preload`, and with it the proxy of
+  `theplanet.wtf`; then SSL *Full (strict)*. Later, the rotation of the token of
+  production before about 2027-11-25. Issue #3 stays open for them.
 - [ ] Older issues to plan with the owner: #1 (coverage map: colours from an API,
   click to explore), #4 (security audit with the skill, profile `quick`, findings only as
   private advisories), #18 (a section of the site with a Leaflet map).
@@ -704,14 +741,20 @@ Open points:
   walking, with the files, how to load them and their rights.
 - [ ] The license of every repository (owner, 2026-11-23): thesite decided on 2026-11-25
   (Section 2) and released it in `v0.2.0` (issue #10, closed). The same issue, "Change the
-  license: candidate licenses compared", is open since 2026-11-25 in the public
-  repositories (theaction#9, thegame#10, mixamo-in-playcanvas#3); the 12 private ones need
-  a Codespace created after 2026-11-24 (Section 12, access). Then the issue of thebox,
-  which holds the overview, links them all, the script turns the mention of thebox in the
-  issues opened before it into a link, and a comment on #10 links it. The
-  script and the texts are kept in a private artifact of the owner, "License Issues Kit"
-  (https://claude.ai/artifact/XMVTBxhuJ8Zkizv2DELHtH, files under `kit/`). Then the owner
-  decides, repository by repository.
+  license: candidate licenses compared", is open since 2026-11-25 in every other repository
+  of the organization: thebox#11, which holds the overview (a row and a link for every
+  issue) and the proposal of a common policy; the other private ones, thestory#7,
+  thejungle#6, thepipeline#7, thedashboard#14, thehumongous#9, theburden#7, theshort#5,
+  thedeal#11, theblend#3, theosm#12 and thepianist#8; the public ones, theaction#9,
+  thegame#10 and mixamo-in-playcanvas#3. Every issue of the series, #10 included, links the
+  issue of thebox, and a comment on #10 links it too. Before the 12 private ones were
+  opened, the facts their texts give (the license of each branch, the branches of work, the
+  issues they cite, the manifests) were checked again on 2026-11-25: none had changed since
+  2026-11-23. The private artifact that kept the script and the texts while the series was
+  opened, "License Issues Kit", was deleted by the owner on 2026-11-25, once every issue
+  existed: the issues are the record, and the overview of thebox#11 lists them all. Now the
+  owner decides, repository by repository; each issue is closed by the pull request that
+  changes the license there.
 - [ ] The logo (owner, 2026-11-25, "segnati queste due cose per ricordarmele"): it was
   generated with an AI tool, so its protection as a work rests on the human part of it.
   Issue #19: its provenance is in `media/README.md` since 2026-11-25 (ChatGPT with DALL-E;
