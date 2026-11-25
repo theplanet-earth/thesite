@@ -726,10 +726,11 @@ Open points:
   issue of thebox, and a comment on #10 links it too. Before the 12 private ones were
   opened, the facts their texts give (the license of each branch, the branches of work, the
   issues they cite, the manifests) were checked again on 2026-11-25: none had changed since
-  2026-11-23. The script and the texts are kept in a private artifact of the owner,
-  "License Issues Kit" (https://claude.ai/artifact/XMVTBxhuJ8Zkizv2DELHtH, files under
-  `kit/`; `kit/links.json` lists every issue). Now the owner decides, repository by
-  repository; each issue is closed by the pull request that changes the license there.
+  2026-11-23. The private artifact that kept the script and the texts while the series was
+  opened, "License Issues Kit", was deleted by the owner on 2026-11-25, once every issue
+  existed: the issues are the record, and the overview of thebox#11 lists them all. Now the
+  owner decides, repository by repository; each issue is closed by the pull request that
+  changes the license there.
 - [ ] The logo (owner, 2026-11-25, "segnati queste due cose per ricordarmele"): it was
   generated with an AI tool, so its protection as a work rests on the human part of it.
   Issue #19: its provenance is in `media/README.md` since 2026-11-25 (ChatGPT with DALL-E;
