@@ -187,6 +187,28 @@
     }
 }
 
+/* With Privacy in the menu (2026-11-25) the mascot, the logotype, the three pages and the icon
+   need about 381 pixels in one row with gaps of 1rem (64 of them are the padding of the
+   sidebar and of its container), 349 with gaps of 0.5rem (measured with Playwright): below
+   400 pixels the gaps narrow, so that phones 360 pixels wide keep one row; below 360 (320
+   leaves 256 pixels for the row) the menu takes a second row, and the rows are centred, as
+   the notice under them is. */
+@media (max-width: 24.99em) {
+    .sidebar .container {
+        column-gap: 0.5rem;
+    }
+
+    .sidebar-nav {
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 22.49em) {
+    .sidebar .container {
+        justify-content: center;
+    }
+}
+
 /* The page of the globe fits one window too (the owner, 2026-11-24): a slightly smaller text. */
 .globe-page .page {
     margin-bottom: 0;
