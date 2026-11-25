@@ -226,6 +226,13 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   issue #25; they are described in `CONTRIBUTING.md` (*Branches and pull requests*), in the
   caution of `README.md` and in Section 12. The same day the owner set the email records
   against spoofing of `theplanet.observer` (issue #3).
+- 2026-11-25, on what was left of issue #3: HSTS, "rimandiamolo, segnalo"; Always Use HTTPS
+  on `theplanet.observer` and DNSSEC on the three domains, "facciamoli", done by the owner
+  the same day (Section 12). The proxy of `theplanet.wtf` (the orange cloud) stays off: it
+  serves neither of the two, since Always Use HTTPS acts only on the traffic that crosses
+  Cloudflare ([documentation](https://developers.cloudflare.com/ssl/edge-certificates/additional-options/always-use-https/))
+  and DNSSEC signs every record of the zone; it comes back with HSTS, which on
+  `theplanet.wtf` needs it.
 
 Rules of the organization, carried over from thebox or from its issues (keep them unless the
 owner decides otherwise):
@@ -610,6 +617,18 @@ harness) comes from thebox, which is versioned and released like any other repos
   key and a null MX, issue #3) are on both domains: on `theplanet.wtf` since 2026-11-24, on
   `theplanet.observer` since 2026-11-25, after the first deploy as the owner chose, without
   harm to the custom domain of the Worker (`dig` and HTTP 200, 2026-11-25).
+- **HTTPS and DNSSEC of the domains** (issue #3, checked from outside on 2026-11-25 with
+  `curl` and DNS over HTTPS through `1.1.1.1` and `8.8.8.8`): `http://theplanet.observer/`
+  answered 200 in plain HTTP until the owner turned on *Always Use HTTPS* in its zone; it
+  now answers 301 to `https://`, the path and the query kept, and the site and
+  `/api/osm-edits.json` still 200. `http://theplanet.wtf/` answers 301 from GitHub Pages
+  (*Enforce HTTPS*). DNSSEC is on for `theplanet.observer`, `theplanet.wtf` and
+  `theplanet.dev`: each zone answers its DNSKEY (algorithm 13) and a CDS record; the three
+  are registered with Cloudflare Registrar (RDAP), which reads the CDS and sends the DS
+  record to the registry within one to two days
+  ([documentation](https://developers.cloudflare.com/registrar/get-started/enable-dnssec/)).
+  Until the registry publishes the DS, resolvers do not validate the answers. No site sends
+  `Strict-Transport-Security`: HSTS is postponed (Section 2).
 - **The yearly rebuild** (`.github/workflows/new-year.yml`, 2026-11-25): GitHub runs a
   schedule only from the default branch, so it works since the file reached `master` with
   `v0.2.0` (*New year* is active); the run then has the ref of `master`, and the environment
@@ -702,9 +721,14 @@ Open points:
   the page *Privacy* then no longer needs to name it.
 - [ ] The first merge back of `master` into `stage` under the ruleset `chain` (issue #25):
   check that the bypass lets it through, then close #25.
-- [ ] Owner: the rest of the hardening of the Cloudflare zones (issue #3): the proxy of
-  `theplanet.wtf`, SSL *Full (strict)*, DNSSEC, HSTS, and the rotation of the token of
-  production before about 2027-11-25.
+- [ ] From 2026-11-27: check that the registry publishes the DS record of
+  `theplanet.observer`, `theplanet.wtf` and `theplanet.dev` (a DS query through `1.1.1.1`
+  answers, with the flag AD), then record it on issue #3 and in Section 12. If it is
+  still missing after a few more days, the owner looks at *Manage Domains* in the
+  dashboard.
+- [ ] Owner, postponed (Section 2): HSTS, first without `preload`, and with it the proxy of
+  `theplanet.wtf`; then SSL *Full (strict)*. Later, the rotation of the token of
+  production before about 2027-11-25. Issue #3 stays open for them.
 - [ ] Older issues to plan with the owner: #1 (coverage map: colours from an API,
   click to explore), #4 (security audit with the skill, profile `quick`, findings only as
   private advisories), #18 (a section of the site with a Leaflet map).
