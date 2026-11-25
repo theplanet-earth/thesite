@@ -1,4 +1,5 @@
-// The edits of OpenStreetMap, kept current while the visitor looks at the globe. The snapshot
+// The edits of OpenStreetMap, kept current while the visitor looks at the globe: those of the
+// window of replication.js (the 20 minutes before the replication last ran). The snapshot
 // of the build is shown first, so the globe never waits for the network; then, every 19
 // minutes (the owner, 2026-11-24), the browser reads them again:
 // - from the Worker of production, at /api/osm-edits.json (worker/index.js), which reads the
@@ -10,7 +11,7 @@
 // When nothing can be read, the shown edits stay. The rules of what is kept are those of
 // replication.js; readReplication is shared with the Worker.
 
-import { MAX_FILES, REPLICATION, TARGET_EDITS, lastRunOf, mergeEdits, parseChangesets, pathOf, sequenceOf } from './replication.js';
+import { REPLICATION, WINDOW_FILES, inWindow, lastRunOf, mergeEdits, parseChangesets, pathOf, sequenceOf } from './replication.js';
 
 export const EVERY = 19 * 60 * 1000;
 export const ENDPOINT = '/api/osm-edits.json';
@@ -29,26 +30,21 @@ async function readGzip(fetchImpl, url, headers) {
 }
 
 /**
- * The latest edits from the replication, given those shown and the sequence they were read at
- * (`last`, null when unknown): { edits, sequence, asOf, changed }. Reads the new files only
- * when they are at most MAX_FILES; otherwise from the latest file backwards, until
- * TARGET_EDITS edits, fewer minutes when the map is busy.
+ * The edits of the window (replication.js) as the replication holds them now, given those shown
+ * and the sequence they were read at (`last`, null when unknown): { edits, sequence, asOf,
+ * changed }. Reads only the files not read yet when the shown edits are recent enough, the
+ * WINDOW_FILES latest otherwise; then keeps the edits of the window before the last run.
  */
 export async function readReplication(fetchImpl, { edits = [], last = null, headers } = {}) {
   const state = await readText(fetchImpl, `${REPLICATION}state.yaml`, headers);
   const latest = sequenceOf(state);
   const asOf = lastRunOf(state) ?? new Date();
   if (last !== null && latest <= last) return { edits, sequence: last, asOf, changed: false };
-  if (last !== null && latest - last <= MAX_FILES) {
-    let incoming = [];
-    for (let n = last + 1; n <= latest; n += 1) incoming = incoming.concat(parseChangesets(await readGzip(fetchImpl, REPLICATION + pathOf(n), headers)));
-    return { edits: mergeEdits(edits, incoming), sequence: latest, asOf, changed: true };
-  }
-  let fresh = [];
-  for (let n = latest, read = 0; read < MAX_FILES && fresh.length < TARGET_EDITS; n -= 1, read += 1) {
-    fresh = mergeEdits(fresh, parseChangesets(await readGzip(fetchImpl, REPLICATION + pathOf(n), headers)), Infinity);
-  }
-  return { edits: mergeEdits([], fresh), sequence: latest, asOf, changed: true };
+  const recent = last !== null && latest - last < WINDOW_FILES;
+  const first = recent ? last + 1 : latest - WINDOW_FILES + 1;
+  let incoming = [];
+  for (let n = first; n <= latest; n += 1) incoming = incoming.concat(parseChangesets(await readGzip(fetchImpl, REPLICATION + pathOf(n), headers)));
+  return { edits: inWindow(mergeEdits(recent ? edits : [], incoming), asOf), sequence: latest, asOf, changed: true };
 }
 
 /**

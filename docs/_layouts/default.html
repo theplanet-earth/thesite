@@ -1,15 +1,32 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html lang="en-us"{% if jekyll.environment == "stage" %} class="preview"{% endif %}>
 
   {% include head.html %}
 
   <body{% if page.body_class %} class="{{ page.body_class }}"{% endif %}>
+
+    {%- comment %} The stage site says on every page, at the top and at the bottom, that it is a
+    preview: a build with JEKYLL_ENV=stage only, the one of .github/workflows/stage.yml (the
+    owner, 2026-11-25). {% endcomment %}
+    {%- if jekyll.environment == "stage" %}
+    {% include preview-banner.html position="top" %}
+    {%- endif %}
 
     {% include sidebar.html %}
 
     <div class="content container">
       {{ content }}
     </div>
+
+    {%- if jekyll.environment == "stage" %}
+    {% include preview-banner.html position="bottom" %}
+    {%- endif %}
+
+    {%- comment %} The notice of privacy, opened at the start of a visit (the owner, 2026-11-25),
+    on every page but the page Privacy, which it points to. {% endcomment %}
+    {%- unless page.url == '/privacy/' %}
+    {% include privacy-notice.html %}
+    {%- endunless %}
 
   </body>
 </html>

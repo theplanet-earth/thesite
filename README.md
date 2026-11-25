@@ -1,4 +1,27 @@
-# thesite
+<p align="center">
+  <img src="media/theplanetearth.png" width="160"
+       alt="The logo of theplanet: the Earth walking, with a cap, sunglasses and sneakers">
+</p>
+
+<h1 align="center">
+  thesite<br>
+  <sub>The project site of <a href="https://github.com/theplanet-earth">theplanet-earth</a></sub>
+</h1>
+
+<p align="center">
+  Its home page is a 3D globe with the latest edits to OpenStreetMap.
+</p>
+
+<p align="center">
+  <a href="https://theplanet.observer/"><img alt="Production: theplanet.observer, up or down"
+     src="https://img.shields.io/website?url=https%3A%2F%2Ftheplanet.observer%2F&label=production&up_message=theplanet.observer&down_message=down"></a>
+  <a href="https://theplanet.wtf/"><img alt="Stage: theplanet.wtf, up or down"
+     src="https://img.shields.io/website?url=https%3A%2F%2Ftheplanet.wtf%2F&label=stage&up_message=theplanet.wtf&down_message=down"></a>
+  <a href="https://github.com/theplanet-earth/thesite/releases/latest"><img alt="The latest release"
+     src="https://img.shields.io/github/v/release/theplanet-earth/thesite?label=release"></a>
+  <a href="#license"><img alt="License: MIT for the code, CC BY 4.0 for the texts"
+     src="https://img.shields.io/badge/license-MIT%20%2B%20CC%20BY%204.0-blue"></a>
+</p>
 
 > [!CAUTION]
 > **What a Codespace of this repository is allowed to do.** Creating a Codespace from this
@@ -20,8 +43,13 @@
 > So the Codespace of one repository talks to the others through issues only
 > ([CONTRIBUTING.md](CONTRIBUTING.md#branches-and-pull-requests)). The rules of
 > [CLAUDE.md](CLAUDE.md) also forbid an assistant to push to `stage` or `master` of this
-> repository, to merge into them or to force-push; the token of this repository does not,
-> and no ruleset protects its branches yet (issue #7): those rules are the only guard here.
+> repository, to merge into them or to force-push; the token of this repository does not.
+> Since 2026-11-25 two rulesets enforce part of them on GitHub (issue #25,
+> [CONTRIBUTING.md](CONTRIBUTING.md#branches-and-pull-requests)): no force push and no
+> deletion of `dev`, `stage` and `master`, and `stage` and `master` change only through a
+> squash-merged pull request with CI green. The admins of the repository may bypass them,
+> and a Codespace acts as its owner, who is one: for an assistant, the rules of `CLAUDE.md`
+> remain the guard.
 >
 > The Codespace also: enables the git hooks of `.githooks/` (the confidentiality guard),
 > installs the npm, Python and Ruby dependencies, the Chromium of the Playwright MCP server
@@ -29,16 +57,12 @@
 > (`scripts/install-skills.sh`), and installs Node, the GitHub CLI, Claude Code and Ruby as
 > devcontainer features.
 
-The project site of the GitHub organization **theplanet-earth**.
-
-![The Pipeline](media/theplanetearth.png)
-
 ## Environments
 
 | Environment | Branch | Address | Published by |
 |---|---|---|---|
-| Stage | `stage` | <https://theplanet.wtf/> | `.github/workflows/stage.yml`, on GitHub Pages, at every merge into `stage` |
-| Production | `master` | <https://theplanet.observer/> | A Cloudflare Worker with static assets (`wrangler.jsonc`, `worker/`), deployed by `.github/workflows/production.yml` after every release of `master`, once the owner sets the variable `DEPLOY_PRODUCTION` (issues #2, #6, #7) |
+| Stage | `stage` | <https://theplanet.wtf/> | `.github/workflows/stage.yml`, on GitHub Pages, at every merge into `stage`; every page carries the banner *Work in progress* at its top and at its bottom, which says it is a preview |
+| Production | `master` | <https://theplanet.observer/> | A Cloudflare Worker with static assets (`wrangler.jsonc`, `worker/`), deployed by `.github/workflows/production.yml` after every release of `master`, while the repository variable `DEPLOY_PRODUCTION` is `true` |
 
 Work happens on `dev`; `dev` goes into `stage`, and `stage` into `master`, by pull requests
 that the owner squash-merges, each followed by a merge back down the chain
@@ -48,23 +72,31 @@ that the owner squash-merges, each followed by a merge back down the chain
 
 - The site is Jekyll in `docs/` (the Hyde theme on Poole), grown from the 2024 prototype of
   the branches `glob_coverage` and `hyde_theme`. Released first as that prototype with its
-  Leaflet map (`v0.1.0`, pull request #11); on `dev`, and next on stage, its home page is a
-  3D globe with the latest edits to OpenStreetMap, kept current by the browser, explained on
-  `/globe/` (`CLAUDE.md`, Section 2), and the demo text of the theme is gone.
+  Leaflet map (`v0.1.0`, pull request #11); since `v0.2.0` (pull request #24) its home page
+  is a 3D globe with the latest edits to OpenStreetMap, kept current by the browser,
+  explained on `/globe/` (`CLAUDE.md`, Section 2), and the demo text of the theme is gone.
 - The mascot of the logo in 3D is kept in [`media/mascot/`](media/mascot/README.md), not used
   by the site.
-- On 2026-11-23 neither address reaches the site: `theplanet.wtf` answers with a Cloudflare
-  error, "DNS points to prohibited IP", and `theplanet.observer` has no DNS record yet. The
-  steps for the owner are in issues #6 (Cloudflare) and #7 (GitHub).
+- Since 2026-11-25 both addresses serve the site, each deployed by its workflow (issues #2,
+  #6 and #7, closed).
+- The page *Privacy* (`docs/privacy.md`, `/privacy/`) is the notice of the site under the GDPR:
+  no cookies and no tracking, so no consent banner; it names what the servers of Cloudflare,
+  GitHub and OpenStreetMap receive. The site loads nothing from another host, its fonts
+  included, and `npm run check:site` fails if it does. Its address,
+  `privacy@theplanet.dev`, is forwarded by Cloudflare Email Routing (`CLAUDE.md`, Section
+  12). At the start of a visit every other page opens a short notice
+  in orange that points to it and must be closed before the site can be used; it stores
+  nothing, so it opens again at the next visit.
 
 ## Getting started
 
 Open the repository in a **Codespace** or in the **devcontainer**, then:
 
 ```bash
-npm run serve    # preview at http://localhost:4000, rebuilt on every change
-npm run build    # every output in build/: the site in build/pages/
-npm run check    # tests, confidentiality, TEMPLATE markers: run it before every pull request
+npm run serve          # preview at http://localhost:4000, rebuilt on every change
+npm run serve:stage    # the same, as the stage site, with its banners on every page
+npm run build          # every output in build/: the site in build/pages/
+npm run check          # tests, confidentiality, TEMPLATE markers: run it before every pull request
 ```
 
 The preview is also the task *Preview: site (live reload)* (*Terminal, Run Task*). The
@@ -94,6 +126,11 @@ unset: the GitHub Pages site of this repository is the stage site.
   OpenStreetMap contributors, [ODbL](https://www.openstreetmap.org/copyright).
 - The icon of GitHub in the sidebar: `mark-github` of
   [Octicons](https://github.com/primer/octicons) 19.43.0, MIT licence.
+- The fonts, served by the site (`docs/assets/fonts/`): [PT Sans](https://fonts.google.com/specimen/PT+Sans)
+  by ParaType and [Roboto Mono](https://github.com/googlefonts/robotomono), both under the
+  [SIL Open Font License 1.1](https://openfontlicense.org/), published with their texts;
+  the files come from the npm packages `@fontsource/pt-sans` and `@fontsource/roboto-mono`
+  5.3.0.
 
 ## License
 
@@ -117,5 +154,6 @@ moves on without a commit.
   `media/README.md` (issue #19).
 - **Third-party work** keeps its own license (*Credits*): the Hyde theme on Poole
   (`docs/public/css/`, MIT, `docs/public/LICENSE.md`), three.js (MIT, bundled with its
-  licence), the icon of GitHub (Octicons, MIT). The data the globe shows keep their terms:
+  licence), the icon of GitHub (Octicons, MIT), the fonts PT Sans and Roboto Mono (SIL Open
+  Font License 1.1, `docs/assets/fonts/`). The data the globe shows keep their terms:
   OpenStreetMap (ODbL, credited next to the globe) and Natural Earth (public domain).

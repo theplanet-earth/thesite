@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # The scripts of the site: esbuild bundles src/globe/main.js, with the parts of three.js it
-# uses, into docs/assets/bundle/globe.js, where Jekyll picks it up. The bundle is generated
+# uses, into docs/assets/bundle/globe.js, and src/notice/main.js, the notice of privacy, into
+# docs/assets/bundle/notice.js, where Jekyll picks them up. The bundle is generated
 # (git-ignored, never edited by hand); package-lock.json pins three.js and esbuild, and the
 # licence comments of three.js stay at the end of the bundle. Run by scripts/build.sh and by
 # scripts/serve.sh, which rebuilds it on every change of src/ (--watch).
@@ -23,4 +24,4 @@ if [[ "${1:-}" == "--watch" ]]; then
   exec node scripts/bundle.mjs --watch
 fi
 node scripts/bundle.mjs
-log "bundle: docs/assets/bundle/globe.js ($(wc -c < docs/assets/bundle/globe.js) bytes)"
+log "bundle: docs/assets/bundle/globe.js ($(wc -c < docs/assets/bundle/globe.js) bytes), notice.js ($(wc -c < docs/assets/bundle/notice.js) bytes)"

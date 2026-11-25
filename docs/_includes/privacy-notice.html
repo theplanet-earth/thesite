@@ -1,0 +1,14 @@
+<!-- The notice of privacy (the owner, 2026-11-25: a popup, in the orange of the banner of the
+     stage site, that the visitor reads and closes before using the site, to show that the
+     question was not ignored). The layout includes it on every page but the page Privacy;
+     src/notice/main.js opens it at the start of a visit, without storing anything, and
+     scripts/check-site.py finds it by data-privacy-notice. Its style is
+     assets/css/notice.css. What it says is what docs/privacy.md says, in short. -->
+<dialog class="privacy-notice" aria-labelledby="privacy-notice-title" aria-describedby="privacy-notice-text" data-privacy-notice>
+  <form method="dialog">
+    <h2 id="privacy-notice-title">Privacy</h2>
+    <p id="privacy-notice-text">This site sets no cookies and does not track you. Like every website, its servers receive the address of your device: the page <a href="{{ '/privacy/' | relative_url }}">Privacy</a> says which servers, and why.</p>
+    <button type="submit" autofocus>Close</button>
+  </form>
+</dialog>
+<script type="module" src="{{ '/assets/bundle/notice.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>

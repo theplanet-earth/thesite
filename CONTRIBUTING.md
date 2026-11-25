@@ -33,6 +33,7 @@ call the shell scripts in `scripts/`, so they also run without npm.
 |---|---|
 | `npm run build` | Every output in `build/`: the files to attach to a release in `build/release/`, the site (Jekyll, from `docs/`, with the globe bundled from `src/` by esbuild) in `build/pages/` |
 | `npm run serve` | Preview of the site at `http://localhost:4000`, rebuilt on every change (task *Preview: site (live reload)*) |
+| `npm run serve:stage` | The same preview, built as the stage site (`JEKYLL_ENV=stage`), with its banner *Work in progress* at the top and at the bottom of every page (task *Preview: site as stage (live reload)*) |
 | `npm test` | Unit tests (`scripts/test.sh`) |
 | `npm run check` | Tests, confidentiality, `TEMPLATE` markers and the checks of this repository: **run it before every pull request** |
 | `npm run check:confidential` | Confidentiality guard on every tracked file |
@@ -41,7 +42,7 @@ call the shell scripts in `scripts/`, so they also run without npm.
 | `npm run mascot:generate` | The mascot of the logo as a 3D model, by the API of Meshy, into `build/meshy/<date>/`: it spends credits of the organization and needs `MESHY_API_KEY` in the environment (`-- --dry-run` shows the requests only) |
 | `npm run globe:activity` | The latest edits to OpenStreetMap for the globe, into `docs/_data/activity.json` (also run by `npm run build` and `npm run serve`; without network, an empty list) |
 | `npm run worker:check` / `worker:dev` | The Worker of production (`wrangler.jsonc`, `worker/`): validate and bundle it without deploying, or serve the built site with it at `http://localhost:8787`; wrangler at the version of `scripts/worker.sh`, no account needed |
-| `npm run check:site` | Every local link and resource of the built site (`build/pages/`) exists; part of `npm run check` once the site is built, and a step of CI after its build |
+| `npm run check:site` | Every local link and resource of the built site (`build/pages/`) exists, and none is loaded from another host; the notice of privacy is on every page but `/privacy/`; and the banner of the stage site is at the top and at the bottom of every page of a build for stage and on no page of any other (by `JEKYLL_ENV`, production when unset); part of `npm run check` once the site is built, a step of CI after its build, and of each deploy |
 | `npm run setup:python` | `.venv/` from `requirements.txt`, when the repository has one |
 | `npm run version:current` / `version:next` / `release:notes` | Version of this build, of the next release, and the notes of the next release |
 | `npm run clean` | Remove `build/` |
@@ -52,8 +53,11 @@ call the shell scripts in `scripts/`, so they also run without npm.
 - Three branches, the rule of the organization (issue #5): work happens on **`dev`**; `dev`
   goes into **`stage`** by a pull request, whose merge deploys the stage site
   (`.github/workflows/stage.yml`, `theplanet.wtf`); `stage` goes into **`master`**, the main
-  branch, by a pull request, whose merge publishes a release (and, once issue #2 is done, the
-  production site at `theplanet.observer`).
+  branch, by a pull request, whose merge publishes a release and deploys the production site
+  (`.github/workflows/production.yml`, `theplanet.observer`). The stage site is built with
+  `JEKYLL_ENV=stage`, so every page carries, at its top and at its bottom, a banner that says
+  it is a preview; the production site is built with `JEKYLL_ENV=production`, without it. The
+  code is the same on the three branches: no merge adds or removes the banner.
 - Nobody pushes to `stage` or `master`: every change reaches them through a pull request, and
   the **owner of the repository merges** it. The only push outside a pull request is the merge
   back of `master` into `stage` (below).
@@ -80,9 +84,21 @@ call the shell scripts in `scripts/`, so they also run without npm.
   merges picks the method on the merge button: *Squash and merge* along the chain, *Create a
   merge commit* into `dev`. The settings of the repository that go with it (*Settings,
   General, Pull Requests*: keep merge commits and squash merging, *Default to pull request
-  title* for the squash, rebase merging off) and the ruleset on `stage` and `master` are
-  steps of issue #7
-  ([GitHub documentation](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/configuring-commit-squashing-for-pull-requests)).
+  title* for the squash, rebase merging off) are set (issue #7)
+  ([GitHub documentation](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/configuring-commit-squashing-for-pull-requests));
+  the rulesets below allow only the squash into `stage` and `master`.
+- **Two rulesets** of the repository (*Settings, Rules, Rulesets*; set by the owner on
+  2026-11-25, issue #25) make GitHub enforce these rules
+  ([GitHub documentation](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets)):
+
+  | Ruleset | Branches | Rules |
+  |---|---|---|
+  | `chain` | `stage`, `master` | No deletion; no force push; changes only through a pull request, merged with *Squash and merge* only, without required approvals, once the check `check` of CI has passed (the branch need not be up to date) |
+  | `dev` | `dev` | No deletion; no force push. Direct pushes stay allowed: the work happens there |
+
+  The role *Repository admin* may bypass both, always: the merge back of `master` into
+  `stage` is a direct push and needs it. A Codespace acts as its owner, an admin, so it may
+  bypass them too; the rules of this file still apply to whoever can.
 - Every pull request to `stage` or `master` runs **CI** (`.github/workflows/ci.yml`): checks and
   build. Its job summary shows the version and the release notes that merging into `master`
   would publish, and the `TEMPLATE` markers left.
@@ -199,3 +215,10 @@ Applies to documentation, comments, commit messages and pull request description
   such as the names of the mappers, are not kept, whether the build or the browser reads
   them. An attribution that its licence wants next to the data (OpenStreetMap) stays there;
   the other credits may go on the page that explains the work.
+- **The data of the visitors**: the site sets no cookie, stores nothing in the browser, and
+  loads its pages, fonts, styles, scripts and images from itself (`npm run check:site` fails
+  on a resource of another host). A change that makes the browser contact another host, or
+  that keeps anything about a visitor, changes the page *Privacy* (`docs/privacy.md`) in the
+  same pull request, before it reaches a site. Every page but that one opens, at the start
+  of a visit, the notice of privacy (`docs/_includes/privacy-notice.html`, `src/notice/`),
+  which stores nothing either; `npm run check:site` fails on a page without it.

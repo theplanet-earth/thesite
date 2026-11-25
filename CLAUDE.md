@@ -21,16 +21,17 @@ The site is a Jekyll site in `docs/`, the 2024 prototype folded in on 2026-11-23
 branches `glob_coverage` and `hyde_theme` (opened in this order, then deleted). Its home page
 shows a 3D globe (`src/globe/`, three.js bundled by esbuild), which replaced the Leaflet map
 of the prototype on 2026-11-23, with the latest edits to OpenStreetMap as orange spikes and
-arcs (issue #1, Section 2): those of the build first, then those the browser reads once a
-minute while the globe is shown. `/globe/` explains it and credits the work it builds on. In production a Worker
-(`wrangler.jsonc`, `worker/`) serves the site and reads the edits once for every visitor. `npm run build` builds it into `build/pages/`,
-`npm run serve` previews it. Two environments, decided by the
-owner on 2026-11-23 following issue #2:
+arcs (issue #1, Section 2): those of the build first, then those the browser reads every 19
+minutes while the globe is shown. `/globe/` explains it and credits the work it builds on.
+In production a Worker (`wrangler.jsonc`, `worker/`) serves the site and reads the edits
+once for every visitor. `npm run build` builds it into `build/pages/`, `npm run serve`
+previews it (`npm run serve:stage` as the stage site). Two environments, decided by the owner
+on 2026-11-23 following issue #2, both live since 2026-11-25:
 
 | Environment | Branch | Where | How | State |
 |---|---|---|---|---|
-| Stage | `stage` | `https://theplanet.wtf/`, GitHub Pages of this repository | `.github/workflows/stage.yml` on every push to `stage` | DNS broken (issue #6) |
-| Production | `master` | `https://theplanet.observer/`, a Cloudflare Worker serving `build/pages/` as static assets | `.github/workflows/production.yml`, called by `release.yml` after every release, once `DEPLOY_PRODUCTION` is `true` (issue #2) | token, secrets and custom domain to set up (issues #6, #7) |
+| Stage | `stage` | `https://theplanet.wtf/`, GitHub Pages of this repository | `.github/workflows/stage.yml` on every push to `stage`, built with `JEKYLL_ENV=stage`: the banner *Work in progress* at the top and at the bottom of every page (Section 2) | live since 2026-11-25 (#14) |
+| Production | `master` | `https://theplanet.observer/`, a Cloudflare Worker serving `build/pages/` as static assets | `.github/workflows/production.yml`, called by `release.yml` after every release while the repository variable `DEPLOY_PRODUCTION` is `true`; built with `JEKYLL_ENV=production`, without the banner | live since `v0.2.0`, 2026-11-25 (#24, issue #2) |
 
 What the site shows and how it links the other repositories of the organization are decided
 by the owner, request by request.
@@ -108,7 +109,9 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   vedere il deploy automatico funzionare sui due domini": once the owner has finished issues
   #6, #7 and #2 and says so, Claude squash-merges #11, then #14, merges each target back down
   the chain, and deletes the merged branches of work (`globe`, `mascot`, `cleanup`, `home`).
-  Until then they stay open.
+  Done on 2026-11-25, after "va bene il globo in produzione, procedi pure": #11 (`v0.1.0`),
+  #14 and #24 (`v0.2.0`, the globe in production) squash-merged and merged back, the
+  branches of work deleted; only `dev`, `stage` and `master` are left (issue #2).
 - 2026-11-24, on the issue of thegame for the easter egg of the mascot: "ricordami di aprirla
   fino a che non ricreiamo il devcontainer": every recap reminds it, until a Codespace created
   after the change of the devcontainer can open it. On the other files of Meshy: "per adesso
@@ -120,6 +123,14 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   guidelines require; About is left to the project; a GitHub icon instead of "Source on
   GitHub"; and the edits of OpenStreetMap "in tempo reale [...] a quando sta visualizzando
   l'utente e non a build time", about as many as the build keeps (113 to 120).
+- 2026-11-25, asked why the caption always said 120: option A, "finestra di tempo fissa, numero
+  che varia", "come finestra di tempo per adesso fai 20 minuti [...] ma non dire nel messaggio
+  che sono negli ultimi 20 minuti [...] allinea anche in fase di build il lasso temporale a 20
+  minuti precedenti": the build, the browser and the Worker keep the edits closed in the 20
+  minutes before the replication last ran (`WINDOW_MINUTES` of `src/globe/replication.js`,
+  the same in `scripts/osm-activity.py`); the caption shows their number, not the window.
+  The same day, of `/globe/`: "lui può anche menzionarlo [...] dei 20 minuti intendo": the
+  page that explains the globe names the window, the caption under the globe does not.
 - 2026-11-24, on the edits read by every browser: "fallo, magari non ogni minuto, ma ogni 19
   minuti": the Worker of production reads the replication at most every 19 minutes per data
   centre and serves that copy to every visitor (`/api/osm-edits.json`); the browser asks
@@ -156,6 +167,72 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   prompt etc...) ricordami che ti serve e te lo darò in futuro": `media/README.md` records
   what git and the metadata of the files say; the owner will give the prompt, the model, the
   date and the image chosen (Section 12, issue #19).
+- 2026-11-25, "aggiungi a https://theplanet.wtf/ (stage) un banner (su ogni pagina, servita
+  sotto quel dominio) in stile "work in progress" per segnalare che quella versione del sito
+  è solo una preview. fai in modo di aggiungerlo automaticamente a ogni merge di dev su stage
+  e di levarlo a ogni merge su master di stage": the banner
+  (`docs/_includes/preview-banner.html`, `docs/assets/css/preview.css`) is in the code of
+  every branch and appears only in a build for stage, `JEKYLL_ENV=stage`
+  ([Jekyll environments](https://jekyllrb.com/docs/configuration/environments/)), which
+  `stage.yml` sets at every merge into `stage`; production builds with
+  `JEKYLL_ENV=production`, which `scripts/worker.sh` forces, and never shows it. No file is
+  added or removed at the merges: a file that `stage` had and `master` had not would come back
+  to `dev` with the merge back and reach `master` with the next squash.
+  `scripts/check-site.py` checks both, before each deploy: the banner on every page of the
+  build for stage, on no page of any other. It links the production site.
+- 2026-11-25, on seeing it: "replica lo stesso identico banner anche in fondo alla pagina.
+  aggiungi all'avviso una second frase del tipo "Here is where stunning features happen." o
+  qualcosa del genere migliorato (deve stare tutto in un'unica riga)": the same banner at the
+  top and at the bottom of every page, both checked by `check-site.py`; the text reads "Work
+  in progress: only a preview of theplanet.observer. New features take shape here first."
+  (no "stunning", which the writing style of `CONTRIBUTING.md` excludes), on one line from a
+  window 768 pixels wide, on two on a phone 390 pixels wide.
+- 2026-11-25, "forse è il caso di aggiungere un tab "Privacy" con l'informativa sulla privacy,
+  cookies ai sensi del GDPR e di tutte le altre normative applicabili?", and the owner's
+  answers on the plan: a page *Privacy* in the menu, in English only (`docs/privacy.md`);
+  the fonts served by the site instead of Google Fonts, so that no resource comes from
+  another host; as the address of the controller, "privacy@theplanet.dev visto che possiedo
+  anche quel dominio, li faremo delle configurazioni per creare anche altri indirizzi mail
+  con le regole di cf": the addresses of the project live on `theplanet.dev`, routed by
+  Cloudflare Email Routing (Section 12). The site sets no cookie, so it shows no consent
+  banner.
+- 2026-11-25, after seeing the page in a preview, "perfetta, va benissimo, prima di mergiare
+  su dev aggiungi comunque un popoup (in stile arancione, come il banner wip) che costringa il
+  lettore a leggere brevemente che c'è una sezione privacy apposta e a chiudere questo popup
+  prima di poter fare nulla sul sito [...] giusto per far vedeer che non si è ignorata la
+  questione": the notice of privacy, a modal dialog on every page but `/privacy/`
+  (`docs/_includes/privacy-notice.html`, `src/notice/`), opened at the start of a visit.
+  It stores nothing, so that the page stays true: a visit starts when the page was not
+  reached from another page of the site (`document.referrer`), and a reload or a step in the
+  history is not a new one; it opens again at the next visit.
+- 2026-11-25, "quando lo visualizzo da cellulare vorrei che il logo THEPLANET fosse alto tanto
+  quanto il logo. aggiustali in questo caso per fare si che mantengano le proporzioni": on
+  narrow screens the logotype is as high as the mascot, 3.5rem, and each keeps its
+  proportions: the mascot takes its width from its height, the logotype scales its text,
+  padding and border together (`docs/assets/css/theplanet.css`).
+- 2026-11-25, "sistemami il README.md, rimpicciolendo il logo e mettendolo sopra a tutto,
+  migliorando il titolo e aggiungendo dei badge che ti sembrano appropriati (non a caso, non
+  necessariamente tanti)": `README.md` opens with the logo, 160 pixels wide, then the title
+  with the organization as its subtitle, one line on the globe and four badges, then the
+  caution, before every section (`tests/test_readme.py`). Each badge says something the
+  reader needs: the two sites, which [shields.io](https://shields.io/badges/website) finds up
+  or down (the address, or "down"); the latest release
+  ([GitHub release](https://shields.io/badges/git-hub-release)); the license, "MIT + CC BY
+  4.0", a [static badge](https://shields.io/badges/static-badge) linking to *License*, since
+  the badge that GitHub reads from `LICENSE` would say MIT only. No badge of CI: it runs on
+  pull requests only. The alt text of the logo was "The Pipeline", a leftover.
+- 2026-11-25, "ho fatto anche i ruleset su dev stage e master, documenta tutto da qualche
+  parte": the owner created the rulesets `chain` (`stage`, `master`) and `dev` (`dev`) of
+  issue #25; they are described in `CONTRIBUTING.md` (*Branches and pull requests*), in the
+  caution of `README.md` and in Section 12. The same day the owner set the email records
+  against spoofing of `theplanet.observer` (issue #3).
+- 2026-11-25, on what was left of issue #3: HSTS, "rimandiamolo, segnalo"; Always Use HTTPS
+  on `theplanet.observer` and DNSSEC on the three domains, "facciamoli", done by the owner
+  the same day (Section 12). The proxy of `theplanet.wtf` (the orange cloud) stays off: it
+  serves neither of the two, since Always Use HTTPS acts only on the traffic that crosses
+  Cloudflare ([documentation](https://developers.cloudflare.com/ssl/edge-certificates/additional-options/always-use-https/))
+  and DNSSEC signs every record of the zone; it comes back with HSTS, which on
+  `theplanet.wtf` needs it.
 
 Rules of the organization, carried over from thebox or from its issues (keep them unless the
 owner decides otherwise):
@@ -204,10 +281,10 @@ owner decides otherwise):
 | `package.json` | The command surface: every command is an npm script (`CONTRIBUTING.md`, *Commands*) |
 | `scripts/lib.sh` | Helpers shared by the shell scripts: repository root, `build/`, `$PY`, `log`, `warn`, `die`, `need`, `project_version` |
 | `scripts/build.sh`, `test.sh`, `check.sh` | Build (the site into `build/pages/`), unit tests, every check (the entry points of CI) |
-| `scripts/serve.sh` | Live preview of the site at `http://localhost:4000` (`npm run serve`), with the bundle rebuilt on every change of `src/` |
-| `scripts/bundle.sh`, `scripts/bundle.mjs` | esbuild bundles `src/globe/main.js` and three.js into `docs/assets/bundle/globe.js` (generated, git-ignored), with the licence of three.js beside it; run by `build.sh` and `serve.sh`; in watch mode it touches the bundle a second after each build (Section 12) |
+| `scripts/serve.sh` | Live preview of the site at `http://localhost:4000` (`npm run serve`; `npm run serve:stage` as the stage site, with its banners), with the bundle rebuilt on every change of `src/` |
+| `scripts/bundle.sh`, `scripts/bundle.mjs` | esbuild bundles `src/globe/main.js` and three.js into `docs/assets/bundle/globe.js`, and `src/notice/main.js` into `docs/assets/bundle/notice.js` (generated, git-ignored), with the licence of three.js beside it; run by `build.sh` and `serve.sh`; in watch mode it touches the bundle a second after each build (Section 12) |
 | `wrangler.jsonc`, `worker/` | The Worker of production (issue #2): static assets from `build/pages/`, custom domain `theplanet.observer`; `worker/index.js` runs only for `/api/*`, `worker/edits.js` serves `/api/osm-edits.json`, read at most every 19 minutes and cached |
-| `scripts/worker.sh` | wrangler at a pinned version: `npm run worker:check` (dry run), `npm run worker:dev` (the site with the Worker at `http://localhost:8787`), and `deploy`, run by `production.yml` with the token and the account in the environment |
+| `scripts/worker.sh` | wrangler at a pinned version: `npm run worker:check` (dry run), `npm run worker:dev` (the site with the Worker at `http://localhost:8787`), and `deploy`, run by `production.yml` with the token and the account in the environment; each builds the site with `JEKYLL_ENV=production` and runs `check-site.py` before wrangler |
 | `media/mascot/` | The mascot of the logo in 3D, not used by the site: the five files Meshy made (walking, running, rigged, without skeleton, preview; 20 MB), `provenance.json` and a `README.md` on what each may serve; kept for thegame (Section 2) |
 | `scripts/meshy.py` | The mascot of the logo as a 3D model by the API of Meshy: Image to 3D, rigging, the GLB files and their provenance in `build/meshy/<date>/` (`npm run mascot:generate`) |
 | `scripts/osm-activity.py` | The latest edits to OpenStreetMap for the globe, from the minutely replication of changesets, into `docs/_data/activity.json` (generated at every build, git-ignored; `npm run globe:activity`) |
@@ -215,11 +292,12 @@ owner decides otherwise):
 | `scripts/install-skills.sh` | Claude Code skills installed for the user, pinned to a commit (Section 10) |
 | `scripts/check-confidential.py` | Confidentiality guard (pre-commit hook and `npm run check`) |
 | `scripts/check-template.sh` | Lists the `TEMPLATE` markers left; none since 2026-11-24, so `npm run check` runs it with `--strict` |
-| `scripts/check-site.py` | Check of the built site: every local link and resource of `build/pages/` exists, none loads over `http`, nothing unpublishable is published (`npm run check:site`) |
+| `scripts/check-site.py` | Check of the built site: every local link and resource of `build/pages/` exists, none loads over `http` or from another host, the notice of privacy is on every page but `/privacy/`, nothing unpublishable is published, and the banner of the stage site is at the top and at the bottom of every page of a build for stage and on no page of any other, by `JEKYLL_ENV` (`npm run check:site`) |
 | `scripts/version.py` | Version, next version and release notes from the tags and the commits |
 | `scripts/setup-python.sh` | `.venv/` from `requirements.txt`, reinstalled only when it changes |
-| `tests/` | `unittest` checks of the harness scripts, of `check-site.py`, of `land-mask.py`, of `osm-activity.py`, of the permissions of the devcontainer, of the license and of the deploys (standard library only); `globe.test.mjs`, `replication.test.mjs` and `live.test.mjs` (the live edits and the Worker, against fakes), with `node --test` |
+| `tests/` | `unittest` checks of the harness scripts, of `check-site.py`, of `land-mask.py`, of `osm-activity.py`, of the permissions of the devcontainer, of the header of `README.md`, of the license and of the deploys (standard library only); `notice.test.mjs` (when the notice of privacy opens), `globe.test.mjs`, `replication.test.mjs` and `live.test.mjs` (the live edits and the Worker, against fakes), with `node --test` |
 | `src/globe/` | The globe of the home page: `geometry.js` (dots of the land, spikes, arcs, quality tiers; no three.js), `replication.js` (the replication of changesets: paths, parsing, merging; no DOM), `live.js` (every 19 minutes, the edits from the Worker or from the replication; shared with the Worker), `main.js` (the three.js scene) |
+| `src/notice/` | The notice of privacy: `visit.js` (whether a visit starts, from the referrer and the type of navigation; no DOM), `main.js` (opens the dialog of `docs/_includes/privacy-notice.html`) |
 | `package.json`, `package-lock.json` | Also the dependencies of the site, pinned: three.js and esbuild (Section 10) |
 | `.devcontainer/` | `Dockerfile`, `devcontainer.json`, `post-create.sh` (Section 10) |
 | `.vscode/` | Recommended extensions, settings, and every command as a task |
@@ -239,11 +317,11 @@ The site, cleaned up on 2026-11-24 (`CONTRIBUTING.md`, *Conventions of this repo
 
 | Path | Content |
 |---|---|
-| `docs/` | Jekyll 4.3 site: `_config.yml`, `Gemfile` and `Gemfile.lock` (Jekyll, and the three gems Ruby 3.3 warns about), `_layouts/` (`default`, `page`), `_includes/` (`head`, `sidebar`), `index.html` (the globe), `globe.md` (how the globe is made, linked under it, not in the menu), `about.md`, `404.html`; the menu lists the pages with a `nav_order` |
+| `docs/` | Jekyll 4.3 site: `_config.yml`, `Gemfile` and `Gemfile.lock` (Jekyll, and the three gems Ruby 3.3 warns about), `_layouts/` (`default`, `page`), `_includes/` (`head`, `sidebar`, `preview-banner`, the banner of the stage site, `privacy-notice`), `index.html` (the globe), `globe.md` (how the globe is made, linked under it, not in the menu), `about.md`, `privacy.md` (the notice under the GDPR, Section 2), `404.html`; the menu lists the pages with a `nav_order` |
 | `docs/_data/coverage.yml` | The places shown as orange rings on the globe (issue #1) |
 | `docs/_data/activity.json` | The latest edits to OpenStreetMap, the orange spikes and arcs of the globe: generated at every build by `scripts/osm-activity.py`, git-ignored |
 | `docs/public/` | The Hyde theme on Poole, third-party, MIT, with the dark colours of the project: its CSS, icons and `LICENSE.md`, published with them as the licence asks |
-| `docs/assets/` | The project's own CSS (`theplanet.css`, `globe.css`), the logo, `globe/land.png` (generated by `scripts/land-mask.py` and **committed** as data of the site: it changes only with its source), and `bundle/` (generated by `scripts/bundle.sh`, git-ignored) |
+| `docs/assets/` | The project's own CSS (`theplanet.css`, `globe.css`, `fonts.css`, `notice.css`, and `preview.css`, loaded by the stage site only), the fonts (`fonts/`: PT Sans and Roboto Mono, OFL 1.1, with their licence texts; third-party, committed), the logo, `globe/land.png` (generated by `scripts/land-mask.py` and **committed** as data of the site: it changes only with its source), and `bundle/` (generated by `scripts/bundle.sh`, git-ignored) |
 | `media/` | Files of the repository that the site does not publish: `theplanetearth.png` (the image of `README.md`), `mascot/`, and `README.md`, the provenance of the logo (issue #19) |
 
 ## 5. Checks before reporting a change as done
@@ -260,9 +338,14 @@ The site, cleaned up on 2026-11-24 (`CONTRIBUTING.md`, *Conventions of this repo
 
 For the site: `npm run serve` (or the task *Preview: site (live reload)*), then open
 `http://localhost:4000` with the Playwright MCP server, the home page with its globe (drag it,
-turn it with the arrow keys) and `/about/` at least. After `npm run build`, `npm run check:site`
-checks the links and resources of `build/pages/`, that nothing loads over `http`, and that
-nothing unpublishable (`README.md`, `CNAME`, `Gemfile`) is published.
+turn it with the arrow keys) and `/about/` at least. A change of the layout is looked at with
+`npm run serve:stage` too (task *Preview: site as stage (live reload)*): the stage site has
+its banners above and below the pages. After `npm run build`, `npm run check:site` checks the links and
+resources of `build/pages/`, that nothing loads over `http` or from another host, that the
+notice of privacy is on every page but `/privacy/`, that nothing unpublishable
+(`README.md`, `CNAME`, `Gemfile`) is published, and the banner of the stage site: run it with
+the `JEKYLL_ENV` of the build (`JEKYLL_ENV=stage npm run build`, then
+`JEKYLL_ENV=stage npm run check:site`).
 
 ## 6. How to handle the owner's requests (permanent)
 
@@ -316,7 +399,9 @@ The rules are in `CONTRIBUTING.md`, *Confidentiality*. In addition:
   owner asks Claude to merge a pull request, Claude squash-merges it with the subject and body
   that `CONTRIBUTING.md` describes (`gh pr merge --squash --subject ... --body ...`), then
   merges the target back down the chain. The only push to `stage` outside a pull request is
-  the merge back of `master` into it.
+  the merge back of `master` into it. The rulesets of issue #25 enforce part of this on
+  GitHub, but the token of a Codespace may bypass them as the owner
+  (`current_user_can_bypass: always`): GitHub does not stop Claude, this rule does.
 - **Before working on `dev`**, fetch and complete any merge back the chain lacks (`master`
   into `stage`, `stage` into `dev`): the owner may have squash-merged a pull request without
   merging it back. Merging them into the working branch is always allowed.
@@ -378,7 +463,8 @@ The rules are in `CONTRIBUTING.md`, *Confidentiality*. In addition:
 | Jekyll | 4.3.3, with the gems of `docs/Gemfile.lock` (Bundler 2.5.6) | `docs/` |
 | Mascot | Meshy Image to 3D, `ai_model: latest` (Meshy 7.1 in 2026-11), then rigging; tasks and parameters in `media/mascot/provenance.json`, 2026-11-24, 35 credits | `scripts/meshy.py` |
 | three.js | 0.187.0 (MIT), bundled by esbuild 0.28.2 (MIT); exact versions in `package.json` | `package.json`, `package-lock.json` |
-| OpenStreetMap edits | the minutely replication of changesets, `https://planet.openstreetmap.org/replication/changesets/` (redirects to a mirror on S3): the last 4 files, at most 120 edits, at every build; then, every 19 minutes, the Worker of production for every visitor, or the browser where there is no Worker: the latest 120 edits (backwards from the latest file, at most 10 files) | `scripts/osm-activity.py`, `src/globe/live.js`, `worker/edits.js` |
+| Fonts | PT Sans 400, 400 italic, 700 and Roboto Mono 400, 700, latin and latin-ext, from `@fontsource/pt-sans` and `@fontsource/roboto-mono` 5.3.0 (`npm pack`, not dependencies), OFL 1.1 | `docs/assets/fonts/`, `docs/assets/css/fonts.css` |
+| OpenStreetMap edits | the minutely replication of changesets, `https://planet.openstreetmap.org/replication/changesets/` (redirects to a mirror on S3): the edits closed in the 20 minutes before its last run (`WINDOW_MINUTES`), read from the files of 22 minutes, at most 3000: at every build, then every 19 minutes the Worker of production for every visitor, or the browser where there is no Worker (only the files not read yet) | `scripts/osm-activity.py`, `src/globe/live.js`, `worker/edits.js` |
 | wrangler | 4.168.0, through `npx` (not a dependency of the site); `compatibility_date` 2026-11-24 | `scripts/worker.sh`, `wrangler.jsonc` |
 | Natural Earth | v5.1.2, 1:50m land (public domain), the source of `docs/assets/globe/land.png` | `scripts/land-mask.py` |
 | Plugin `ui-ux-pro-max` | v2.15.0 of `nextlevelbuilder/ui-ux-pro-max-skill` (MIT; its manifest at that tag says 2.13.0) | `.claude/settings.json` |
@@ -429,6 +515,18 @@ harness) comes from thebox, which is versioned and released like any other repos
   2026-11-24, with the access authorized: GitHub applies changed permissions to new
   Codespaces only, "even if you rebuild the codespace"
   ([GitHub documentation](https://docs.github.com/en/codespaces/managing-your-codespaces/managing-repository-access-for-your-codespaces)).
+  **Correction of 2026-11-25**: this note said that a Codespace created on 2026-11-25 had
+  it, from one request to thegame. The Codespace in use then was the one of 2026-11-23,
+  rebuilt (its clone dates from 2026-11-23 23:18; `creation.log` records the rebuild at
+  21:07), and requests without a title, which create nothing, show what its token may do:
+  HTTP 422 ("title wasn't supplied") in the public repositories (thesite, thegame,
+  theaction, mixamo-in-playcanvas), HTTP 403 "Resource not accessible by integration" in the
+  private ones (thebox, thestory, thejungle, thepipeline, thedeal). Issues in the private
+  repositories need a Codespace **created**, not rebuilt, after the change: confirmed on
+  2026-11-25 by a Codespace created after commit `94c6aa0` (its clone and `creation.log`
+  both start at 22:05 UTC that day, with a single creation of the container), whose token
+  answered HTTP 422 in thebox and opened the issues of the 12 private repositories (the
+  license of every repository, in the open points below).
 - **Git LFS hooks**: Codespaces writes Git LFS hooks in `.git/hooks` that abort every push when
   `git-lfs` is not installed; `core.hooksPath .githooks` makes git ignore them.
 - **Python interpreter in VS Code**: `.vscode/settings.json` does not set
@@ -464,12 +562,15 @@ harness) comes from thebox, which is versioned and released like any other repos
 - **The edits of OpenStreetMap** come from the minutely replication of changesets, not
   from the API: the API is "provided in order to edit the map data, **not** for read-only
   purposes or projects" ([API usage policy](https://operations.osmfoundation.org/policies/api/)).
-  A build reads 5 files (about 20 KB): the state and the last 4 minutes. Then, every 19
-  minutes while the globe is shown and the tab visible, the browser asks
+  The window is the same everywhere (owner, 2026-11-25): the edits closed in the 20 minutes
+  before the replication last ran, read from the files of 22 minutes (a changeset appears in
+  the file of a minute or two after it closes), about 5 KB each; their number follows how busy
+  the map is, and the caption shows it, never the window; `/globe/` names the window. A build reads them once. Then,
+  every 19 minutes while the globe is shown and the tab visible, the browser asks
   `/api/osm-edits.json`: in production the Worker answers from the cache of Cloudflare, and
-  reads the replication itself (about 5 files) at most every 19 minutes per data centre;
-  where there is no Worker (the stage site on GitHub Pages, the preview), the browser reads
-  the replication directly, one file at a time. The server and its mirror on S3 answer
+  reads the replication itself (22 files) at most every 19 minutes per data centre; where
+  there is no Worker (the stage site on GitHub Pages, the preview), the browser reads the
+  files it has not read yet, one at a time. The server and its mirror on S3 answer
   `Access-Control-Allow-Origin: *` (checked on 2026-11-24). No user, comment or tag is kept,
   only the centre of each changeset rounded to 0.01 degree, its number of changes and its
   time; changesets spanning more than 1 degree are left out.
@@ -501,22 +602,39 @@ harness) comes from thebox, which is versioned and released like any other repos
   needs. If it is missing, the MCP tool `browser_install` installs it.
 
 - **GitHub Pages** (GitHub API, `GET /repos/theplanet-earth/thesite/pages` and
-  `.../environments/github-pages`, 2026-11-23): build type *GitHub Actions*, custom domain
-  `theplanet.wtf`, the stage site. The `github-pages` environment accepts deployments from
-  `stage` only (set by the owner on 2026-11-23, issue #7). The last deployment came from
-  `hyde_theme` (commit `ec8acac`, now in the history of `dev`) on 2024-03-27.
-- **The stage domain does not reach the site** (checked on 2026-11-23): `https://theplanet.wtf/`
-  answers HTTP 403 from Cloudflare with the page "DNS points to prohibited IP"
-  ([Cloudflare Error 1000](https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1000/)),
-  while `https://theplanet-earth.github.io/thesite/` answers 301 to `https://theplanet.wtf/`:
-  GitHub Pages works, the DNS records on Cloudflare do not (issue #6).
-  `theplanet.observer` has no A, AAAA or CNAME record yet.
+  `.../environments/github-pages`, 2026-11-23 and 2026-11-25): build type *GitHub Actions*,
+  custom domain `theplanet.wtf`, the stage site, HTTPS enforced. The `github-pages`
+  environment accepts deployments from `stage` only (set by the owner on 2026-11-23, issue
+  #7); since 2026-11-25 every push to `stage` deploys it.
+- **Both domains reach the site** (checked on 2026-11-25, issues #2 and #6, closed):
+  `https://theplanet.wtf/` answers 200 from GitHub Pages, and
+  `https://theplanet-earth.github.io/thesite/` 301 to it; `https://theplanet.observer/`
+  answers 200 from the Worker `thesite`, whose custom domain created its DNS records and its
+  certificate at the first deploy (`v0.2.0`), and `/api/osm-edits.json` 200. Until then the
+  stage domain answered Cloudflare's "DNS points to prohibited IP"
+  ([Error 1000](https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1000/)).
+  The email records against spoofing (SPF `v=spf1 -all`, DMARC `p=reject`, an empty DKIM
+  key and a null MX, issue #3) are on both domains: on `theplanet.wtf` since 2026-11-24, on
+  `theplanet.observer` since 2026-11-25, after the first deploy as the owner chose, without
+  harm to the custom domain of the Worker (`dig` and HTTP 200, 2026-11-25).
+- **HTTPS and DNSSEC of the domains** (issue #3, checked from outside on 2026-11-25 with
+  `curl` and DNS over HTTPS through `1.1.1.1` and `8.8.8.8`): `http://theplanet.observer/`
+  answered 200 in plain HTTP until the owner turned on *Always Use HTTPS* in its zone; it
+  now answers 301 to `https://`, the path and the query kept, and the site and
+  `/api/osm-edits.json` still 200. `http://theplanet.wtf/` answers 301 from GitHub Pages
+  (*Enforce HTTPS*). DNSSEC is on for `theplanet.observer`, `theplanet.wtf` and
+  `theplanet.dev`: each zone answers its DNSKEY (algorithm 13) and a CDS record; the three
+  are registered with Cloudflare Registrar (RDAP), which reads the CDS and sends the DS
+  record to the registry within one to two days
+  ([documentation](https://developers.cloudflare.com/registrar/get-started/enable-dnssec/)).
+  Until the registry publishes the DS, resolvers do not validate the answers. No site sends
+  `Strict-Transport-Security`: HSTS is postponed (Section 2).
 - **The yearly rebuild** (`.github/workflows/new-year.yml`, 2026-11-25): GitHub runs a
-  schedule only from the default branch, so it works once the file reaches `master` (the
-  first release after it); the run then has the ref of `master`, and the environment
+  schedule only from the default branch, so it works since the file reached `master` with
+  `v0.2.0` (*New year* is active); the run then has the ref of `master`, and the environment
   `github-pages` accepts `stage` only, so it starts `stage.yml` on `stage` by
   `workflow_dispatch`, which the `GITHUB_TOKEN` may trigger; it starts `production.yml` on
-  `master` too, which deploys only once `DEPLOY_PRODUCTION` is `true`. In a public repository
+  `master` too, which deploys only while `DEPLOY_PRODUCTION` is `true`. In a public repository
   GitHub disables a schedule after 60 days without activity: after a quiet autumn, check in
   *Actions* that *New year* is enabled, or run it by hand on 1 January
   ([GitHub Docs](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)).
@@ -525,51 +643,118 @@ harness) comes from thebox, which is versioned and released like any other repos
 - **What the preview shows** (`npm run serve`, Playwright at 1280x800 and 390x844, and at
   1440x900 and 1024x768 for the height, 2026-11-24; screenshots in `.playwright-mcp/`,
   git-ignored): the home page ("Global reach") and `/globe/` fit one window, without
-  scrolling; the menu lists Home and About, then the icon of GitHub; on narrow screens the
-  sidebar is a single row; no console error from the site, no broken link, no horizontal
+  scrolling; the menu lists Home, About and Privacy, then the icon of GitHub; on narrow screens the
+  sidebar is a single row, with the mascot and the logotype 56 pixels high and aligned
+  (2026-11-25), down to about 350 pixels (the gaps narrow below 400, so that 360 keeps one
+  row); below, as at 320, two centred rows, the mascot and the logotype, then the menu
+  (measured with Playwright, 2026-11-25); no console error from the site, no broken link, no horizontal
   scroll. Fixed on the way:
   the tiles of CARTO, which now need a key ([CARTO](https://carto.com/basemaps/apikey)),
   until the globe replaced the map; `/about/` without style (links relative to the page);
   the click towards `https://enjoy.theplanet.wtf`, a name with no DNS record, gone with the
   map; the demo text of Hyde; the title of the pages and the links, of low contrast on the
   dark grey; the fonts over `http`; `maximum-scale=1`, which stopped zooming on phones.
-- **Merge settings of the repository** (GitHub API, 2026-11-23): squash, merge commits and
-  rebase all allowed; squash title `COMMIT_OR_PR_TITLE` and message `COMMIT_MESSAGES`.
-  `CONTRIBUTING.md` (thebox v0.1.2) expects the pull request title as subject, no list of
-  commits, and rebase off; no ruleset exists. Owner steps in issue #7.
+  The stage site (`npm run serve:stage`, 2026-11-25, the same four sizes and 768x1024): on
+  wide screens each banner is one line 2rem high at its edge of the window, 22 pixels in a
+  window less than 800 pixels high; the sidebar fits between them, and the home page and
+  `/globe/` give them their vertical padding (the text of `/globe/` had 11 pixels left at
+  1024x768). On 390x844 each takes two lines, the top one scrolling away with the row of the
+  sidebar, the bottom one ending the page. Still no scroll, no scrollbar in the sidebar, no
+  console error. **Found on the way, not fixed**: below about 720 pixels of height the
+  sidebar of the production site scrolls a little (7 pixels at 1024x688, 17 at 1280x640, 26
+  at 1024x600); the stage site does the same with the height of its banners less (4 pixels
+  at 800x600). To decide with the owner.
+- **Merge settings of the repository** (GitHub API, 2026-11-25, issue #7, closed): squash
+  and merge commits allowed, rebase off; squash title `PR_TITLE` and message `BLANK`, as
+  `CONTRIBUTING.md` expects.
+- **Rulesets** (GitHub API, `GET /repos/theplanet-earth/thesite/rulesets`, 2026-11-25, set by
+  the owner, issue #25): `chain` (id 28115089) on `stage` and `master`, with *deletion*,
+  *non_fast_forward*, *pull_request* (squash only, 0 approvals) and *required_status_checks*
+  (`check` of GitHub Actions, not strict); `dev` (id 28115148) on `dev`, with *deletion* and
+  *non_fast_forward*; both active, bypassed always by the role *Repository admin* (actor 5),
+  and the API answers `current_user_can_bypass: always` to the token of the Codespace.
+  `chain` also held `require_extra_approval_for_unattributed_changes: true`, which the table
+  of #25 did not list; reported, the owner turned it off the same day (`false`, ruleset
+  updated at 22:47 UTC). Not verified yet: the first merge back of `master` into `stage`
+  under the ruleset.
+- **The labels** `release:major`, `release:minor` and `release:patch`, read by `ci.yml` and
+  `release.yml`, exist since 2026-11-25 (issue #26, closed); none is on a pull request.
+- **The address of the page *Privacy*** (2026-11-25, checked from outside): `privacy@theplanet.dev`
+  is forwarded by Cloudflare Email Routing (Compute, Email Service, Email Routing; a routing
+  rule *Send to an email* to the owner's verified inbox), and a test message arrived. The
+  DNS of `theplanet.dev` holds the three MX records of Cloudflare (`route1` to `route3.mx.cloudflare.net`),
+  the SPF `v=spf1 include:_spf.mx.cloudflare.net ~all`, the DKIM `cf2024-1._domainkey`, and
+  the DMARC `v=DMARC1; p=reject; sp=reject; adkim=s; aspf=s`, as on `theplanet.wtf`: nothing
+  is sent from `theplanet.dev`. Email Routing only forwards
+  ([documentation](https://developers.cloudflare.com/email-service/configuration/email-routing-addresses/)):
+  a reply leaves from the owner's own address, and sending as `privacy@` would need a
+  sending service, with its SPF and DKIM, before the DMARC lets it through. The owner
+  approved the page on 2026-11-25 ("perfetta, va benissimo"). Mail servers of Cloudflare
+  refuse SMTP connections from a Codespace (its address of Azure is on a blocklist), so an
+  address is tested by sending it a message from another account.
+- **The data of the visitors** (2026-11-25, `docs/privacy.md`): checked on the code and on
+  both live sites, the site sets no cookie (no `Set-Cookie` on `theplanet.observer` nor on
+  `theplanet.wtf`) and stores nothing in the browser. Until then every page loaded its fonts
+  from Google Fonts, which received the address of every visitor: the Landgericht of Munich
+  awarded damages for that on 20 January 2022 (3 O 17493/20,
+  [text](https://www.gesetze-bayern.de/Content/Document/Y-300-Z-GRURRS-B-2022-N-612)),
+  because the fonts could be served by the site; now they are, and `check-site.py` fails on
+  any resource of another host. What other hosts still receive is said on the page: the
+  servers of the site (Cloudflare, GitHub Pages), the reports of Network Error Logging that
+  Cloudflare asks of browsers (`NEL` and `Report-To` headers on `theplanet.observer`), and
+  the replication of OpenStreetMap, read by the browser on stage (it redirects to the bucket
+  `osm-planet-eu-central-1` on Amazon S3, Frankfurt) and in production only when the Worker
+  does not answer the first time. Found on the way, and reported rather than kept:
+  - the prototype loaded **Abril Fatface** from Google, but no rule uses it (`hyde.css` has
+    it commented out): it is not served any more;
+  - Google Fonts served the Cyrillic subsets of PT Sans and Roboto Mono too; the site, in
+    English, serves latin and latin-ext only;
+  - **inconsistency, reported**: the licence of Roboto Mono is the SIL Open Font License 1.1
+    in the repository of Google Fonts (`ofl/robotomono/OFL.txt` of `google/fonts`) and in
+    the package `@fontsource/roboto-mono` 5.3.0, while older third-party pages give the
+    Apache License 2.0, under which Google first published it; the site follows the
+    repository of Google Fonts.
 
 Open points:
 
-- [ ] Owner: the Cloudflare side of both environments, issue #6; the GitHub side, issue #7.
-- [ ] Production deploy (issue #2): the Worker `thesite` (`wrangler.jsonc`, `worker/`,
-  checked locally) and its deploy (`production.yml`, called by `release.yml`, 2026-11-25) are
-  ready. Owner: the token and the Account ID (#6); the environment `production`, limited to
-  `master`, with the secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` (#7, step
-  5); then the repository variable `DEPLOY_PRODUCTION` = `true`; the first deploy creates
-  the Worker and its custom domain
-  ([Workers static assets](https://developers.cloudflare.com/workers/static-assets/),
-  [GitHub Actions](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/)).
+- [ ] Optional, owner: turn off Network Error Logging on the zone of `theplanet.observer`;
+  the page *Privacy* then no longer needs to name it.
+- [ ] The first merge back of `master` into `stage` under the ruleset `chain` (issue #25):
+  check that the bypass lets it through, then close #25.
+- [ ] From 2026-11-27: check that the registry publishes the DS record of
+  `theplanet.observer`, `theplanet.wtf` and `theplanet.dev` (a DS query through `1.1.1.1`
+  answers, with the flag AD), then record it on issue #3 and in Section 12. If it is
+  still missing after a few more days, the owner looks at *Manage Domains* in the
+  dashboard.
+- [ ] Owner, postponed (Section 2): HSTS, first without `preload`, and with it the proxy of
+  `theplanet.wtf`; then SSL *Full (strict)*. Later, the rotation of the token of
+  production before about 2027-11-25. Issue #3 stays open for them.
 - [ ] Older issues to plan with the owner: #1 (coverage map: colours from an API,
-  click to explore), #3 (hardening of the Cloudflare zones), #4 (security audit with the skill,
-  profile `quick`, findings only as private advisories).
-- [ ] The labels `release:major`, `release:minor` and `release:patch`, read by `ci.yml` and
-  `release.yml`, do not exist in the repository yet; create them when one is needed.
-- [ ] Owner: the merge settings and the ruleset of the repository (issue #7), so that the
-  squash along the chain takes the pull request title and no list of commits.
-- [ ] The globe on the home of the stage site (Section 2): merged into `dev` by #9,
-  with the latest edits to OpenStreetMap as orange spikes and arcs. Issue #1 stays open for
-  what it asked first: the colours of the coverage from an API not defined yet, and the
-  click towards `explore.<domain>`, a site that does not exist yet.
+  click to explore), #4 (security audit with the skill, profile `quick`, findings only as
+  private advisories), #18 (a section of the site with a Leaflet map).
+- [ ] The globe on the home of both sites (Section 2), released in `v0.2.0`. Issue #1 stays
+  open for what it asked first: the colours of the coverage from an API not defined yet, and
+  the click towards `explore.<domain>`, a site that does not exist yet.
 - [ ] The mascot from Meshy (Section 2): kept in `media/mascot/` for thegame. Owner: whether to
   keep the other files of `build/meshy/2026-11-24/` (the running clip, the rigged model), and
-  whether thegame wants it: an issue there needs a Codespace created after 2026-11-24.
+  whether thegame wants it: asked in thegame#11 (2026-11-25), the easter egg of the mascot
+  walking, with the files, how to load them and their rights.
 - [ ] The license of every repository (owner, 2026-11-23): thesite decided on 2026-11-25
-  (Section 2, issue #10). The same issue, "Change the license: candidate licenses
-  compared", is still to be opened in the other 15 repositories of the organization from a
-  Codespace created after 2026-11-24; then the issue of thebox, which holds the overview,
-  links them all and #10 links it. The script and the texts are kept in a private artifact
-  of the owner, "License Issues Kit" (https://claude.ai/artifact/XMVTBxhuJ8Zkizv2DELHtH,
-  files under `kit/`). Then the owner decides, repository by repository.
+  (Section 2) and released it in `v0.2.0` (issue #10, closed). The same issue, "Change the
+  license: candidate licenses compared", is open since 2026-11-25 in every other repository
+  of the organization: thebox#11, which holds the overview (a row and a link for every
+  issue) and the proposal of a common policy; the other private ones, thestory#7,
+  thejungle#6, thepipeline#7, thedashboard#14, thehumongous#9, theburden#7, theshort#5,
+  thedeal#11, theblend#3, theosm#12 and thepianist#8; the public ones, theaction#9,
+  thegame#10 and mixamo-in-playcanvas#3. Every issue of the series, #10 included, links the
+  issue of thebox, and a comment on #10 links it too. Before the 12 private ones were
+  opened, the facts their texts give (the license of each branch, the branches of work, the
+  issues they cite, the manifests) were checked again on 2026-11-25: none had changed since
+  2026-11-23. The private artifact that kept the script and the texts while the series was
+  opened, "License Issues Kit", was deleted by the owner on 2026-11-25, once every issue
+  existed: the issues are the record, and the overview of thebox#11 lists them all. Now the
+  owner decides, repository by repository; each issue is closed by the pull request that
+  changes the license there.
 - [ ] The logo (owner, 2026-11-25, "segnati queste due cose per ricordarmele"): it was
   generated with an AI tool, so its protection as a work rests on the human part of it.
   Issue #19: its provenance is in `media/README.md` since 2026-11-25 (ChatGPT with DALL-E;

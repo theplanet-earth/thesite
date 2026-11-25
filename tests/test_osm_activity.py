@@ -51,9 +51,11 @@ class OsmActivityTest(unittest.TestCase):
         self.assertNotIn("user", json.dumps(edits))
         self.assertNotIn("comment", json.dumps(edits))
 
-    def test_collect_reads_the_last_minutes_oldest_first(self) -> None:
+    def test_collect_keeps_the_window_before_the_last_run_oldest_first(self) -> None:
         files = {
-            "state.yaml": b"sequence: 101\n",
+            "state.yaml": b"---\nlast_run: 2026-11-24 19:22:00.123 +00:00\nsequence: 101\n",
+            "000/000/098.osm.gz": replication(changeset(8, "2026-11-24T19:19:59Z")),  # before the window
+            "000/000/099.osm.gz": replication(),
             "000/000/100.osm.gz": replication(changeset(10, "2026-11-24T19:20:00Z"), changeset(11, "2026-11-24T19:20:30Z")),
             "000/000/101.osm.gz": replication(changeset(12, "2026-11-24T19:21:00Z"), changeset(11, "2026-11-24T19:20:30Z", changes=9)),
         }
@@ -63,13 +65,19 @@ class OsmActivityTest(unittest.TestCase):
             asked.append(url)
             return files[url.removeprefix(self.tool.BASE)]
 
-        data = self.tool.collect(get, minutes=2, limit=10)
+        data = self.tool.collect(get, minutes=2)
         self.assertEqual(data["sequence"], 101)
+        self.assertEqual(data["generated"], "2026-11-24T19:22:00Z")  # the last run, not the build
         self.assertEqual([e["closed"] for e in data["edits"]], ["2026-11-24T19:20:00Z", "2026-11-24T19:20:30Z", "2026-11-24T19:21:00Z"])
         self.assertEqual(data["edits"][1]["changes"], 9)  # the later file wins
         self.assertTrue(all("id" not in e for e in data["edits"]))
-        self.assertEqual(len(asked), 3)
-        self.assertEqual(self.tool.collect(get, minutes=2, limit=2)["edits"][0]["closed"], "2026-11-24T19:20:30Z")
+        self.assertEqual(len(asked), 1 + 2 + 2)  # the state, the 2 minutes and two files more
+
+    def test_the_window_is_that_of_the_globe(self) -> None:
+        source = (SCRIPT.parent.parent / "src" / "globe" / "replication.js").read_text(encoding="utf-8")
+        self.assertIn(f"WINDOW_MINUTES = {self.tool.WINDOW_MINUTES};", source)
+        self.assertIn(f"MAX_EDITS = {self.tool.MAX_EDITS};", source)
+        self.assertEqual(self.tool.WINDOW_MINUTES, 20)
 
     def test_without_network_the_file_says_why(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

@@ -1,0 +1,138 @@
+/* The banner of the stage site (docs/_includes/preview-banner.html), at the top and at the
+   bottom of every page, loaded only by a build with JEKYLL_ENV=stage: a strip striped as
+   caution tape, in the orange of the globe (src/globe/main.js) and a dark grey, with its text
+   on a solid label (contrast 9:1 and more, WCAG 2.2, success criterion 1.4.3). */
+.preview-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem 1rem;
+  background: repeating-linear-gradient(-45deg, #ffa94d 0 0.75rem, #202020 0.75rem 1.5rem);
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.preview-banner p {
+  margin: 0;
+  padding: 0.15rem 0.75rem;
+  border-radius: 0.25rem;
+  background: #202020;
+  color: #eee;
+  text-align: center;
+}
+
+.preview-banner strong {
+  color: #ffa94d;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* The link to the production site, in the blue of the links of the content. */
+.preview-banner a {
+  color: #9cd3ff;
+}
+
+.preview-banner a:focus-visible {
+  outline: 2px solid #9ccc65;
+  outline-offset: 2px;
+}
+
+/* The page is at least as high as the window, and the content takes what the sidebar and the
+   banners leave: the bottom banner stays at the bottom of the window on a short page, and
+   after the content on a long one. */
+.preview body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100svh;
+}
+
+.preview .content {
+  flex: 1 0 auto;
+}
+
+/* On narrow screens the content is centred by auto margins (Poole), which in a column of flex
+   would make it as narrow as its text: it keeps the whole width, as in a block. */
+@media (max-width: 47.99em) {
+  .preview .content {
+    width: 100%;
+  }
+
+  /* Two lines on a phone 390 pixels wide: the label, then the second sentence. */
+  .preview-banner {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.65rem;
+  }
+
+  .preview-banner p {
+    padding: 0.15rem 0.5rem;
+  }
+}
+
+/* On wide screens the sidebar is fixed (Hyde): each banner keeps one line of a known height and
+   stays at its edge of the window while the content scrolls, and the sidebar fits between
+   them. The globe (assets/css/globe.css) and the logo of the sidebar
+   (assets/css/theplanet.css) leave room for both, --preview-height. On narrow screens the top
+   banner scrolls away with the row of the sidebar, and the bottom one ends the page. */
+@media (min-width: 48em) {
+  .preview {
+    --preview-banner-height: 2rem;
+    --preview-height: calc(2 * var(--preview-banner-height));
+  }
+
+  .preview-banner {
+    z-index: 10;
+    height: var(--preview-banner-height);
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .preview-banner--top {
+    position: sticky;
+    top: 0;
+  }
+
+  .preview-banner--bottom {
+    position: sticky;
+    bottom: 0;
+  }
+
+  .preview-banner p {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .preview .sidebar {
+    top: var(--preview-banner-height);
+    bottom: var(--preview-banner-height);
+  }
+
+  /* The home page and the page of the globe fit the window (assets/css/theplanet.css): the
+     banners take the room of their padding, 1rem above and 1rem below. */
+  .preview .home .content,
+  .preview .globe-page .content {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+/* Windows less than 800 pixels high: thinner banners. The sidebar of the production site
+   fits from about 720 pixels of height, and the text of the page of the globe has 11 pixels
+   left at 1024x768: two banners of 22 pixels keep both in a window of 1024x768. */
+@media (min-width: 48em) and (max-height: 799.98px) {
+  .preview {
+    --preview-banner-height: 22px;
+  }
+
+  .preview-banner {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .preview-banner p {
+    padding-top: 1px;
+    padding-bottom: 1px;
+  }
+}
