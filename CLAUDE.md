@@ -21,16 +21,17 @@ The site is a Jekyll site in `docs/`, the 2024 prototype folded in on 2026-11-23
 branches `glob_coverage` and `hyde_theme` (opened in this order, then deleted). Its home page
 shows a 3D globe (`src/globe/`, three.js bundled by esbuild), which replaced the Leaflet map
 of the prototype on 2026-11-23, with the latest edits to OpenStreetMap as orange spikes and
-arcs (issue #1, Section 2): those of the build first, then those the browser reads once a
-minute while the globe is shown. `/globe/` explains it and credits the work it builds on. In production a Worker
-(`wrangler.jsonc`, `worker/`) serves the site and reads the edits once for every visitor. `npm run build` builds it into `build/pages/`,
-`npm run serve` previews it. Two environments, decided by the
-owner on 2026-11-23 following issue #2:
+arcs (issue #1, Section 2): those of the build first, then those the browser reads every 19
+minutes while the globe is shown. `/globe/` explains it and credits the work it builds on.
+In production a Worker (`wrangler.jsonc`, `worker/`) serves the site and reads the edits
+once for every visitor. `npm run build` builds it into `build/pages/`, `npm run serve`
+previews it. Two environments, decided by the owner on 2026-11-23 following issue #2, both
+live since 2026-11-25:
 
 | Environment | Branch | Where | How | State |
 |---|---|---|---|---|
-| Stage | `stage` | `https://theplanet.wtf/`, GitHub Pages of this repository | `.github/workflows/stage.yml` on every push to `stage` | DNS broken (issue #6) |
-| Production | `master` | `https://theplanet.observer/`, a Cloudflare Worker serving `build/pages/` as static assets | `.github/workflows/production.yml`, called by `release.yml` after every release, once `DEPLOY_PRODUCTION` is `true` (issue #2) | token, secrets and custom domain to set up (issues #6, #7) |
+| Stage | `stage` | `https://theplanet.wtf/`, GitHub Pages of this repository | `.github/workflows/stage.yml` on every push to `stage` | live since 2026-11-25 (#14) |
+| Production | `master` | `https://theplanet.observer/`, a Cloudflare Worker serving `build/pages/` as static assets | `.github/workflows/production.yml`, called by `release.yml` after every release while the repository variable `DEPLOY_PRODUCTION` is `true` | live since `v0.2.0`, 2026-11-25 (#24, issue #2) |
 
 What the site shows and how it links the other repositories of the organization are decided
 by the owner, request by request.
@@ -108,7 +109,9 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   vedere il deploy automatico funzionare sui due domini": once the owner has finished issues
   #6, #7 and #2 and says so, Claude squash-merges #11, then #14, merges each target back down
   the chain, and deletes the merged branches of work (`globe`, `mascot`, `cleanup`, `home`).
-  Until then they stay open.
+  Done on 2026-11-25, after "va bene il globo in produzione, procedi pure": #11 (`v0.1.0`),
+  #14 and #24 (`v0.2.0`, the globe in production) squash-merged and merged back, the
+  branches of work deleted; only `dev`, `stage` and `master` are left (issue #2).
 - 2026-11-24, on the issue of thegame for the easter egg of the mascot: "ricordami di aprirla
   fino a che non ricreiamo il devcontainer": every recap reminds it, until a Codespace created
   after the change of the devcontainer can open it. On the other files of Meshy: "per adesso
@@ -429,6 +432,8 @@ harness) comes from thebox, which is versioned and released like any other repos
   2026-11-24, with the access authorized: GitHub applies changed permissions to new
   Codespaces only, "even if you rebuild the codespace"
   ([GitHub documentation](https://docs.github.com/en/codespaces/managing-your-codespaces/managing-repository-access-for-your-codespaces)).
+  The Codespace created on 2026-11-25 has it: a request without a title to the issues of
+  thegame answered HTTP 422 ("title wasn't supplied"), not 403, and created nothing.
 - **Git LFS hooks**: Codespaces writes Git LFS hooks in `.git/hooks` that abort every push when
   `git-lfs` is not installed; `core.hooksPath .githooks` makes git ignore them.
 - **Python interpreter in VS Code**: `.vscode/settings.json` does not set
@@ -501,22 +506,25 @@ harness) comes from thebox, which is versioned and released like any other repos
   needs. If it is missing, the MCP tool `browser_install` installs it.
 
 - **GitHub Pages** (GitHub API, `GET /repos/theplanet-earth/thesite/pages` and
-  `.../environments/github-pages`, 2026-11-23): build type *GitHub Actions*, custom domain
-  `theplanet.wtf`, the stage site. The `github-pages` environment accepts deployments from
-  `stage` only (set by the owner on 2026-11-23, issue #7). The last deployment came from
-  `hyde_theme` (commit `ec8acac`, now in the history of `dev`) on 2024-03-27.
-- **The stage domain does not reach the site** (checked on 2026-11-23): `https://theplanet.wtf/`
-  answers HTTP 403 from Cloudflare with the page "DNS points to prohibited IP"
-  ([Cloudflare Error 1000](https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1000/)),
-  while `https://theplanet-earth.github.io/thesite/` answers 301 to `https://theplanet.wtf/`:
-  GitHub Pages works, the DNS records on Cloudflare do not (issue #6).
-  `theplanet.observer` has no A, AAAA or CNAME record yet.
+  `.../environments/github-pages`, 2026-11-23 and 2026-11-25): build type *GitHub Actions*,
+  custom domain `theplanet.wtf`, the stage site, HTTPS enforced. The `github-pages`
+  environment accepts deployments from `stage` only (set by the owner on 2026-11-23, issue
+  #7); since 2026-11-25 every push to `stage` deploys it.
+- **Both domains reach the site** (checked on 2026-11-25, issues #2 and #6, closed):
+  `https://theplanet.wtf/` answers 200 from GitHub Pages, and
+  `https://theplanet-earth.github.io/thesite/` 301 to it; `https://theplanet.observer/`
+  answers 200 from the Worker `thesite`, whose custom domain created its DNS records and its
+  certificate at the first deploy (`v0.2.0`), and `/api/osm-edits.json` 200. Until then the
+  stage domain answered Cloudflare's "DNS points to prohibited IP"
+  ([Error 1000](https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1000/)).
+  The email records against spoofing of `theplanet.observer` (already on `theplanet.wtf`)
+  were deferred by the owner until the first deploy: they are in issue #3, not set yet.
 - **The yearly rebuild** (`.github/workflows/new-year.yml`, 2026-11-25): GitHub runs a
-  schedule only from the default branch, so it works once the file reaches `master` (the
-  first release after it); the run then has the ref of `master`, and the environment
+  schedule only from the default branch, so it works since the file reached `master` with
+  `v0.2.0` (*New year* is active); the run then has the ref of `master`, and the environment
   `github-pages` accepts `stage` only, so it starts `stage.yml` on `stage` by
   `workflow_dispatch`, which the `GITHUB_TOKEN` may trigger; it starts `production.yml` on
-  `master` too, which deploys only once `DEPLOY_PRODUCTION` is `true`. In a public repository
+  `master` too, which deploys only while `DEPLOY_PRODUCTION` is `true`. In a public repository
   GitHub disables a schedule after 60 days without activity: after a quiet autumn, check in
   *Actions* that *New year* is enabled, or run it by hand on 1 January
   ([GitHub Docs](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)).
@@ -533,43 +541,41 @@ harness) comes from thebox, which is versioned and released like any other repos
   the click towards `https://enjoy.theplanet.wtf`, a name with no DNS record, gone with the
   map; the demo text of Hyde; the title of the pages and the links, of low contrast on the
   dark grey; the fonts over `http`; `maximum-scale=1`, which stopped zooming on phones.
-- **Merge settings of the repository** (GitHub API, 2026-11-23): squash, merge commits and
-  rebase all allowed; squash title `COMMIT_OR_PR_TITLE` and message `COMMIT_MESSAGES`.
-  `CONTRIBUTING.md` (thebox v0.1.2) expects the pull request title as subject, no list of
-  commits, and rebase off; no ruleset exists. Owner steps in issue #7.
+- **Merge settings of the repository** (GitHub API, 2026-11-25, issue #7, closed): squash
+  and merge commits allowed, rebase off; squash title `PR_TITLE` and message `BLANK`, as
+  `CONTRIBUTING.md` expects. No ruleset exists yet (issue #25).
+- **The labels** `release:major`, `release:minor` and `release:patch`, read by `ci.yml` and
+  `release.yml`, exist since 2026-11-25 (issue #26, closed); none is on a pull request.
 
 Open points:
 
-- [ ] Owner: the Cloudflare side of both environments, issue #6; the GitHub side, issue #7.
-- [ ] Production deploy (issue #2): the Worker `thesite` (`wrangler.jsonc`, `worker/`,
-  checked locally) and its deploy (`production.yml`, called by `release.yml`, 2026-11-25) are
-  ready. Owner: the token and the Account ID (#6); the environment `production`, limited to
-  `master`, with the secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` (#7, step
-  5); then the repository variable `DEPLOY_PRODUCTION` = `true`; the first deploy creates
-  the Worker and its custom domain
-  ([Workers static assets](https://developers.cloudflare.com/workers/static-assets/),
-  [GitHub Actions](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/)).
+- [ ] Owner: the ruleset `chain` on `stage` and `master` (issue #25), which needs admin
+  rights.
+- [ ] Owner: the email records against spoofing of `theplanet.observer`, due now that the
+  Worker is deployed, and the rest of the hardening of the Cloudflare zones (issue #3).
+- [ ] With the owner (issue #2, observation of 2026-11-25): on first load the caption counts
+  the edits of the build (52 in production, 68 on stage), read from the last 4 minutes of the
+  replication, while `/api/osm-edits.json` serves 120; on 2026-11-24 the owner asked for
+  "about as many as the build keeps (113 to 120)".
 - [ ] Older issues to plan with the owner: #1 (coverage map: colours from an API,
-  click to explore), #3 (hardening of the Cloudflare zones), #4 (security audit with the skill,
-  profile `quick`, findings only as private advisories).
-- [ ] The labels `release:major`, `release:minor` and `release:patch`, read by `ci.yml` and
-  `release.yml`, do not exist in the repository yet; create them when one is needed.
-- [ ] Owner: the merge settings and the ruleset of the repository (issue #7), so that the
-  squash along the chain takes the pull request title and no list of commits.
-- [ ] The globe on the home of the stage site (Section 2): merged into `dev` by #9,
-  with the latest edits to OpenStreetMap as orange spikes and arcs. Issue #1 stays open for
-  what it asked first: the colours of the coverage from an API not defined yet, and the
-  click towards `explore.<domain>`, a site that does not exist yet.
+  click to explore), #4 (security audit with the skill, profile `quick`, findings only as
+  private advisories), #18 (a section of the site with a Leaflet map).
+- [ ] The globe on the home of both sites (Section 2), released in `v0.2.0`. Issue #1 stays
+  open for what it asked first: the colours of the coverage from an API not defined yet, and
+  the click towards `explore.<domain>`, a site that does not exist yet.
 - [ ] The mascot from Meshy (Section 2): kept in `media/mascot/` for thegame. Owner: whether to
   keep the other files of `build/meshy/2026-11-24/` (the running clip, the rigged model), and
-  whether thegame wants it: an issue there needs a Codespace created after 2026-11-24.
+  whether thegame wants it: the issue there is still to open. The Codespace created on
+  2026-11-25 may open it (a request without a title to the issues of thegame answered 422,
+  not 403).
 - [ ] The license of every repository (owner, 2026-11-23): thesite decided on 2026-11-25
-  (Section 2, issue #10). The same issue, "Change the license: candidate licenses
-  compared", is still to be opened in the other 15 repositories of the organization from a
-  Codespace created after 2026-11-24; then the issue of thebox, which holds the overview,
-  links them all and #10 links it. The script and the texts are kept in a private artifact
-  of the owner, "License Issues Kit" (https://claude.ai/artifact/XMVTBxhuJ8Zkizv2DELHtH,
-  files under `kit/`). Then the owner decides, repository by repository.
+  (Section 2) and released it in `v0.2.0` (issue #10, closed). The same issue, "Change the
+  license: candidate licenses compared", is still to be opened in the other 15 repositories
+  of the organization, which the Codespace created on 2026-11-25 may do; then the issue of
+  thebox, which holds the overview, links them all and a comment on #10 links it. The
+  script and the texts are kept in a private artifact of the owner, "License Issues Kit"
+  (https://claude.ai/artifact/XMVTBxhuJ8Zkizv2DELHtH, files under `kit/`). Then the owner
+  decides, repository by repository.
 - [ ] The logo (owner, 2026-11-25, "segnati queste due cose per ricordarmele"): it was
   generated with an AI tool, so its protection as a work rests on the human part of it.
   Issue #19: its provenance is in `media/README.md` since 2026-11-25 (ChatGPT with DALL-E;

@@ -21,7 +21,7 @@
 > ([CONTRIBUTING.md](CONTRIBUTING.md#branches-and-pull-requests)). The rules of
 > [CLAUDE.md](CLAUDE.md) also forbid an assistant to push to `stage` or `master` of this
 > repository, to merge into them or to force-push; the token of this repository does not,
-> and no ruleset protects its branches yet (issue #7): those rules are the only guard here.
+> and no ruleset protects its branches yet (issue #25): those rules are the only guard here.
 >
 > The Codespace also: enables the git hooks of `.githooks/` (the confidentiality guard),
 > installs the npm, Python and Ruby dependencies, the Chromium of the Playwright MCP server
@@ -38,7 +38,7 @@ The project site of the GitHub organization **theplanet-earth**.
 | Environment | Branch | Address | Published by |
 |---|---|---|---|
 | Stage | `stage` | <https://theplanet.wtf/> | `.github/workflows/stage.yml`, on GitHub Pages, at every merge into `stage` |
-| Production | `master` | <https://theplanet.observer/> | A Cloudflare Worker with static assets (`wrangler.jsonc`, `worker/`), deployed by `.github/workflows/production.yml` after every release of `master`, once the owner sets the variable `DEPLOY_PRODUCTION` (issues #2, #6, #7) |
+| Production | `master` | <https://theplanet.observer/> | A Cloudflare Worker with static assets (`wrangler.jsonc`, `worker/`), deployed by `.github/workflows/production.yml` after every release of `master`, while the repository variable `DEPLOY_PRODUCTION` is `true` |
 
 Work happens on `dev`; `dev` goes into `stage`, and `stage` into `master`, by pull requests
 that the owner squash-merges, each followed by a merge back down the chain
@@ -48,14 +48,13 @@ that the owner squash-merges, each followed by a merge back down the chain
 
 - The site is Jekyll in `docs/` (the Hyde theme on Poole), grown from the 2024 prototype of
   the branches `glob_coverage` and `hyde_theme`. Released first as that prototype with its
-  Leaflet map (`v0.1.0`, pull request #11); on `dev`, and next on stage, its home page is a
-  3D globe with the latest edits to OpenStreetMap, kept current by the browser, explained on
-  `/globe/` (`CLAUDE.md`, Section 2), and the demo text of the theme is gone.
+  Leaflet map (`v0.1.0`, pull request #11); since `v0.2.0` (pull request #24) its home page
+  is a 3D globe with the latest edits to OpenStreetMap, kept current by the browser,
+  explained on `/globe/` (`CLAUDE.md`, Section 2), and the demo text of the theme is gone.
 - The mascot of the logo in 3D is kept in [`media/mascot/`](media/mascot/README.md), not used
   by the site.
-- On 2026-11-23 neither address reaches the site: `theplanet.wtf` answers with a Cloudflare
-  error, "DNS points to prohibited IP", and `theplanet.observer` has no DNS record yet. The
-  steps for the owner are in issues #6 (Cloudflare) and #7 (GitHub).
+- Since 2026-11-25 both addresses serve the site, each deployed by its workflow (issues #2,
+  #6 and #7, closed).
 
 ## Getting started
 

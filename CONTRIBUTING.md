@@ -52,8 +52,8 @@ call the shell scripts in `scripts/`, so they also run without npm.
 - Three branches, the rule of the organization (issue #5): work happens on **`dev`**; `dev`
   goes into **`stage`** by a pull request, whose merge deploys the stage site
   (`.github/workflows/stage.yml`, `theplanet.wtf`); `stage` goes into **`master`**, the main
-  branch, by a pull request, whose merge publishes a release (and, once issue #2 is done, the
-  production site at `theplanet.observer`).
+  branch, by a pull request, whose merge publishes a release and deploys the production site
+  (`.github/workflows/production.yml`, `theplanet.observer`).
 - Nobody pushes to `stage` or `master`: every change reaches them through a pull request, and
   the **owner of the repository merges** it. The only push outside a pull request is the merge
   back of `master` into `stage` (below).
@@ -80,8 +80,8 @@ call the shell scripts in `scripts/`, so they also run without npm.
   merges picks the method on the merge button: *Squash and merge* along the chain, *Create a
   merge commit* into `dev`. The settings of the repository that go with it (*Settings,
   General, Pull Requests*: keep merge commits and squash merging, *Default to pull request
-  title* for the squash, rebase merging off) and the ruleset on `stage` and `master` are
-  steps of issue #7
+  title* for the squash, rebase merging off) are set (issue #7); the ruleset on `stage` and
+  `master` is issue #25
   ([GitHub documentation](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/configuring-commit-squashing-for-pull-requests)).
 - Every pull request to `stage` or `master` runs **CI** (`.github/workflows/ci.yml`): checks and
   build. Its job summary shows the version and the release notes that merging into `master`
