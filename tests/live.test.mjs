@@ -7,10 +7,14 @@ import { gzipSync } from 'node:zlib';
 import { ENDPOINT, readReplication, readWorker, liveEdits } from '../src/globe/live.js';
 import { REFRESH_SECONDS, editsResponse } from '../worker/edits.js';
 import worker from '../worker/index.js';
-import { REPLICATION, TARGET_EDITS, pathOf } from '../src/globe/replication.js';
+import { REPLICATION, WINDOW_FILES, WINDOW_MINUTES, pathOf } from '../src/globe/replication.js';
 
-// A replication whose latest file is `latest`; each file holds `perFile` closed changesets.
-function replication(latest, perFile = 40) {
+// A replication whose latest file is `latest`; file n holds `perFile` changesets closed in the
+// minute n (counted from the start of 2026-11-24), and the replication last ran a minute after
+// the latest. The window of 20 minutes then holds the files latest - 19 to latest.
+const PER_FILE = 40;
+const IN_WINDOW = WINDOW_MINUTES * PER_FILE;
+function replication(latest, perFile = PER_FILE) {
   const asked = [];
   const file = (n) => {
     const changesets = Array.from({ length: perFile }, (_, i) => {
@@ -22,7 +26,10 @@ function replication(latest, perFile = 40) {
   };
   const fetchImpl = async (url, options = {}) => {
     asked.push({ url, headers: options.headers });
-    if (url === `${REPLICATION}state.yaml`) return new Response(`---\nlast_run: 2026-11-24 22:00:00.0 +00:00\nsequence: ${latest}\n`);
+    if (url === `${REPLICATION}state.yaml`) {
+      const run = new Date(Date.UTC(2026, 10, 24) + (latest + 1) * 60000).toISOString().replace('T', ' ').replace('.000Z', '.0 +00:00');
+      return new Response(`---\nlast_run: ${run}\nsequence: ${latest}\n`);
+    }
     const n = Number(url.replace(REPLICATION, '').replace('.osm.gz', '').replaceAll('/', ''));
     if (url.startsWith(REPLICATION) && n <= latest && url === REPLICATION + pathOf(n)) return new Response(file(n));
     return new Response('not found', { status: 404, headers: { 'content-type': 'text/html' } });
@@ -30,14 +37,14 @@ function replication(latest, perFile = 40) {
   return { fetchImpl, asked };
 }
 
-test('readReplication reads backwards from the latest file until enough edits', async () => {
+test('readReplication reads the files of the window and keeps its edits', async () => {
   const { fetchImpl, asked } = replication(1000);
   const read = await readReplication(fetchImpl);
   assert.equal(read.changed, true);
   assert.equal(read.sequence, 1000);
-  assert.equal(read.edits.length, TARGET_EDITS);
-  assert.equal(read.asOf.toISOString(), '2026-11-24T22:00:00.000Z');
-  assert.equal(asked.length, 1 + 3); // the state, then 3 files of 40 edits
+  assert.equal(read.edits.length, IN_WINDOW); // 20 files of 40 edits; the 2 older files fall outside
+  assert.equal(read.asOf.toISOString(), new Date(Date.UTC(2026, 10, 24) + 1001 * 60000).toISOString());
+  assert.equal(asked.length, 1 + WINDOW_FILES); // the state, then the files of the window and two more
   assert.ok(read.edits.every((e, i, all) => i === 0 || all[i - 1].closed <= e.closed));
 });
 
@@ -46,7 +53,7 @@ test('readReplication reads only the new files, and nothing when there is none',
   const first = await readReplication(replication(1000).fetchImpl);
   const next = await readReplication(fetchImpl, { edits: first.edits, last: 1000 });
   assert.deepEqual(asked.map((a) => a.url.replace(REPLICATION, '')), ['state.yaml', pathOf(1001), pathOf(1002)]);
-  assert.equal(next.edits.length, TARGET_EDITS);
+  assert.equal(next.edits.length, IN_WINDOW); // the window moved on by two minutes
   assert.ok(next.edits.at(-1).closed > first.edits.at(-1).closed);
   const same = await readReplication(replication(1002).fetchImpl, { edits: next.edits, last: 1002 });
   assert.equal(same.changed, false);
@@ -93,7 +100,7 @@ test('liveEdits falls back to the replication where there is no Worker, and stay
   await live.refresh();
   await live.refresh();
   assert.equal(asked.filter((url) => url === ENDPOINT).length, 1);
-  assert.equal(updates[0][0].length, TARGET_EDITS);
+  assert.equal(updates[0][0].length, IN_WINDOW);
   assert.equal(updates[1][2], false);
 });
 
@@ -122,7 +129,7 @@ test('the Worker reads the replication once per 19 minutes, and serves its copy 
   assert.equal(first.status, 200);
   assert.equal(first.headers.get('cache-control'), 'no-cache');
   const body = await first.json();
-  assert.equal(body.edits.length, TARGET_EDITS);
+  assert.equal(body.edits.length, IN_WINDOW);
   assert.equal(body.attribution, '© OpenStreetMap contributors');
   assert.ok(!JSON.stringify(body).includes('"user"'));
   assert.ok(asked.every((a) => a.headers['User-Agent'].startsWith('thesite-worker/')));
