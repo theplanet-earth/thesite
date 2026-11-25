@@ -129,6 +129,8 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   minuti precedenti": the build, the browser and the Worker keep the edits closed in the 20
   minutes before the replication last ran (`WINDOW_MINUTES` of `src/globe/replication.js`,
   the same in `scripts/osm-activity.py`); the caption shows their number, not the window.
+  The same day, of `/globe/`: "lui può anche menzionarlo [...] dei 20 minuti intendo": the
+  page that explains the globe names the window, the caption under the globe does not.
 - 2026-11-24, on the edits read by every browser: "fallo, magari non ogni minuto, ma ogni 19
   minuti": the Worker of production reads the replication at most every 19 minutes per data
   centre and serves that copy to every visitor (`/api/osm-edits.json`); the browser asks
@@ -478,7 +480,7 @@ harness) comes from thebox, which is versioned and released like any other repos
   The window is the same everywhere (owner, 2026-11-25): the edits closed in the 20 minutes
   before the replication last ran, read from the files of 22 minutes (a changeset appears in
   the file of a minute or two after it closes), about 5 KB each; their number follows how busy
-  the map is, and the caption shows it, never the window. A build reads them once. Then,
+  the map is, and the caption shows it, never the window; `/globe/` names the window. A build reads them once. Then,
   every 19 minutes while the globe is shown and the tab visible, the browser asks
   `/api/osm-edits.json`: in production the Worker answers from the cache of Cloudflare, and
   reads the replication itself (22 files) at most every 19 minutes per data centre; where
