@@ -9,12 +9,15 @@
 // Data (c) OpenStreetMap contributors, ODbL 1.0 (https://www.openstreetmap.org/copyright).
 
 export const REPLICATION = 'https://planet.openstreetmap.org/replication/changesets/';
-// About as many edits as the snapshot of the build keeps: the latest ones, whatever the
-// number of minutes they take (fewer minutes when the map is busy).
-export const TARGET_EDITS = 120;
-// The most files read at once: when the shown edits are older than this many minutes, the
-// globe starts again from the latest file and reads backwards until TARGET_EDITS.
-export const MAX_FILES = 10;
+// The window of the globe, the same for the build, the browser and the Worker: the edits closed
+// in the WINDOW_MINUTES before the replication last ran (the owner, 2026-11-25: 20 minutes, "per
+// adesso"). Their number follows how busy the map is; the caption shows it, not the window.
+export const WINDOW_MINUTES = 20;
+// The files that hold them: one a minute, and two more, since a changeset appears in the file of
+// a minute or two after it closes (seen on 2026-11-24).
+export const WINDOW_FILES = WINDOW_MINUTES + 2;
+// A bound for a burst, such as a large import: beyond it, the oldest edits are left out.
+export const MAX_EDITS = 3000;
 // A changeset whose box spans more than this many degrees is left out: its centre says
 // nothing of where the edit is.
 const MAX_SPAN = 1;
@@ -60,9 +63,15 @@ export function parseChangesets(xml) {
 }
 
 /** The edits of `current` and `incoming` together, each once, oldest first, the latest `limit`. */
-export function mergeEdits(current, incoming, limit = TARGET_EDITS) {
+export function mergeEdits(current, incoming, limit = MAX_EDITS) {
   const byKey = new Map();
   for (const edit of [...current, ...incoming]) byKey.set(`${edit.closed}|${edit.lat}|${edit.lon}|${edit.changes}`, edit);
   const edits = [...byKey.values()].sort((a, b) => (a.closed < b.closed ? -1 : a.closed > b.closed ? 1 : 0));
   return Number.isFinite(limit) ? edits.slice(-limit) : edits;
+}
+
+/** The edits closed in the `minutes` before `asOf` (a Date), the window of the globe. */
+export function inWindow(edits, asOf, minutes = WINDOW_MINUTES) {
+  const from = asOf.getTime() - minutes * 60 * 1000;
+  return edits.filter((edit) => Date.parse(edit.closed) >= from);
 }

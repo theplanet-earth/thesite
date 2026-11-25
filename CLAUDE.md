@@ -123,6 +123,12 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   guidelines require; About is left to the project; a GitHub icon instead of "Source on
   GitHub"; and the edits of OpenStreetMap "in tempo reale [...] a quando sta visualizzando
   l'utente e non a build time", about as many as the build keeps (113 to 120).
+- 2026-11-25, asked why the caption always said 120: option A, "finestra di tempo fissa, numero
+  che varia", "come finestra di tempo per adesso fai 20 minuti [...] ma non dire nel messaggio
+  che sono negli ultimi 20 minuti [...] allinea anche in fase di build il lasso temporale a 20
+  minuti precedenti": the build, the browser and the Worker keep the edits closed in the 20
+  minutes before the replication last ran (`WINDOW_MINUTES` of `src/globe/replication.js`,
+  the same in `scripts/osm-activity.py`); the caption shows their number, not the window.
 - 2026-11-24, on the edits read by every browser: "fallo, magari non ogni minuto, ma ogni 19
   minuti": the Worker of production reads the replication at most every 19 minutes per data
   centre and serves that copy to every visitor (`/api/osm-edits.json`); the browser asks
@@ -381,7 +387,7 @@ The rules are in `CONTRIBUTING.md`, *Confidentiality*. In addition:
 | Jekyll | 4.3.3, with the gems of `docs/Gemfile.lock` (Bundler 2.5.6) | `docs/` |
 | Mascot | Meshy Image to 3D, `ai_model: latest` (Meshy 7.1 in 2026-11), then rigging; tasks and parameters in `media/mascot/provenance.json`, 2026-11-24, 35 credits | `scripts/meshy.py` |
 | three.js | 0.187.0 (MIT), bundled by esbuild 0.28.2 (MIT); exact versions in `package.json` | `package.json`, `package-lock.json` |
-| OpenStreetMap edits | the minutely replication of changesets, `https://planet.openstreetmap.org/replication/changesets/` (redirects to a mirror on S3): the last 4 files, at most 120 edits, at every build; then, every 19 minutes, the Worker of production for every visitor, or the browser where there is no Worker: the latest 120 edits (backwards from the latest file, at most 10 files) | `scripts/osm-activity.py`, `src/globe/live.js`, `worker/edits.js` |
+| OpenStreetMap edits | the minutely replication of changesets, `https://planet.openstreetmap.org/replication/changesets/` (redirects to a mirror on S3): the edits closed in the 20 minutes before its last run (`WINDOW_MINUTES`), read from the files of 22 minutes, at most 3000: at every build, then every 19 minutes the Worker of production for every visitor, or the browser where there is no Worker (only the files not read yet) | `scripts/osm-activity.py`, `src/globe/live.js`, `worker/edits.js` |
 | wrangler | 4.168.0, through `npx` (not a dependency of the site); `compatibility_date` 2026-11-24 | `scripts/worker.sh`, `wrangler.jsonc` |
 | Natural Earth | v5.1.2, 1:50m land (public domain), the source of `docs/assets/globe/land.png` | `scripts/land-mask.py` |
 | Plugin `ui-ux-pro-max` | v2.15.0 of `nextlevelbuilder/ui-ux-pro-max-skill` (MIT; its manifest at that tag says 2.13.0) | `.claude/settings.json` |
@@ -469,12 +475,15 @@ harness) comes from thebox, which is versioned and released like any other repos
 - **The edits of OpenStreetMap** come from the minutely replication of changesets, not
   from the API: the API is "provided in order to edit the map data, **not** for read-only
   purposes or projects" ([API usage policy](https://operations.osmfoundation.org/policies/api/)).
-  A build reads 5 files (about 20 KB): the state and the last 4 minutes. Then, every 19
-  minutes while the globe is shown and the tab visible, the browser asks
+  The window is the same everywhere (owner, 2026-11-25): the edits closed in the 20 minutes
+  before the replication last ran, read from the files of 22 minutes (a changeset appears in
+  the file of a minute or two after it closes), about 5 KB each; their number follows how busy
+  the map is, and the caption shows it, never the window. A build reads them once. Then,
+  every 19 minutes while the globe is shown and the tab visible, the browser asks
   `/api/osm-edits.json`: in production the Worker answers from the cache of Cloudflare, and
-  reads the replication itself (about 5 files) at most every 19 minutes per data centre;
-  where there is no Worker (the stage site on GitHub Pages, the preview), the browser reads
-  the replication directly, one file at a time. The server and its mirror on S3 answer
+  reads the replication itself (22 files) at most every 19 minutes per data centre; where
+  there is no Worker (the stage site on GitHub Pages, the preview), the browser reads the
+  files it has not read yet, one at a time. The server and its mirror on S3 answer
   `Access-Control-Allow-Origin: *` (checked on 2026-11-24). No user, comment or tag is kept,
   only the centre of each changeset rounded to 0.01 degree, its number of changes and its
   time; changesets spanning more than 1 degree are left out.
@@ -553,10 +562,6 @@ Open points:
   rights.
 - [ ] Owner: the email records against spoofing of `theplanet.observer`, due now that the
   Worker is deployed, and the rest of the hardening of the Cloudflare zones (issue #3).
-- [ ] With the owner (issue #2, observation of 2026-11-25): on first load the caption counts
-  the edits of the build (52 in production, 68 on stage), read from the last 4 minutes of the
-  replication, while `/api/osm-edits.json` serves 120; on 2026-11-24 the owner asked for
-  "about as many as the build keeps (113 to 120)".
 - [ ] Older issues to plan with the owner: #1 (coverage map: colours from an API,
   click to explore), #4 (security audit with the skill, profile `quick`, findings only as
   private advisories), #18 (a section of the site with a Leaflet map).
