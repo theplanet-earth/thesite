@@ -142,6 +142,10 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   texts of the pages are CC BY 4.0; the logo and the mascot are not licensed (`README.md`,
   *License*). The sidebar keeps one line, the notice, which links to that section;
   `author` in `docs/_config.yml` holds the name.
+- 2026-11-25, "fai 2024-2026 nella barra laterale [...] però aggiungi una action (schedulata)
+  che buildi per aggiornare la data all'inizio di ciascun anno, sennò rimane vecchia": the
+  notice reads "© 2024-<year of the build>", and `.github/workflows/new-year.yml` starts a
+  build of the published sites on 1 January (Section 12).
 
 Rules of the organization, carried over from thebox or from its issues (keep them unless the
 owner decides otherwise):
@@ -212,7 +216,7 @@ owner decides otherwise):
 | `.mcp.json` | Project MCP servers for Claude Code: Playwright |
 | `.claude/settings.json` | Project settings of Claude Code: the plugin marketplaces and plugins of the repository (Section 10) |
 | `.githooks/pre-commit` | Confidentiality guard, enabled by `post-create.sh` |
-| `.github/workflows/` | `ci.yml` (pull requests to `stage` and `master`), `stage.yml` (push to `stage`: the stage site on GitHub Pages), `release.yml` (merge on `master`) |
+| `.github/workflows/` | `ci.yml` (pull requests to `stage` and `master`), `stage.yml` (push to `stage`: the stage site on GitHub Pages), `release.yml` (merge on `master`), `new-year.yml` (1 January: starts `stage.yml` on `stage`, so that the year of the notice moves on) |
 | `.github/pull_request_template.md` | Checklist of every pull request |
 | `.github/copilot-instructions.md` | Points GitHub Copilot to these conventions |
 | `build/` | Every output (git-ignored): `build/release/`, `build/pages/` |
@@ -394,7 +398,7 @@ harness) comes from thebox, which is versioned and released like any other repos
   (and to propose to thebox where they are useful to every repository): the branch model
   `dev`, `stage`, `master` of issue #5, a rule of the whole organization (`ci.yml` triggers,
   `CONTRIBUTING.md`, *Branches and pull requests*, Sections 2 and 9 of this file); the
-  workflow `stage.yml`; the note on `PUBLISH_PAGES` in `release.yml`; the Ruby step of the
+  workflows `stage.yml` and `new-year.yml`; the note on `PUBLISH_PAGES` in `release.yml`; the Ruby step of the
   workflows; `scripts/serve.sh`, `scripts/install-skills.sh` and `.claude/settings.json`;
   the permissions of `devcontainer.json` on the organization, with the caution of
   `README.md`, `tests/test_devcontainer_permissions.py` and the paragraphs of
@@ -497,6 +501,15 @@ harness) comes from thebox, which is versioned and released like any other repos
   while `https://theplanet-earth.github.io/thesite/` answers 301 to `https://theplanet.wtf/`:
   GitHub Pages works, the DNS records on Cloudflare do not (issue #6).
   `theplanet.observer` has no A, AAAA or CNAME record yet.
+- **The yearly rebuild** (`.github/workflows/new-year.yml`, 2026-11-25): GitHub runs a
+  schedule only from the default branch, so it works once the file reaches `master` (the
+  first release after it); the run then has the ref of `master`, and the environment
+  `github-pages` accepts `stage` only, so it starts `stage.yml` on `stage` by
+  `workflow_dispatch`, which the `GITHUB_TOKEN` may trigger. Production is not rebuilt yet:
+  nothing deploys `master` until issue #2 (a `TODO` in the workflow). In a public repository
+  GitHub disables a schedule after 60 days without activity: after a quiet autumn, check in
+  *Actions* that *New year* is enabled, or run it by hand on 1 January
+  ([GitHub Docs](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)).
 - **`PUBLISH_PAGES` stays unset** in this repository: the GitHub Pages site here is the stage
   site, and `release.yml` would publish `master` on it.
 - **What the preview shows** (`npm run serve`, Playwright at 1280x800 and 390x844, and at
@@ -544,3 +557,9 @@ Open points:
   links them all and #10 links it. The script and the texts are kept in a private artifact
   of the owner, "License Issues Kit" (https://claude.ai/artifact/XMVTBxhuJ8Zkizv2DELHtH,
   files under `kit/`). Then the owner decides, repository by repository.
+- [ ] The logo (owner, 2026-11-25, "segnati queste due cose per ricordarmele"): it was
+  generated with an AI tool, so its protection as a work rests on the human part of it.
+  Issue #19: record its provenance (the tool, the date, the prompt, what was done by hand)
+  in `media/README.md`, once the owner says which tool it was. Issue #20: register the logo,
+  and possibly the name, as a trademark (UIBM or EUIPO), the owner's decision. Remind both
+  in the recaps until they are done.
