@@ -4,6 +4,11 @@
 # goes to a Cloudflare Worker at theplanet.observer (issue #2), never to this GitHub Pages
 # site: PUBLISH_PAGES stays unset in this repository.
 #
+# The build is for stage (JEKYLL_ENV=stage): every page shows the banner "Work in progress"
+# (docs/_includes/preview-banner.html), and the check of the built site makes sure of it
+# before the deploy. Production builds with JEKYLL_ENV=production and never shows it (the
+# owner, 2026-11-25).
+#
 # It replaces the 2024 workflow jekyll.yml of the branch hyde_theme (issue #5).
 name: Stage
 
@@ -25,6 +30,8 @@ jobs:
     # A manual run deploys stage only, whatever branch it is started from.
     if: github.ref == 'refs/heads/stage'
     runs-on: ubuntu-24.04
+    env:
+      JEKYLL_ENV: stage   # the banner of the stage site, on every page
     steps:
       - uses: actions/checkout@v7
         with:
@@ -50,6 +57,10 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # Links, resources, and the banner on every page (scripts/check-site.py).
+      - name: Site check
+        run: npm run check:site
 
       - uses: actions/upload-pages-artifact@v5
         with:

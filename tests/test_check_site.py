@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import importlib.util
+import os
 import subprocess
 import sys
 import tempfile
@@ -84,9 +85,49 @@ class CheckSiteTest(unittest.TestCase):
         self.assertEqual(self.tool.page_url(self.site, self.site / "about" / "index.html"), "/about/")
         self.assertEqual(self.tool.page_url(self.site, self.site / "404.html"), "/404.html")
 
+    def banner_page(self, name: str) -> None:
+        self.write(name, '<!DOCTYPE html>\n<html class="preview"><head></head><body>\n'
+                         '<aside class="preview-banner" aria-label="Preview" data-preview-banner>'
+                         '<p>Work in progress</p></aside>\n</body></html>\n')
+
+    def test_a_build_for_stage_has_the_banner_on_every_page(self) -> None:
+        self.banner_page("index.html")
+        self.banner_page("404.html")
+        self.page("about/index.html", "")
+        self.assertEqual(self.tool.preview_banner(self.site, "stage"),
+                         ["about/index.html (without the preview banner, JEKYLL_ENV=stage)"])
+        self.banner_page("about/index.html")
+        self.assertEqual(self.tool.preview_banner(self.site, "stage"), [])
+
+    def test_any_other_build_has_it_on_no_page(self) -> None:
+        self.page("index.html", "")
+        self.page("about/index.html", "")
+        self.assertEqual(self.tool.preview_banner(self.site, "production"), [])
+        self.assertEqual(self.tool.preview_banner(self.site, "development"), [])
+        self.banner_page("404.html")
+        self.assertEqual(self.tool.preview_banner(self.site, "production"),
+                         ["404.html (with the preview banner, JEKYLL_ENV=production)"])
+
+    def test_exit_status_follows_jekyll_env(self) -> None:
+        def run(environment: str | None) -> int:
+            env = {k: v for k, v in os.environ.items() if k != "JEKYLL_ENV"}
+            if environment is not None:
+                env["JEKYLL_ENV"] = environment
+            return subprocess.run([sys.executable, str(SCRIPT), str(self.site)],
+                                  env=env, capture_output=True, text=True).returncode
+
+        self.banner_page("index.html")
+        self.assertEqual(run("stage"), 0)
+        self.assertEqual(run(None), 1, "unset, JEKYLL_ENV means production, as in scripts/build.sh")
+        self.assertEqual(run("production"), 1)
+        self.page("index.html", "")
+        self.assertEqual(run(None), 0)
+        self.assertEqual(run("stage"), 1)
+
     def test_exit_status(self) -> None:
         def run(*args: str) -> int:
-            return subprocess.run([sys.executable, str(SCRIPT), *args], capture_output=True, text=True).returncode
+            env = {k: v for k, v in os.environ.items() if k != "JEKYLL_ENV"}
+            return subprocess.run([sys.executable, str(SCRIPT), *args], env=env, capture_output=True, text=True).returncode
 
         self.page("index.html", '<link rel="stylesheet" href="/public/css/theme.css">')
         self.assertEqual(run(str(self.site)), 0)

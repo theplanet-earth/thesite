@@ -2,8 +2,9 @@
 .globe {
   position: relative;
   /* As wide as the content, and short enough for the heading and the caption to fit in the
-     window with it, without scrolling (the owner, 2026-11-24). */
-  width: min(100%, 42rem, calc(100svh - 12rem));
+     window with it, without scrolling (the owner, 2026-11-24); on the stage site, with the
+     banner above them too (assets/css/preview.css). */
+  width: min(100%, 42rem, calc(100svh - 12rem - var(--preview-banner-height, 0rem)));
   aspect-ratio: 1;
   margin: 0 auto;
 }

@@ -1,0 +1,9 @@
+<!-- The banner of the stage site, https://theplanet.wtf/ (the owner, 2026-11-25): the layout
+     includes it only in a build with JEKYLL_ENV=stage, which .github/workflows/stage.yml runs at
+     every merge into stage; the production site, built with JEKYLL_ENV=production, never has
+     it. scripts/check-site.py finds it by data-preview-banner, on every page of the one and on
+     none of the other. Its style is assets/css/preview.css. It links the production site,
+     https://theplanet.observer/ (wrangler.jsonc). -->
+<aside class="preview-banner" aria-label="Preview" data-preview-banner>
+  <p><strong>Work in progress:</strong> this version of the site is only a preview of <a href="https://theplanet.observer/">theplanet.observer</a>.</p>
+</aside>

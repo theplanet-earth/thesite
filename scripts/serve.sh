@@ -2,7 +2,8 @@
 # Live preview of the site: Jekyll serves docs/ at http://localhost:4000 and rebuilds on every
 # change. The devcontainer forwards port 4000 (opened in the VS Code preview) and port 35729
 # (live reload, which reloads the page in VS Code desktop; in a browser, reload by hand).
-#   npm run serve
+#   npm run serve          the site as on dev (JEKYLL_ENV=development, Jekyll's default)
+#   npm run serve:stage    as the stage site (JEKYLL_ENV=stage), with its banner on every page
 . "$(dirname "$0")/lib.sh"
 
 need bundle "Ruby 3.3 and Bundler are needed: open the devcontainer, or install them (CONTRIBUTING.md, Getting started)."

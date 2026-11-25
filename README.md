@@ -37,7 +37,7 @@ The project site of the GitHub organization **theplanet-earth**.
 
 | Environment | Branch | Address | Published by |
 |---|---|---|---|
-| Stage | `stage` | <https://theplanet.wtf/> | `.github/workflows/stage.yml`, on GitHub Pages, at every merge into `stage` |
+| Stage | `stage` | <https://theplanet.wtf/> | `.github/workflows/stage.yml`, on GitHub Pages, at every merge into `stage`; every page carries the banner *Work in progress*, which says it is a preview |
 | Production | `master` | <https://theplanet.observer/> | A Cloudflare Worker with static assets (`wrangler.jsonc`, `worker/`), deployed by `.github/workflows/production.yml` after every release of `master`, while the repository variable `DEPLOY_PRODUCTION` is `true` |
 
 Work happens on `dev`; `dev` goes into `stage`, and `stage` into `master`, by pull requests
@@ -61,9 +61,10 @@ that the owner squash-merges, each followed by a merge back down the chain
 Open the repository in a **Codespace** or in the **devcontainer**, then:
 
 ```bash
-npm run serve    # preview at http://localhost:4000, rebuilt on every change
-npm run build    # every output in build/: the site in build/pages/
-npm run check    # tests, confidentiality, TEMPLATE markers: run it before every pull request
+npm run serve          # preview at http://localhost:4000, rebuilt on every change
+npm run serve:stage    # the same, as the stage site, with its banner on every page
+npm run build          # every output in build/: the site in build/pages/
+npm run check          # tests, confidentiality, TEMPLATE markers: run it before every pull request
 ```
 
 The preview is also the task *Preview: site (live reload)* (*Terminal, Run Task*). The

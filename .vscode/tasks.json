@@ -12,6 +12,14 @@
       "problemMatcher": []
     },
     {
+      "label": "Preview: site as stage (live reload)",
+      "detail": "The preview of npm run serve, built as the stage site, with its banner on every page (npm run serve:stage)",
+      "type": "npm",
+      "script": "serve:stage",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
       "label": "Build",
       "detail": "Every output in build/ (build/release/ for the release, build/pages/ for GitHub Pages)",
       "type": "npm",

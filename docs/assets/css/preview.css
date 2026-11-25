@@ -1,0 +1,77 @@
+/* The banner of the stage site (docs/_includes/preview-banner.html), loaded only by a build
+   with JEKYLL_ENV=stage: a strip striped as caution tape, in the orange of the globe
+   (src/globe/main.js) and a dark grey, with its text on a solid label (contrast 9:1 and
+   more, WCAG 2.2, success criterion 1.4.3). */
+.preview-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem 1rem;
+  background: repeating-linear-gradient(-45deg, #ffa94d 0 0.75rem, #202020 0.75rem 1.5rem);
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.preview-banner p {
+  margin: 0;
+  padding: 0.15rem 0.75rem;
+  border-radius: 0.25rem;
+  background: #202020;
+  color: #eee;
+  text-align: center;
+}
+
+.preview-banner strong {
+  color: #ffa94d;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* The link to the production site, in the blue of the links of the content. */
+.preview-banner a {
+  color: #9cd3ff;
+}
+
+.preview-banner a:focus-visible {
+  outline: 2px solid #9ccc65;
+  outline-offset: 2px;
+}
+
+/* On wide screens the sidebar is fixed (Hyde): the banner keeps one line of a known height,
+   stays at the top while the content scrolls, and the sidebar starts under it. The globe
+   (assets/css/globe.css) leaves room for it, so that the home page still fits the window. On
+   narrow screens it scrolls away with the row of the sidebar. */
+@media (min-width: 48em) {
+  .preview {
+    --preview-banner-height: 2rem;
+  }
+
+  .preview-banner {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    height: var(--preview-banner-height);
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .preview-banner p {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .preview .sidebar {
+    top: var(--preview-banner-height);
+  }
+
+  /* The home page and the page of the globe fit the window (assets/css/theplanet.css): the
+     banner takes the room of their padding, 1rem above and 1rem below, so that they keep the
+     height of the production site (the page of the globe had 11 pixels left at 1024x768). */
+  .preview .home .content,
+  .preview .globe-page .content {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}

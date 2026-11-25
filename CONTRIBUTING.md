@@ -33,6 +33,7 @@ call the shell scripts in `scripts/`, so they also run without npm.
 |---|---|
 | `npm run build` | Every output in `build/`: the files to attach to a release in `build/release/`, the site (Jekyll, from `docs/`, with the globe bundled from `src/` by esbuild) in `build/pages/` |
 | `npm run serve` | Preview of the site at `http://localhost:4000`, rebuilt on every change (task *Preview: site (live reload)*) |
+| `npm run serve:stage` | The same preview, built as the stage site (`JEKYLL_ENV=stage`), with its banner *Work in progress* on every page (task *Preview: site as stage (live reload)*) |
 | `npm test` | Unit tests (`scripts/test.sh`) |
 | `npm run check` | Tests, confidentiality, `TEMPLATE` markers and the checks of this repository: **run it before every pull request** |
 | `npm run check:confidential` | Confidentiality guard on every tracked file |
@@ -41,7 +42,7 @@ call the shell scripts in `scripts/`, so they also run without npm.
 | `npm run mascot:generate` | The mascot of the logo as a 3D model, by the API of Meshy, into `build/meshy/<date>/`: it spends credits of the organization and needs `MESHY_API_KEY` in the environment (`-- --dry-run` shows the requests only) |
 | `npm run globe:activity` | The latest edits to OpenStreetMap for the globe, into `docs/_data/activity.json` (also run by `npm run build` and `npm run serve`; without network, an empty list) |
 | `npm run worker:check` / `worker:dev` | The Worker of production (`wrangler.jsonc`, `worker/`): validate and bundle it without deploying, or serve the built site with it at `http://localhost:8787`; wrangler at the version of `scripts/worker.sh`, no account needed |
-| `npm run check:site` | Every local link and resource of the built site (`build/pages/`) exists; part of `npm run check` once the site is built, and a step of CI after its build |
+| `npm run check:site` | Every local link and resource of the built site (`build/pages/`) exists, and the banner of the stage site is on every page of a build for stage and on none of any other (by `JEKYLL_ENV`, production when unset); part of `npm run check` once the site is built, a step of CI after its build, and of each deploy |
 | `npm run setup:python` | `.venv/` from `requirements.txt`, when the repository has one |
 | `npm run version:current` / `version:next` / `release:notes` | Version of this build, of the next release, and the notes of the next release |
 | `npm run clean` | Remove `build/` |
@@ -53,7 +54,10 @@ call the shell scripts in `scripts/`, so they also run without npm.
   goes into **`stage`** by a pull request, whose merge deploys the stage site
   (`.github/workflows/stage.yml`, `theplanet.wtf`); `stage` goes into **`master`**, the main
   branch, by a pull request, whose merge publishes a release and deploys the production site
-  (`.github/workflows/production.yml`, `theplanet.observer`).
+  (`.github/workflows/production.yml`, `theplanet.observer`). The stage site is built with
+  `JEKYLL_ENV=stage`, so every page carries a banner that says it is a preview; the
+  production site is built with `JEKYLL_ENV=production`, without it. The code is the same on
+  the three branches: no merge adds or removes the banner.
 - Nobody pushes to `stage` or `master`: every change reaches them through a pull request, and
   the **owner of the repository merges** it. The only push outside a pull request is the merge
   back of `master` into `stage` (below).
