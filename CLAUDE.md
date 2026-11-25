@@ -515,7 +515,11 @@ harness) comes from thebox, which is versioned and released like any other repos
   HTTP 422 ("title wasn't supplied") in the public repositories (thesite, thegame,
   theaction, mixamo-in-playcanvas), HTTP 403 "Resource not accessible by integration" in the
   private ones (thebox, thestory, thejungle, thepipeline, thedeal). Issues in the private
-  repositories still need a Codespace **created**, not rebuilt, after the change.
+  repositories need a Codespace **created**, not rebuilt, after the change: confirmed on
+  2026-11-25 by a Codespace created after commit `94c6aa0` (its clone and `creation.log`
+  both start at 22:05 UTC that day, with a single creation of the container), whose token
+  answered HTTP 422 in thebox and opened the issues of the 12 private repositories (the
+  license of every repository, in the open points below).
 - **Git LFS hooks**: Codespaces writes Git LFS hooks in `.git/hooks` that abort every push when
   `git-lfs` is not installed; `core.hooksPath .githooks` makes git ignore them.
 - **Python interpreter in VS Code**: `.vscode/settings.json` does not set
@@ -704,14 +708,19 @@ Open points:
   walking, with the files, how to load them and their rights.
 - [ ] The license of every repository (owner, 2026-11-23): thesite decided on 2026-11-25
   (Section 2) and released it in `v0.2.0` (issue #10, closed). The same issue, "Change the
-  license: candidate licenses compared", is open since 2026-11-25 in the public
-  repositories (theaction#9, thegame#10, mixamo-in-playcanvas#3); the 12 private ones need
-  a Codespace created after 2026-11-24 (Section 12, access). Then the issue of thebox,
-  which holds the overview, links them all, the script turns the mention of thebox in the
-  issues opened before it into a link, and a comment on #10 links it. The
-  script and the texts are kept in a private artifact of the owner, "License Issues Kit"
-  (https://claude.ai/artifact/XMVTBxhuJ8Zkizv2DELHtH, files under `kit/`). Then the owner
-  decides, repository by repository.
+  license: candidate licenses compared", is open since 2026-11-25 in every other repository
+  of the organization: thebox#11, which holds the overview (a row and a link for every
+  issue) and the proposal of a common policy; the other private ones, thestory#7,
+  thejungle#6, thepipeline#7, thedashboard#14, thehumongous#9, theburden#7, theshort#5,
+  thedeal#11, theblend#3, theosm#12 and thepianist#8; the public ones, theaction#9,
+  thegame#10 and mixamo-in-playcanvas#3. Every issue of the series, #10 included, links the
+  issue of thebox, and a comment on #10 links it too. Before the 12 private ones were
+  opened, the facts their texts give (the license of each branch, the branches of work, the
+  issues they cite, the manifests) were checked again on 2026-11-25: none had changed since
+  2026-11-23. The script and the texts are kept in a private artifact of the owner,
+  "License Issues Kit" (https://claude.ai/artifact/XMVTBxhuJ8Zkizv2DELHtH, files under
+  `kit/`; `kit/links.json` lists every issue). Now the owner decides, repository by
+  repository; each issue is closed by the pull request that changes the license there.
 - [ ] The logo (owner, 2026-11-25, "segnati queste due cose per ricordarmele"): it was
   generated with an AI tool, so its protection as a work rests on the human part of it.
   Issue #19: its provenance is in `media/README.md` since 2026-11-25 (ChatGPT with DALL-E;
