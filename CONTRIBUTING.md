@@ -31,7 +31,7 @@ call the shell scripts in `scripts/`, so they also run without npm.
 
 | Command | What it does |
 |---|---|
-| `npm run build` | Every output in `build/`: the files to attach to a release in `build/release/`, the site (Jekyll, from `docs/`, with the globe bundled from `src/` by esbuild) in `build/pages/` |
+| `npm run build` | Every output in `build/`: the files to attach to a release in `build/release/`, the site (Jekyll, from `docs/`, with the globe and the map bundled from `src/` by esbuild) in `build/pages/` |
 | `npm run serve` | Preview of the site at `http://localhost:4000`, rebuilt on every change (task *Preview: site (live reload)*) |
 | `npm run serve:stage` | The same preview, built as the stage site (`JEKYLL_ENV=stage`), with its banner *Work in progress* at the top and at the bottom of every page (task *Preview: site as stage (live reload)*) |
 | `npm test` | Unit tests (`scripts/test.sh`) |
@@ -42,7 +42,7 @@ call the shell scripts in `scripts/`, so they also run without npm.
 | `npm run mascot:generate` | The mascot of the logo as a 3D model, by the API of Meshy, into `build/meshy/<date>/`: it spends credits of the organization and needs `MESHY_API_KEY` in the environment (`-- --dry-run` shows the requests only) |
 | `npm run globe:activity` | The latest edits to OpenStreetMap for the globe, into `docs/_data/activity.json` (also run by `npm run build` and `npm run serve`; without network, an empty list) |
 | `npm run worker:check` / `worker:dev` | The Worker of production (`wrangler.jsonc`, `worker/`): validate and bundle it without deploying, or serve the built site with it at `http://localhost:8787`; wrangler at the version of `scripts/worker.sh`, no account needed |
-| `npm run check:site` | Every local link and resource of the built site (`build/pages/`) exists, and none is loaded from another host; the notice of privacy is on every page but `/privacy/`; and the banner of the stage site is at the top and at the bottom of every page of a build for stage and on no page of any other (by `JEKYLL_ENV`, production when unset); part of `npm run check` once the site is built, a step of CI after its build, and of each deploy |
+| `npm run check:site` | Every local link and resource of the built site (`build/pages/`) exists, and none is loaded from another host; the notice of privacy is on every page but `/privacy/`; a page with the map of OpenStreetMap links its copyright page; and the banner of the stage site is at the top and at the bottom of every page of a build for stage and on no page of any other (by `JEKYLL_ENV`, production when unset); part of `npm run check` once the site is built, a step of CI after its build, and of each deploy |
 | `npm run setup:python` | `.venv/` from `requirements.txt`, when the repository has one |
 | `npm run version:current` / `version:next` / `release:notes` | Version of this build, of the next release, and the notes of the next release |
 | `npm run clean` | Remove `build/` |
@@ -200,9 +200,11 @@ Applies to documentation, comments, commit messages and pull request description
   in `public/`. Every local link goes through `relative_url`, never a bare path: the build
   passes an empty `baseurl`, and `npm run check:site` fails on a link that does not resolve.
 - **The scripts of the site** are ES modules in `src/`, bundled by esbuild (`npm run build`,
-  `npm run serve`); no framework. What can be tested without a browser (geometry, timing,
-  data) goes in a module without three.js or the DOM, such as `src/globe/geometry.js`, with
-  its tests in `tests/*.test.mjs` (`node --test`).
+  `npm run serve`); no framework. Their libraries (three.js, Leaflet) are dependencies pinned
+  in `package.json` and bundled with them, never loaded from another host. What can be tested
+  without a browser (geometry, timing, data) goes in a module without three.js, Leaflet or
+  the DOM, such as `src/globe/geometry.js` or `src/globe/transition.js`, with its tests in
+  `tests/*.test.mjs` (`node --test`).
 - **The scripts of the repository** are Python 3 with the standard library only, each with
   its `unittest` tests in `tests/`; a script that reads the network is tested against fake
   answers, never against the service.
@@ -217,7 +219,12 @@ Applies to documentation, comments, commit messages and pull request description
   the other credits may go on the page that explains the work.
 - **The data of the visitors**: the site sets no cookie, stores nothing in the browser, and
   loads its pages, fonts, styles, scripts and images from itself (`npm run check:site` fails
-  on a resource of another host). A change that makes the browser contact another host, or
+  on a resource of another host). The exception is the map of the page Map: Leaflet asks
+  `tile.openstreetmap.org` for the tiles on screen, only once the map is shown, at the URL of
+  `docs/_config.yml` and within the
+  [tile usage policy](https://operations.osmfoundation.org/policies/tiles/) (no prefetch, a
+  Referer with every tile, the credit on the map, which `npm run check:site` checks next to
+  it). A change that makes the browser contact another host, or
   that keeps anything about a visitor, changes the page *Privacy* (`docs/privacy.md`) in the
   same pull request, before it reaches a site. Every page but that one opens, at the start
   of a visit, the notice of privacy (`docs/_includes/privacy-notice.html`, `src/notice/`),

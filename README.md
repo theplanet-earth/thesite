@@ -9,7 +9,8 @@
 </h1>
 
 <p align="center">
-  Its home page is a 3D globe with the latest edits to OpenStreetMap.
+  Its home page is a 3D globe with the latest edits to OpenStreetMap, which opens into the map
+  of OpenStreetMap.
 </p>
 
 <p align="center">
@@ -75,6 +76,11 @@ that the owner squash-merges, each followed by a merge back down the chain
   Leaflet map (`v0.1.0`, pull request #11); since `v0.2.0` (pull request #24) its home page
   is a 3D globe with the latest edits to OpenStreetMap, kept current by the browser,
   explained on `/globe/` (`CLAUDE.md`, Section 2), and the demo text of the theme is gone.
+- Since 2026-11-26 the page *Map* (`/map/`, between Home and About in the menu) shows the
+  Standard map of OpenStreetMap in Leaflet, rectangular as on openstreetmap.org. Home and Map
+  are one document with two views (`docs/_includes/world.html`): following the link from one to
+  the other, the spikes and arcs of the globe leave, the globe opens into the map and the
+  tiles fade in over it, and back (`src/globe/transition.js`); each page also loads on its own.
 - The mascot of the logo in 3D is kept in [`media/mascot/`](media/mascot/README.md), not used
   by the site.
 - Since 2026-11-25 both addresses serve the site, each deployed by its workflow (issues #2,
@@ -82,7 +88,9 @@ that the owner squash-merges, each followed by a merge back down the chain
 - The page *Privacy* (`docs/privacy.md`, `/privacy/`) is the notice of the site under the GDPR:
   no cookies and no tracking, so no consent banner; it names what the servers of Cloudflare,
   GitHub and OpenStreetMap receive. The site loads nothing from another host, its fonts
-  included, and `npm run check:site` fails if it does. Its address,
+  included, and `npm run check:site` fails if a page does; the one exception is the map of
+  the page Map, whose tiles the browser asks of `tile.openstreetmap.org` while the map is
+  shown. Its address,
   `privacy@theplanet.dev`, is forwarded by Cloudflare Email Routing (`CLAUDE.md`, Section
   12). At the start of a visit every other page opens a short notice
   in orange that points to it and must be closed before the site can be used; it stores
@@ -117,6 +125,12 @@ unset: the GitHub Pages site of this repository is the stage site.
   [How we built the GitHub globe](https://github.blog/engineering/engineering-principles/how-we-built-the-github-globe/)
   (GitHub, 2020); GitHub did not publish the code of its globe, and none of it is used here.
 - [three.js](https://threejs.org/) (MIT), bundled into the site with its licence.
+- [Leaflet](https://leafletjs.com/) 1.9.4 (BSD 2-Clause), the map of the page Map, bundled
+  into the site with its licence and credited on the map itself.
+- The map of the page Map: the Standard tiles of [OpenStreetMap](https://www.openstreetmap.org/),
+  data © OpenStreetMap contributors, [ODbL](https://www.openstreetmap.org/copyright), used
+  within their [tile usage policy](https://operations.osmfoundation.org/policies/tiles/) and
+  credited on the map and under it.
 - [Natural Earth](https://www.naturalearthdata.com/) (public domain), the land of the globe.
 - The mascot in `media/mascot/`: a 3D model generated from the logo by
   [Meshy](https://www.meshy.ai/) on a paid plan, so that it belongs to the organization

@@ -14,3 +14,9 @@ author: Andrea Gallegati
 
 github:
   repo: https://github.com/theplanet-earth/thesite
+
+# The tiles of the page Map (src/globe/map.js): the Standard tiles of OpenStreetMap, at the URL
+# their tile usage policy asks for (https://operations.osmfoundation.org/policies/tiles/), kept
+# here rather than in the code, as the policy recommends.
+map:
+  tiles: https://tile.openstreetmap.org/{z}/{x}/{y}.png
