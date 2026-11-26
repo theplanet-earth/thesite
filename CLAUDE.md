@@ -233,6 +233,11 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   Cloudflare ([documentation](https://developers.cloudflare.com/ssl/edge-certificates/additional-options/always-use-https/))
   and DNSSEC signs every record of the zone; it comes back with HSTS, which on
   `theplanet.wtf` needs it.
+- 2026-11-25, "mergia tutto su master e rimergia indietro le cose per non complicarci la vita
+  poi": Claude squash-merged #39 into `stage` and #40 into `master` (`v0.3.0`: the banner of
+  the stage site, the edits of 20 minutes, the page *Privacy* and its notice, now in
+  production), then merged `master` into `stage` and `stage` into `dev`; the three branches
+  held the same files, and the merge back closed issue #25 (Section 12).
 
 Rules of the organization, carried over from thebox or from its issues (keep them unless the
 owner decides otherwise):
@@ -675,8 +680,10 @@ harness) comes from thebox, which is versioned and released like any other repos
   and the API answers `current_user_can_bypass: always` to the token of the Codespace.
   `chain` also held `require_extra_approval_for_unattributed_changes: true`, which the table
   of #25 did not list; reported, the owner turned it off the same day (`false`, ruleset
-  updated at 22:47 UTC). Not verified yet: the first merge back of `master` into `stage`
-  under the ruleset.
+  updated at 22:47 UTC). The first merge back of `master` into `stage` under them
+  (`7b74f29`, 2026-11-25, 23:21 UTC, after #40) was pushed from a Codespace with its token:
+  GitHub accepted it and named the rule it bypassed ("Required status check "check" is
+  expected."), so nothing needs adjusting; issue #25 is closed.
 - **The labels** `release:major`, `release:minor` and `release:patch`, read by `ci.yml` and
   `release.yml`, exist since 2026-11-25 (issue #26, closed); none is on a pull request.
 - **The address of the page *Privacy*** (2026-11-25, checked from outside): `privacy@theplanet.dev`
@@ -719,8 +726,6 @@ Open points:
 
 - [ ] Optional, owner: turn off Network Error Logging on the zone of `theplanet.observer`;
   the page *Privacy* then no longer needs to name it.
-- [ ] The first merge back of `master` into `stage` under the ruleset `chain` (issue #25):
-  check that the bypass lets it through, then close #25.
 - [ ] From 2026-11-27: check that the registry publishes the DS record of
   `theplanet.observer`, `theplanet.wtf` and `theplanet.dev` (a DS query through `1.1.1.1`
   answers, with the flag AD), then record it on issue #3 and in Section 12. If it is
