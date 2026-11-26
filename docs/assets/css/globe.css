@@ -65,3 +65,136 @@
   color: #bbb;
   text-align: center;
 }
+
+/* Home and the page Map (_includes/world.html, the owner, 2026-11-26): two views in one cell of
+   the grid, so that both boxes can be measured at any time; the hidden one is invisible and
+   inert (src/globe/main.js). */
+.world {
+  display: grid;
+}
+
+.world-view {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+.world-view.is-hidden {
+  visibility: hidden;
+}
+
+/* While the globe opens into the map, closes again, and stays under the tiles until they have
+   loaded, its canvas covers the window, under the sidebar (assets/css/theplanet.css) and the map;
+   it only draws, and takes no input. Visible on its own even in the hidden view of Home. */
+.globe canvas.globe-canvas--window {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  border-radius: 0;
+  pointer-events: none;
+}
+
+/* The map: rectangular, as the map of openstreetmap.org, as wide as the content allows and at
+   most three quarters of its width high (Web Mercator is square: more height would show the
+   grey beyond the poles). It fits the window with the lines under it, as the home page does,
+   and between the banners of the stage site (assets/css/preview.css). Above the canvas of the
+   globe (z-index 6), and transparent until the globe under it has gone, so that tiles still
+   loading show the flat globe rather than an empty sea. */
+.map {
+  --map-width: calc(100vw - 2rem);
+  position: relative;
+  z-index: 6;
+  width: var(--map-width);
+  height: min(calc(100svh - 17rem - var(--preview-height, 0rem)), calc(var(--map-width) * 0.75));
+  margin: 0 auto;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Beside the sidebar the content keeps equal room on its two sides (public/css/hyde.css), so the
+   map may grow past the column of text into that room, centred on the same axis. */
+@media (min-width: 48em) {
+  .map {
+    --map-width: calc(100vw - 18rem - 2.5rem);
+    height: min(calc(100svh - 9rem - var(--preview-height, 0rem)), calc(var(--map-width) * 0.72));
+    margin-left: calc(50% - var(--map-width) / 2);
+  }
+}
+
+.map.is-live {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.map.leaflet-container {
+  background: transparent;
+  font: 0.65rem/1.4 "PT Sans", Helvetica, Arial, sans-serif;
+}
+
+.map.leaflet-container.map--alone {
+  background: #aad3df; /* the water of the Standard tiles */
+}
+
+.map.leaflet-container:focus-visible {
+  outline: 2px solid #9ccc65;
+  outline-offset: 3px;
+}
+
+/* The theme rounds the corners of every image and gives it a margin (public/css/poole.css):
+   tiles keep square edges. At the fractional zooms of the map (its first view is at
+   log2(width / 256)) the tiles leave hairlines where they meet; leaflet.css adds them up where
+   they overlap (mix-blend-mode: plus-lighter), which turned the joins white here (seen with
+   Playwright, 2026-11-26). Half a pixel more on each tile, drawn normally, covers them. */
+.map img {
+  margin: 0;
+  border-radius: 0;
+}
+
+.map.leaflet-container img.leaflet-tile {
+  width: 256.5px !important;
+  height: 256.5px !important;
+  mix-blend-mode: normal;
+}
+
+/* The links of the content are light blue on the dark grey (theplanet.css): not on the white of
+   the controls of the map. */
+.content .map .leaflet-control-attribution a {
+  color: #0b5394;
+}
+
+.content .map .leaflet-bar a {
+  color: #333;
+}
+
+.map-readout {
+  min-height: 1.45em;
+  margin: 0.4rem 0 0;
+  font: 0.7rem/1.45 "Roboto Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  color: #bbb;
+  text-align: center;
+}
+
+.map-caption {
+  margin-top: 0.2rem;
+}
+
+.map-fallback {
+  margin: 0.5rem 0 0;
+  color: #ddd;
+  text-align: center;
+}
+
+/* A title for assistive technologies only: the page Map shows none (the owner, 2026-11-26). */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

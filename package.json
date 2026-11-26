@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "esbuild": "0.28.2",
+    "leaflet": "1.9.4",
     "three": "0.187.0"
   }
 }

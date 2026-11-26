@@ -149,3 +149,34 @@ export class FrameMonitor {
     return false;
   }
 }
+
+// The page Map (the owner, 2026-11-26): the globe opens into Web Mercator, the projection of
+// the tiles of OpenStreetMap, on a sphere of radius 1, so that the equator keeps its length, 2π.
+// Web Mercator ends at MAX_MERCATOR_LATITUDE, where its world is square.
+export const MAX_MERCATOR_LATITUDE = (2 * Math.atan(Math.exp(Math.PI)) - Math.PI / 2) / DEG;
+
+/** The y of Web Mercator for a latitude in degrees, on a sphere of radius 1. */
+export function mercatorY(lat) {
+  const phi = Math.max(-MAX_MERCATOR_LATITUDE, Math.min(MAX_MERCATOR_LATITUDE, lat)) * DEG;
+  return Math.log(Math.tan(Math.PI / 4 + phi / 2));
+}
+
+/** The latitude in degrees of a y of Web Mercator. */
+export function latitudeOfY(y) {
+  return (2 * Math.atan(Math.exp(y)) - Math.PI / 2) / DEG;
+}
+
+/**
+ * The first view of the map in a box of `width` by `height` pixels, the one the opened globe
+ * ends on: the whole width of the world across the box, at the zoom of the tiles
+ * log2(width / 256) (a tile is 256 pixels wide), centred on longitude 0 and, as near as the
+ * box allows without showing beyond the edge of the world, on `latitude`. Returns { zoom, lat,
+ * y }, y being the Mercator y of the centre.
+ */
+export function mapView(width, height, latitude = 20) {
+  const zoom = Math.log2(width / 256);
+  const half = (Math.PI * height) / width; // half the height of the box, in Mercator y
+  const limit = Math.max(0, Math.PI - half);
+  const y = Math.max(-limit, Math.min(limit, mercatorY(latitude)));
+  return { zoom, lat: latitudeOfY(y), y };
+}

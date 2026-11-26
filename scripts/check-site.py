@@ -20,6 +20,11 @@ And the banner of the stage site (docs/_includes/preview-banner.html): JEKYLL_EN
 site was built, as it says it to Jekyll (scripts/build.sh, production when unset); a build
 for stage has it at the top and at the bottom of every page, any other build on no page, so
 that the production site never shows it (the owner, 2026-11-25).
+And a page with the map of OpenStreetMap (data-map, docs/_includes/world.html) must link its
+copyright page, https://www.openstreetmap.org/copyright: the tile usage policy and the
+attribution guidelines of OpenStreetMap want the credit next to the map
+(https://operations.osmfoundation.org/policies/tiles/). Leaflet adds it on the map itself,
+but only once the map runs; the page carries it without JavaScript too.
 Exit status 1 on any problem, 2 when DIR does not exist. Standard library only.
 """
 from __future__ import annotations
@@ -51,6 +56,9 @@ UNPUBLISHED = {"README.md", "CNAME", "Gemfile", "Gemfile.lock"}
 PREVIEW_ATTRIBUTE = "data-preview-banner"
 PREVIEW_POSITIONS = ("top", "bottom")
 PREVIEW_ENVIRONMENT = "stage"
+# The marker of the map of OpenStreetMap, and the page that its credit links.
+MAP = "data-map"
+OSM_COPYRIGHT = "https://www.openstreetmap.org/copyright"
 
 
 class Links(HTMLParser):
@@ -160,6 +168,16 @@ def notices(site: Path) -> list[str]:
     return problems
 
 
+def map_credits(site: Path) -> list[str]:
+    """The pages with the map of OpenStreetMap that do not link its copyright page."""
+    problems = []
+    for page in sorted(site.rglob("*.html")):
+        text = page.read_text(encoding="utf-8", errors="replace")
+        if re.search(rf"\b{MAP}\b", text) and OSM_COPYRIGHT not in text:
+            problems.append(f"{page.relative_to(site).as_posix()}: a map of OpenStreetMap without a link to {OSM_COPYRIGHT}")
+    return problems
+
+
 def unpublished(site: Path) -> list[str]:
     """The files of the site that should not be published."""
     return sorted(p.relative_to(site).as_posix() for p in site.rglob("*") if p.is_file() and p.name in UNPUBLISHED)
@@ -199,6 +217,10 @@ def main(argv: list[str]) -> int:
     for problem in missing:
         print(f"site: {problem}", file=sys.stderr)
     problems += missing
+    credits = map_credits(site)
+    for problem in credits:
+        print(f"site: {problem}", file=sys.stderr)
+    problems += credits
     extra = unpublished(site)
     for name in extra:
         print(f"site: should not be published: {name}", file=sys.stderr)
@@ -214,7 +236,8 @@ def main(argv: list[str]) -> int:
         return 1
     where = "at the top and at the bottom of every page" if environment == PREVIEW_ENVIRONMENT else "on no page"
     print(f"site: {pages} pages, every local link and resource exists, nothing over http, nothing from another host,"
-          f" the notice of privacy where due, nothing unpublishable, the preview banner {where} ({environment})")
+          f" the notice of privacy where due, the credit of OpenStreetMap with its map, nothing unpublishable,"
+          f" the preview banner {where} ({environment})")
     return 0
 
 
