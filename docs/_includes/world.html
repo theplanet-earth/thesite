@@ -1,0 +1,63 @@
+{%- comment %}
+Home and the page Map (the owner, 2026-11-26): two pages, / and /map/, and two views of one
+document, so that the globe can open into the map and close again without loading the other
+page (src/globe/main.js). page.world says which view the page shows; the other is hidden and
+inert until a link leads to it. The globe (src/globe/, bundled into /assets/bundle/globe.js):
+the land mask comes from scripts/land-mask.py, the places from _data/coverage.yml, the edits of
+OpenStreetMap from _data/activity.json (the build), then from the replication itself
+(src/globe/live.js). The map: the Standard tiles of OpenStreetMap in Leaflet (src/globe/map.js),
+created only when it is shown.
+{%- endcomment %}
+{%- assign view = page.world | default: "home" %}
+{%- assign activity = site.data.activity %}
+{%- assign edits = activity.edits.size | default: 0 %}
+<div class="world" data-world data-view="{{ view }}"
+     data-home-url="{{ '/' | relative_url }}" data-map-url="{{ '/map/' | relative_url }}"
+     data-home-title="{{ site.title }} · {{ site.tagline }}" data-map-title="Map · {{ site.title }}">
+  <section class="world-view globe-section{% if view != 'home' %} is-hidden{% endif %}" data-view-name="home" aria-labelledby="globe-title"{% if view != 'home' %} inert{% endif %}>
+    <h1 id="globe-title" class="globe-heading" tabindex="-1" data-fade>Global reach</h1>
+    <div class="globe" data-globe data-land="{{ '/assets/globe/land.png' | relative_url }}"
+         data-label="A globe of the Earth, with the land drawn as dots, the covered places as orange rings, and the latest edits to OpenStreetMap as orange spikes joined by arcs in the order they were made. Drag it, or use the arrow keys, to turn it.">
+      <div class="globe-placeholder" aria-hidden="true"></div>
+      <p class="globe-fallback">The globe needs WebGL, which this browser does not offer.</p>
+    </div>
+    <!-- The attribution of OpenStreetMap stays next to the globe, visible without interaction,
+         as its guidelines require (https://osmfoundation.org/wiki/Licence/Attribution_Guidelines);
+         the other credits are on /globe/. live.js updates the count and the time. -->
+    <p class="globe-caption" aria-live="polite" data-fade>
+      <span data-edits-sentence{% if edits == 0 %} hidden{% endif %}>The orange spikes are the
+        latest <span data-edits-count>{{ edits }}</span> edits to
+        <a href="https://www.openstreetmap.org/">OpenStreetMap</a>, as of
+        <time data-edits-time datetime="{{ activity.generated }}">{{ activity.generated | date: "%-d %B, %H:%M" }} UTC</time>,
+        taller the more they changed; the arcs join them in the order they were made.</span>
+      {%- if edits == 0 %}
+      <span data-edits-missing>The latest edits to <a href="https://www.openstreetmap.org/">OpenStreetMap</a>
+        could not be read when this version of the site was built.</span>
+      {%- endif %}
+      Data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>, ODbL.<br>
+      <a href="{{ '/globe/' | relative_url }}">How the globe is made</a>.
+    </p>
+  </section>
+
+  <section class="world-view map-section{% if view != 'map' %} is-hidden{% endif %}" data-view-name="map" aria-labelledby="map-title"{% if view != 'map' %} inert{% endif %}>
+    <!-- No visible title (the owner, 2026-11-26): the map starts at the top of the page. -->
+    <h1 id="map-title" class="visually-hidden" tabindex="-1">Map</h1>
+    <!-- The attribution of OpenStreetMap is on the map itself, bottom right (Leaflet), as the
+         tile usage policy asks (https://operations.osmfoundation.org/policies/tiles/), and
+         again under it. -->
+    <div class="map{% if view == 'map' %} is-live{% endif %}" data-map data-tiles="{{ site.map.tiles }}" role="region"
+         aria-label="A map of the world from OpenStreetMap, with the covered places in orange. Drag it to move it; use the wheel, two fingers or the plus and minus keys to zoom."></div>
+    <noscript><p class="map-fallback">The map needs JavaScript.</p></noscript>
+    <p class="map-readout" data-map-readout aria-live="off" data-fade></p>
+    <p class="globe-caption map-caption" data-fade>The Standard map of
+      <a href="https://www.openstreetmap.org/">OpenStreetMap</a>: data &copy;
+      <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>, under the
+      <a href="https://opendatacommons.org/licenses/odbl/">ODbL</a>; the tiles of openstreetmap.org,
+      used as their <a href="https://operations.osmfoundation.org/policies/tiles/">tile usage policy</a>
+      allows. Something wrong on the map? <a href="https://www.openstreetmap.org/fixthemap">Report it</a>.</p>
+  </section>
+</div>
+<script type="application/json" id="coverage">{{ site.data.coverage | jsonify }}</script>
+<script type="application/json" id="activity">{{ site.data.activity | jsonify }}</script>
+<!-- ?v= changes at every build, so that no browser keeps an older bundle. -->
+<script type="module" src="{{ '/assets/bundle/globe.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>

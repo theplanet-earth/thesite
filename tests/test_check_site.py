@@ -128,6 +128,15 @@ class CheckSiteTest(unittest.TestCase):
             "privacy/index.html: has the notice of privacy, which points to this page",
         ])
 
+    def test_a_map_of_openstreetmap_links_its_copyright(self) -> None:
+        # Home and Map carry the map (docs/_includes/world.html) and its credit; About neither.
+        credit = '<a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+        self.page("index.html", f'<div data-map data-tiles="x"></div>{credit}')
+        self.page("map/index.html", '<div class="map" data-map></div>')
+        self.page("about/index.html", "<p>data-mapping is a word, not the map</p>")
+        problems = self.tool.map_credits(self.site)
+        self.assertEqual(problems, ["map/index.html: a map of OpenStreetMap without a link to https://www.openstreetmap.org/copyright"])
+
     def test_files_that_should_not_be_published(self) -> None:
         self.write("README.md", "theme readme")
         self.write("CNAME", "hyde.getpoole.com")

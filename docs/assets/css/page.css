@@ -1,0 +1,367 @@
+/* The pages of text (docs/_layouts/page.html): About, Privacy, The globe, and the page 404.
+   The owner, 2026-11-26: the text narrower than the window, and an index that follows the
+   reading and marks the section on screen, minimal, without a scrollbar. The rules follow the
+   UX guidelines of ui-ux-pro-max (CLAUDE.md, Section 10): lines of 60 to 75 characters, a line
+   height of 1.5 to 1.75, headings closer to their text than to the text before them, the
+   current section marked by more than its colour, focus never hidden by what stays on screen,
+   and no smooth scrolling for readers who ask for reduced motion.
+
+   Their look (the owner, 2026-11-27, "hai completa libertà, giusto non tradire lo stile e i
+   colori"): the mirror of the sidebar, whose logotype is Roboto Mono, bold, in a square, #444
+   on #ddd, where the content is #ddd on #444. Titles in Roboto Mono; sections numbered in
+   Roboto Mono and opened by a hairline, as in the Swiss style of the guidelines (a grid, one
+   accent, hierarchy by type alone, square corners); one accent, the orange of the globe, for
+   what marks the structure: the numbers, the markers of lists, the section being read, and a
+   square that ends the text. */
+
+/* Anchors bring a heading to rest below the top banner of the stage site
+   (assets/css/preview.css), never under it. */
+html {
+  scroll-padding-top: calc(var(--preview-banner-height, 0rem) + 1.5rem);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* The text: PT Sans at 18 pixels where a rem is 20 (16 where it is 16), in a column of 30em:
+   57 to 76 characters a line on the page Privacy, 69 in the middle (measured with Playwright,
+   2026-11-26). The column and the index are centred in the room the sidebar leaves. */
+.article {
+  --measure: 30em;
+  --index-width: 10rem;
+  --accent: #ffa94d; /* the orange of the globe and of the banner of the stage site */
+  --rule: #5c5c5c;
+  --muted: #b5b5b5; /* 4.7:1 on #444 */
+  --mono: 'Roboto Mono', monospace;
+  display: grid;
+  grid-template-columns: minmax(0, var(--measure));
+  grid-template-areas:
+    "title"
+    "index"
+    "body";
+  justify-content: center;
+  font-size: max(16px, 0.9rem);
+  line-height: 1.65;
+  color: #ddd;
+}
+
+.article ::selection {
+  background: rgba(255, 169, 77, 0.35);
+  color: #fff;
+}
+
+/* The title as the logotype is set: Roboto Mono, bold, in capitals (as the title of the notice of
+   privacy, assets/css/notice.css). */
+.article-title {
+  grid-area: title;
+  margin: 0 0 0.8em;
+  color: #f2f2f2;
+  font-family: var(--mono);
+  font-size: 2.2em;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  text-align: left;
+  text-wrap: balance;
+}
+
+.article-body {
+  grid-area: body;
+  min-width: 0;
+  overflow-wrap: break-word;
+  counter-reset: section;
+}
+
+.article-body > :first-child {
+  margin-top: 0;
+}
+
+/* The opening paragraph, larger: what the page is about, before its sections. */
+.article-body > p:first-child {
+  margin-bottom: 1.5em;
+  color: #eee;
+  font-size: 1.15em;
+  line-height: 1.55;
+}
+
+/* Sections open with a hairline, their headings on the left edge of the text, with more room
+   above than below. */
+.article-body h2,
+.article-body h3 {
+  color: #fff;
+  text-align: left;
+  text-wrap: balance;
+}
+
+.article-body h2 {
+  position: relative;
+  margin: 2.2em 0 0.65em;
+  padding-top: 1em;
+  border-top: 1px solid var(--rule);
+  font-size: 1.35em;
+  line-height: 1.3;
+  counter-increment: section;
+}
+
+.article-body h3 {
+  margin: 1.75em 0 0.5em;
+  font-size: 1.1em;
+  line-height: 1.35;
+}
+
+/* Two sections or more are numbered, 01, 02, ..., as their entries in the index: the number
+   before the heading on narrow screens, in the margin on the left of the text on wide ones. */
+.article:has(.article-body > h2 ~ h2) .article-body > h2::before {
+  content: counter(section, decimal-leading-zero);
+  margin-right: 0.75em;
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 0.62em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  vertical-align: 0.2em;
+}
+
+@media (min-width: 48em) {
+  .article:has(.article-body > h2 ~ h2) .article-body > h2::before {
+    position: absolute;
+    top: calc(1em / 0.62 + 0.6em);
+    right: 100%;
+    margin-right: 1.4em;
+    vertical-align: baseline;
+  }
+}
+
+.article-body p,
+.article-body ul,
+.article-body ol {
+  margin: 0 0 1.1em;
+}
+
+.article-body p {
+  text-wrap: pretty;
+}
+
+.article-body ul,
+.article-body ol {
+  padding-left: 1.25em;
+}
+
+/* Square markers, as the square of the logotype. */
+.article-body ul {
+  list-style-type: square;
+}
+
+.article-body li + li {
+  margin-top: 0.4em;
+}
+
+.article-body li::marker {
+  color: var(--accent);
+}
+
+.article-body strong {
+  color: #fff;
+}
+
+/* Links are underlined: their blue differs from the text by its colour only (contrast 1.2:1,
+   where WCAG 2.2 asks 3:1 to tell them apart by colour alone, success criterion 1.4.1). The
+   line is faint until the pointer is on the link. */
+.article-body a {
+  text-decoration: underline;
+  text-decoration-color: rgba(156, 211, 255, 0.35);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  transition: text-decoration-color 0.2s ease;
+}
+
+.article-body a:hover {
+  text-decoration-color: currentColor;
+}
+
+/* Code in the dark of the page, in Roboto Mono, with square corners. */
+.article-body code {
+  padding: 0.1em 0.35em;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.06);
+  color: #eee;
+  font-family: var(--mono);
+  font-size: 0.85em;
+}
+
+/* The end of a text with sections: a small square in the accent. */
+.article:has(.toc) .article-body::after {
+  content: "";
+  display: block;
+  width: 0.5em;
+  height: 0.5em;
+  margin-top: 2.5em;
+  background: var(--accent);
+}
+
+/* The index: a thin rail, the entries in grey with the numbers of their sections, the section
+   being read in white with the orange on the rail and on its number (aria-current, so that it
+   is not marked by colour alone). Its first entry, the title, reads as its heading. */
+.toc {
+  grid-area: index;
+  margin: 0 0 2rem;
+  font-size: max(14px, 0.75rem);
+  line-height: 1.4;
+}
+
+.toc-label,
+.toc .toc-title a {
+  font-family: var(--mono);
+  font-size: 0.8em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.toc-label {
+  margin: 0 0 0.5rem;
+  color: var(--muted);
+}
+
+.toc ol {
+  margin: 0;
+  padding: 0;
+  border-left: 1px solid var(--rule);
+  list-style: none;
+  counter-reset: entry;
+}
+
+.toc li {
+  margin: 0;
+}
+
+.toc li:not(.toc-title):not(.toc-sub) {
+  counter-increment: entry;
+}
+
+.toc a {
+  display: flex;
+  gap: 0.6em;
+  margin-left: -1px;
+  padding: 0.35rem 0 0.35rem 0.85rem;
+  border-left: 2px solid transparent;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.article:has(.article-body > h2 ~ h2) .toc li:not(.toc-title):not(.toc-sub) > a::before {
+  content: counter(entry, decimal-leading-zero);
+  flex: none;
+  padding-top: 0.15em;
+  font-family: var(--mono);
+  font-size: 0.85em;
+  transition: color 0.2s ease;
+}
+
+.toc .toc-sub a {
+  padding-left: 1.6rem;
+}
+
+.toc a:hover {
+  color: #eee;
+  text-decoration: none;
+}
+
+.toc a:focus-visible {
+  outline: 2px solid #9ccc65;
+  outline-offset: -2px;
+}
+
+.toc a[aria-current] {
+  border-left-color: var(--accent);
+  color: #fff;
+}
+
+.toc a[aria-current]::before {
+  color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .article-body a,
+  .toc a,
+  .toc a::before {
+    transition: none;
+  }
+}
+
+/* On narrow screens the index is the list of the sections under the title: without the title
+   itself, and only when there are two sections or more. */
+.toc .toc-title,
+.toc[data-sections="1"] {
+  display: none;
+}
+
+/* On wide screens the index stands beside the text and stays in the window while the page
+   scrolls, between the banners of the stage site. Higher than the window, it scrolls: by itself
+   (src/toc/main.js), or by the wheel while the pointer is over it, without a visible scrollbar
+   and without scrolling the page at its ends; its edges fade where entries are hidden. The
+   content leaves the sidebar 2rem instead of 4, so that from 1200 pixels the text keeps 27em
+   or more beside the index, about 60 characters. */
+@media (min-width: 75em) {
+  .content {
+    margin-left: 20rem;
+    margin-right: 1rem;
+  }
+
+  .article {
+    grid-template-columns: minmax(0, var(--measure)) var(--index-width);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "title index"
+      "body index";
+    column-gap: 2rem;
+  }
+
+  .toc {
+    position: sticky;
+    top: calc(var(--preview-banner-height, 0rem) + 2rem);
+    align-self: start;
+    max-height: calc(100vh - var(--preview-height, 0rem) - 4rem);
+    margin: 0.35rem 0 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+
+  .toc::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* data-fade marks an index that hides entries, so higher than the window: only then does the
+     wheel stop at its ends. Chrome stops it even at an index that fits, where the wheel would
+     then scroll nothing (seen with Playwright, 2026-11-26). */
+  .toc[data-fade] {
+    overscroll-behavior: contain;
+    --fade-top: 0rem;
+    --fade-bottom: 0rem;
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 var(--fade-top), #000 calc(100% - var(--fade-bottom)), transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 var(--fade-top), #000 calc(100% - var(--fade-bottom)), transparent);
+  }
+
+  .toc[data-fade~="top"] {
+    --fade-top: 2rem;
+  }
+
+  .toc[data-fade~="bottom"] {
+    --fade-bottom: 2rem;
+  }
+
+  .toc-label {
+    display: none;
+  }
+
+  .toc .toc-title,
+  .toc[data-sections="1"] {
+    display: block;
+  }
+}

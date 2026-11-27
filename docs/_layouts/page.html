@@ -2,7 +2,20 @@
 layout: default
 ---
 
-<div class="page">
-  <h1 class="page-title">{{ page.title }}</h1>
-  {{ content }}
-</div>
+{%- comment %} A page of text (the owner, 2026-11-26): the text in a column of 60 to 75 characters,
+and its index (src/toc/), which src/toc/main.js builds from the title and the headings h2 and
+h3: beside the text on wide screens, where it follows the reading, under the title on narrow
+ones. Its style is assets/css/page.css. A page without headings has no index; toc: false in
+the front matter leaves it out. {% endcomment %}
+<article class="page article">
+  <h1 class="page-title article-title" data-toc-title>{{ page.title }}</h1>
+  {%- unless page.toc == false %}
+  <nav class="toc" aria-label="Contents" data-toc hidden></nav>
+  {%- endunless %}
+  <div class="article-body" data-toc-body>
+    {{ content }}
+  </div>
+</article>
+{%- unless page.toc == false %}
+<script type="module" src="{{ '/assets/bundle/toc.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
+{%- endunless %}
