@@ -238,6 +238,22 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   the stage site, the edits of 20 minutes, the page *Privacy* and its notice, now in
   production), then merged `master` into `stage` and `stage` into `dev`; the three branches
   held the same files, and the merge back closed issue #25 (Section 12).
+- 2026-11-26, on `/globe/`, `/about/` and `/privacy/`: "il font mi piace molto, ma c'è
+  qualcosa che non mi convince nel come appare il testo. migliorale usando
+  https://github.com/nextlevelbuilder/ui-ux-pro-max-skill"; "non mi piace che il testo copra
+  tutta la schermata in orizzontale: restringilo"; and an index "che ti segue mano a mano che
+  scrolli" and marks the section on screen, "molto minimal, senza scroll bar", which, when it
+  does not fit, scrolls slowly by itself with the marked entry and, under the pointer, by the
+  wheel alone, with an invisible scrollbar. Done on the branch `reading`, in a worktree of its
+  own while another session worked on `map`: the pages of text (`_layouts/page.html`,
+  `assets/css/page.css`) keep PT Sans, at 18 pixels in a column of 30em (57 to 76 characters
+  a line), with headings on the left edge of the text, more room above them than below,
+  links underlined and code in the dark of the page, after the UX guidelines of
+  `ui-ux-pro-max`; the index (`src/toc/`) stands beside the text from 1200 pixels and is a list
+  under the title below (Section 12). `/globe/` had no headings: its three bold lead-ins
+  became its sections. **Against the instruction of 2026-11-24** that `/globe/` fit one
+  window: with lines of 70 characters its text no longer fits one, at 1280x800 nor at
+  1920x1080 (1268 pixels high); the home page still does. Reported to the owner.
 
 Rules of the organization, carried over from thebox or from its issues (keep them unless the
 owner decides otherwise):
@@ -287,7 +303,7 @@ owner decides otherwise):
 | `scripts/lib.sh` | Helpers shared by the shell scripts: repository root, `build/`, `$PY`, `log`, `warn`, `die`, `need`, `project_version` |
 | `scripts/build.sh`, `test.sh`, `check.sh` | Build (the site into `build/pages/`), unit tests, every check (the entry points of CI) |
 | `scripts/serve.sh` | Live preview of the site at `http://localhost:4000` (`npm run serve`; `npm run serve:stage` as the stage site, with its banners), with the bundle rebuilt on every change of `src/` |
-| `scripts/bundle.sh`, `scripts/bundle.mjs` | esbuild bundles `src/globe/main.js` and three.js into `docs/assets/bundle/globe.js`, and `src/notice/main.js` into `docs/assets/bundle/notice.js` (generated, git-ignored), with the licence of three.js beside it; run by `build.sh` and `serve.sh`; in watch mode it touches the bundle a second after each build (Section 12) |
+| `scripts/bundle.sh`, `scripts/bundle.mjs` | esbuild bundles `src/globe/main.js` and three.js into `docs/assets/bundle/globe.js`, `src/notice/main.js` into `docs/assets/bundle/notice.js`, and `src/toc/main.js` into `docs/assets/bundle/toc.js` (generated, git-ignored), with the licence of three.js beside it; run by `build.sh` and `serve.sh`; in watch mode it touches the bundle a second after each build (Section 12) |
 | `wrangler.jsonc`, `worker/` | The Worker of production (issue #2): static assets from `build/pages/`, custom domain `theplanet.observer`; `worker/index.js` runs only for `/api/*`, `worker/edits.js` serves `/api/osm-edits.json`, read at most every 19 minutes and cached |
 | `scripts/worker.sh` | wrangler at a pinned version: `npm run worker:check` (dry run), `npm run worker:dev` (the site with the Worker at `http://localhost:8787`), and `deploy`, run by `production.yml` with the token and the account in the environment; each builds the site with `JEKYLL_ENV=production` and runs `check-site.py` before wrangler |
 | `media/mascot/` | The mascot of the logo in 3D, not used by the site: the five files Meshy made (walking, running, rigged, without skeleton, preview; 20 MB), `provenance.json` and a `README.md` on what each may serve; kept for thegame (Section 2) |
@@ -300,8 +316,9 @@ owner decides otherwise):
 | `scripts/check-site.py` | Check of the built site: every local link and resource of `build/pages/` exists, none loads over `http` or from another host, the notice of privacy is on every page but `/privacy/`, nothing unpublishable is published, and the banner of the stage site is at the top and at the bottom of every page of a build for stage and on no page of any other, by `JEKYLL_ENV` (`npm run check:site`) |
 | `scripts/version.py` | Version, next version and release notes from the tags and the commits |
 | `scripts/setup-python.sh` | `.venv/` from `requirements.txt`, reinstalled only when it changes |
-| `tests/` | `unittest` checks of the harness scripts, of `check-site.py`, of `land-mask.py`, of `osm-activity.py`, of the permissions of the devcontainer, of the header of `README.md`, of the license and of the deploys (standard library only); `notice.test.mjs` (when the notice of privacy opens), `globe.test.mjs`, `replication.test.mjs` and `live.test.mjs` (the live edits and the Worker, against fakes), with `node --test` |
+| `tests/` | `unittest` checks of the harness scripts, of `check-site.py`, of `land-mask.py`, of `osm-activity.py`, of the permissions of the devcontainer, of the header of `README.md`, of the license and of the deploys (standard library only); `notice.test.mjs` (when the notice of privacy opens), `toc.test.mjs` (the index of the pages of text), `globe.test.mjs`, `replication.test.mjs` and `live.test.mjs` (the live edits and the Worker, against fakes), with `node --test` |
 | `src/globe/` | The globe of the home page: `geometry.js` (dots of the land, spikes, arcs, quality tiers; no three.js), `replication.js` (the replication of changesets: paths, parsing, merging; no DOM), `live.js` (every 19 minutes, the edits from the Worker or from the replication; shared with the Worker), `main.js` (the three.js scene) |
+| `src/toc/` | The index of the pages of text: `spy.js` (the section being read, where the index scrolls, how slowly; no DOM), `main.js` (builds it from the title and the headings, follows the reading) |
 | `src/notice/` | The notice of privacy: `visit.js` (whether a visit starts, from the referrer and the type of navigation; no DOM), `main.js` (opens the dialog of `docs/_includes/privacy-notice.html`) |
 | `package.json`, `package-lock.json` | Also the dependencies of the site, pinned: three.js and esbuild (Section 10) |
 | `.devcontainer/` | `Dockerfile`, `devcontainer.json`, `post-create.sh` (Section 10) |
@@ -322,11 +339,11 @@ The site, cleaned up on 2026-11-24 (`CONTRIBUTING.md`, *Conventions of this repo
 
 | Path | Content |
 |---|---|
-| `docs/` | Jekyll 4.3 site: `_config.yml`, `Gemfile` and `Gemfile.lock` (Jekyll, and the three gems Ruby 3.3 warns about), `_layouts/` (`default`, `page`), `_includes/` (`head`, `sidebar`, `preview-banner`, the banner of the stage site, `privacy-notice`), `index.html` (the globe), `globe.md` (how the globe is made, linked under it, not in the menu), `about.md`, `privacy.md` (the notice under the GDPR, Section 2), `404.html`; the menu lists the pages with a `nav_order` |
+| `docs/` | Jekyll 4.3 site: `_config.yml`, `Gemfile` and `Gemfile.lock` (Jekyll, and the three gems Ruby 3.3 warns about), `_layouts/` (`default`, `page`: the pages of text, with their index), `_includes/` (`head`, `sidebar`, `preview-banner`, the banner of the stage site, `privacy-notice`), `index.html` (the globe), `globe.md` (how the globe is made, in three sections, linked under it, not in the menu), `about.md`, `privacy.md` (the notice under the GDPR, Section 2), `404.html`; the menu lists the pages with a `nav_order` |
 | `docs/_data/coverage.yml` | The places shown as orange rings on the globe (issue #1) |
 | `docs/_data/activity.json` | The latest edits to OpenStreetMap, the orange spikes and arcs of the globe: generated at every build by `scripts/osm-activity.py`, git-ignored |
 | `docs/public/` | The Hyde theme on Poole, third-party, MIT, with the dark colours of the project: its CSS, icons and `LICENSE.md`, published with them as the licence asks |
-| `docs/assets/` | The project's own CSS (`theplanet.css`, `globe.css`, `fonts.css`, `notice.css`, and `preview.css`, loaded by the stage site only), the fonts (`fonts/`: PT Sans and Roboto Mono, OFL 1.1, with their licence texts; third-party, committed), the logo, `globe/land.png` (generated by `scripts/land-mask.py` and **committed** as data of the site: it changes only with its source), and `bundle/` (generated by `scripts/bundle.sh`, git-ignored) |
+| `docs/assets/` | The project's own CSS (`theplanet.css`, `globe.css`, `fonts.css`, `notice.css`, `page.css`, loaded by the pages of text only, and `preview.css`, loaded by the stage site only), the fonts (`fonts/`: PT Sans and Roboto Mono, OFL 1.1, with their licence texts; third-party, committed), the logo, `globe/land.png` (generated by `scripts/land-mask.py` and **committed** as data of the site: it changes only with its source), and `bundle/` (generated by `scripts/bundle.sh`, git-ignored) |
 | `media/` | Files of the repository that the site does not publish: `theplanetearth.png` (the image of `README.md`), `mascot/`, and `README.md`, the provenance of the logo (issue #19) |
 
 ## 5. Checks before reporting a change as done
@@ -552,7 +569,11 @@ harness) comes from thebox, which is versioned and released like any other repos
   Codespace (`claude plugin list`: "No plugins installed"). Start `claude` in a terminal at
   the root of the repository, trust the folder and accept the marketplace and the plugin it
   offers (pinned to v2.15.0 by `.claude/settings.json`); `/plugin` shows them. Then start a
-  new session.
+  new session. On 2026-11-26 the plugin was still not installed (`installed_plugins.json`
+  empty), but its marketplace was cloned in `~/.claude/plugins/marketplaces/ui-ux-pro-max-skill`
+  (tag v2.15.0), and the search of the skill runs from there:
+  `python3 <clone>/.claude/skills/ui-ux-pro-max/scripts/search.py "<query>" --domain ux`
+  (not `python3 -I`, with which it does not find its own modules).
 - **Stale `.venv/`**: a `.venv/` that survives a change of image keeps a dangling interpreter
   link; `scripts/setup-python.sh` recreates it with `--clear`.
 - **The mascot from Meshy** (2026-11-24):
@@ -647,8 +668,8 @@ harness) comes from thebox, which is versioned and released like any other repos
   site, and `release.yml` would publish `master` on it.
 - **What the preview shows** (`npm run serve`, Playwright at 1280x800 and 390x844, and at
   1440x900 and 1024x768 for the height, 2026-11-24; screenshots in `.playwright-mcp/`,
-  git-ignored): the home page ("Global reach") and `/globe/` fit one window, without
-  scrolling; the menu lists Home, About and Privacy, then the icon of GitHub; on narrow screens the
+  git-ignored): the home page ("Global reach") fits one window, without scrolling, as
+  `/globe/` did until 2026-11-26; the menu lists Home, About and Privacy, then the icon of GitHub; on narrow screens the
   sidebar is a single row, with the mascot and the logotype 56 pixels high and aligned
   (2026-11-25), down to about 350 pixels (the gaps narrow below 400, so that 360 keeps one
   row); below, as at 320, two centred rows, the mascot and the logotype, then the menu
@@ -661,14 +682,27 @@ harness) comes from thebox, which is versioned and released like any other repos
   dark grey; the fonts over `http`; `maximum-scale=1`, which stopped zooming on phones.
   The stage site (`npm run serve:stage`, 2026-11-25, the same four sizes and 768x1024): on
   wide screens each banner is one line 2rem high at its edge of the window, 22 pixels in a
-  window less than 800 pixels high; the sidebar fits between them, and the home page and
-  `/globe/` give them their vertical padding (the text of `/globe/` had 11 pixels left at
-  1024x768). On 390x844 each takes two lines, the top one scrolling away with the row of the
+  window less than 800 pixels high; the sidebar fits between them, and the home page gives
+  them its vertical padding. On 390x844 each takes two lines, the top one scrolling away with the row of the
   sidebar, the bottom one ending the page. Still no scroll, no scrollbar in the sidebar, no
   console error. **Found on the way, not fixed**: below about 720 pixels of height the
   sidebar of the production site scrolls a little (7 pixels at 1024x688, 17 at 1280x640, 26
   at 1024x600); the stage site does the same with the height of its banners less (4 pixels
   at 800x600). To decide with the owner.
+  The pages of text (2026-11-26, `/privacy/`, `/about/` and `/globe/` at 1920x1080, 1280x800,
+  1200 and 1199 wide, 1024x768 and 390x844, as on dev and as the stage site): 57 to 76
+  characters a line, 69 in the middle, on `/privacy/`; the index beside the text from 1200
+  pixels (the text 510 pixels wide there, 540 from 1230), and a list of the sections under
+  the title below, on `/about/` none, since it has one section. While the page scrolls, the
+  index stays 2rem under the top of the window (under the banner on the stage site), marks
+  the section whose heading passed 30% of the window, the last one at the end of the page,
+  and an entry chosen by a click or by the address of the page until the reader scrolls. In a
+  window of 1280x420 the index, higher than the window, scrolled by itself to keep the marked
+  entry in its middle, its hidden edges faded, and the wheel over it scrolled it alone; where
+  it fits, the wheel over it scrolls the page, which `overscroll-behavior: contain` had
+  stopped in Chrome until it was kept to an index that overflows. A heading reached from the
+  index stops 1.5rem under the top of the window, or under the banner; with reduced motion the
+  page jumps instead of scrolling. No horizontal scroll, no console error.
 - **Merge settings of the repository** (GitHub API, 2026-11-25, issue #7, closed): squash
   and merge commits allowed, rebase off; squash title `PR_TITLE` and message `BLANK`, as
   `CONTRIBUTING.md` expects.

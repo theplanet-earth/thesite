@@ -1,0 +1,259 @@
+/* The pages of text (docs/_layouts/page.html): About, Privacy, The globe. The owner,
+   2026-11-26: the text narrower than the window, and an index that follows the reading and
+   marks the section on screen, minimal, without a scrollbar. The rules follow the UX
+   guidelines of ui-ux-pro-max (CLAUDE.md, Section 10): lines of 60 to 75 characters, a line
+   height of 1.5 to 1.75, headings closer to their text than to the text before them, the
+   current section marked by more than its colour, focus never hidden by what stays on screen,
+   and no smooth scrolling for readers who ask for reduced motion. */
+
+/* Anchors bring a heading to rest below the top banner of the stage site
+   (assets/css/preview.css), never under it. */
+html {
+  scroll-padding-top: calc(var(--preview-banner-height, 0rem) + 1.5rem);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* The text: PT Sans at 18 pixels where a rem is 20 (16 where it is 16), in a column of 30em:
+   57 to 76 characters a line on the page Privacy, 69 in the middle (measured with Playwright,
+   2026-11-26). The column and the index are centred in the room the sidebar leaves. */
+.article {
+  --measure: 30em;
+  --index-width: 9rem;
+  --accent: #ffa94d; /* the orange of the globe and of the banner of the stage site */
+  display: grid;
+  grid-template-columns: minmax(0, var(--measure));
+  grid-template-areas:
+    "title"
+    "index"
+    "body";
+  justify-content: center;
+  font-size: max(16px, 0.9rem);
+  line-height: 1.7;
+  color: #ddd;
+}
+
+.article-title {
+  grid-area: title;
+  margin: 0 0 1.25rem;
+  font-size: 2em;
+  line-height: 1.2;
+  text-align: left;
+  text-wrap: balance;
+}
+
+.article-body {
+  grid-area: body;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.article-body > :first-child {
+  margin-top: 0;
+}
+
+/* Headings on the left edge of their text, as the text is; more room above than below, so
+   that each belongs to the section it opens. */
+.article-body h2,
+.article-body h3 {
+  color: #f2f2f2;
+  text-align: left;
+  text-wrap: balance;
+}
+
+.article-body h2 {
+  margin: 2em 0 0.6em;
+  font-size: 1.3em;
+  line-height: 1.3;
+}
+
+.article-body h3 {
+  margin: 1.75em 0 0.5em;
+  font-size: 1.1em;
+  line-height: 1.35;
+}
+
+.article-body p,
+.article-body ul,
+.article-body ol {
+  margin: 0 0 1.15em;
+}
+
+.article-body p {
+  text-wrap: pretty;
+}
+
+.article-body ul,
+.article-body ol {
+  padding-left: 1.25em;
+}
+
+.article-body li + li {
+  margin-top: 0.4em;
+}
+
+.article-body li::marker {
+  color: #a6a6a6;
+}
+
+/* Links are underlined: their blue differs from the text by its colour only (contrast 1.2:1,
+   where WCAG 2.2 asks 3:1 to tell them apart by colour alone, success criterion 1.4.1). */
+.article-body a {
+  text-decoration: underline;
+  text-decoration-color: rgba(156, 211, 255, 0.45);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.article-body a:hover {
+  text-decoration-color: currentColor;
+}
+
+/* Code in the dark of the page, in Roboto Mono, instead of the white box of the theme. */
+.article-body code {
+  padding: 0.1em 0.35em;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #eee;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.85em;
+}
+
+/* The index: a thin rail, the entries in grey, the section being read in white with the orange
+   of the globe on the rail (aria-current, so that it is not marked by colour alone). */
+.toc {
+  grid-area: index;
+  margin: 0 0 2rem;
+  font-size: max(14px, 0.75rem);
+  line-height: 1.4;
+}
+
+.toc-label {
+  margin: 0 0 0.4rem;
+  color: #b5b5b5;
+  font-size: 0.85em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.toc ol {
+  margin: 0;
+  padding: 0;
+  border-left: 1px solid #5f5f5f;
+  list-style: none;
+}
+
+.toc li {
+  margin: 0;
+}
+
+.toc a {
+  display: block;
+  margin-left: -1px;
+  padding: 0.35rem 0 0.35rem 0.85rem;
+  border-left: 2px solid transparent;
+  color: #b5b5b5;
+  text-decoration: none;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.toc .toc-sub a {
+  padding-left: 1.6rem;
+}
+
+.toc a:hover {
+  color: #eee;
+  text-decoration: none;
+}
+
+.toc a:focus-visible {
+  outline: 2px solid #9ccc65;
+  outline-offset: -2px;
+}
+
+.toc a[aria-current] {
+  border-left-color: var(--accent);
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toc a {
+    transition: none;
+  }
+}
+
+/* On narrow screens the index is the list of the sections under the title: without the title
+   itself, and only when there are two sections or more. */
+.toc .toc-title,
+.toc[data-sections="1"] {
+  display: none;
+}
+
+/* On wide screens the index stands beside the text and stays in the window while the page
+   scrolls, between the banners of the stage site. Higher than the window, it scrolls: by itself
+   (src/toc/main.js), or by the wheel while the pointer is over it, without a visible scrollbar
+   and without scrolling the page at its ends; its edges fade where entries are hidden. The
+   content leaves the sidebar 2rem instead of 4, so that from 1200 pixels the text keeps 28em
+   or more beside the index, about 64 characters. */
+@media (min-width: 75em) {
+  .content {
+    margin-left: 20rem;
+    margin-right: 1rem;
+  }
+
+  .article {
+    grid-template-columns: minmax(0, var(--measure)) var(--index-width);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "title index"
+      "body index";
+    column-gap: 2.5rem;
+  }
+
+  .toc {
+    position: sticky;
+    top: calc(var(--preview-banner-height, 0rem) + 2rem);
+    align-self: start;
+    max-height: calc(100vh - var(--preview-height, 0rem) - 4rem);
+    margin: 0.5rem 0 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+
+  .toc::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* data-fade marks an index that hides entries, so higher than the window: only then does the
+     wheel stop at its ends. Chrome stops it even at an index that fits, where the wheel would
+     then scroll nothing (seen with Playwright, 2026-11-26). */
+  .toc[data-fade] {
+    overscroll-behavior: contain;
+    --fade-top: 0rem;
+    --fade-bottom: 0rem;
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 var(--fade-top), #000 calc(100% - var(--fade-bottom)), transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 var(--fade-top), #000 calc(100% - var(--fade-bottom)), transparent);
+  }
+
+  .toc[data-fade~="top"] {
+    --fade-top: 2rem;
+  }
+
+  .toc[data-fade~="bottom"] {
+    --fade-bottom: 2rem;
+  }
+
+  .toc-label {
+    display: none;
+  }
+
+  .toc .toc-title,
+  .toc[data-sections="1"] {
+    display: block;
+  }
+}

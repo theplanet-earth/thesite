@@ -62,9 +62,8 @@
     }
 }
 
-/* The home page and the page of the globe fit the window: less room above and below. */
-.home .content,
-.globe-page .content {
+/* The home page fits the window: less room above and below. */
+.home .content {
     padding-top: 1rem;
     padding-bottom: 1rem;
 }
@@ -207,18 +206,4 @@
     .sidebar .container {
         justify-content: center;
     }
-}
-
-/* The page of the globe fits one window too (the owner, 2026-11-24): a slightly smaller text. */
-.globe-page .page {
-    margin-bottom: 0;
-    font-size: 0.85rem;
-}
-
-.globe-page .page p {
-    margin-bottom: 0.75rem;
-}
-
-.globe-page .page p:last-child {
-    margin-bottom: 0;
 }

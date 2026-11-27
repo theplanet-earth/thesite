@@ -109,18 +109,17 @@
     bottom: var(--preview-banner-height);
   }
 
-  /* The home page and the page of the globe fit the window (assets/css/theplanet.css): the
-     banners take the room of their padding, 1rem above and 1rem below. */
-  .preview .home .content,
-  .preview .globe-page .content {
+  /* The home page fits the window (assets/css/theplanet.css): the banners take the room of
+     its padding, 1rem above and 1rem below. */
+  .preview .home .content {
     padding-top: 0;
     padding-bottom: 0;
   }
 }
 
 /* Windows less than 800 pixels high: thinner banners. The sidebar of the production site
-   fits from about 720 pixels of height, and the text of the page of the globe has 11 pixels
-   left at 1024x768: two banners of 22 pixels keep both in a window of 1024x768. */
+   fits from about 720 pixels of height: two banners of 22 pixels keep it in a window of
+   1024x768. */
 @media (min-width: 48em) and (max-height: 799.98px) {
   .preview {
     --preview-banner-height: 22px;

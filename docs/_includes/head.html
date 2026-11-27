@@ -36,6 +36,10 @@
   <!-- The notice of privacy (_includes/privacy-notice.html), on every page but the page Privacy. -->
   <link rel="stylesheet" href="{{ '/assets/css/notice.css' | relative_url }}?v={{ site.time | date: '%s' }}">
   {%- endunless %}
+  {%- if page.layout == 'page' %}
+  <!-- The pages of text (_layouts/page.html): their measure, their type and their index. -->
+  <link rel="stylesheet" href="{{ '/assets/css/page.css' | relative_url }}?v={{ site.time | date: '%s' }}">
+  {%- endif %}
 
   <link rel="apple-touch-icon" sizes="144x144" href="{{ '/public/apple-touch-icon.png' | relative_url }}">
   <link rel="icon" href="{{ '/public/favicon.ico' | relative_url }}">

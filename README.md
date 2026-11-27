@@ -75,6 +75,8 @@ that the owner squash-merges, each followed by a merge back down the chain
   Leaflet map (`v0.1.0`, pull request #11); since `v0.2.0` (pull request #24) its home page
   is a 3D globe with the latest edits to OpenStreetMap, kept current by the browser,
   explained on `/globe/` (`CLAUDE.md`, Section 2), and the demo text of the theme is gone.
+- The pages of text (About, Privacy, The globe) are set in a column of about 70 characters,
+  with an index of their sections that follows the reading (`CLAUDE.md`, Section 2).
 - The mascot of the logo in 3D is kept in [`media/mascot/`](media/mascot/README.md), not used
   by the site.
 - Since 2026-11-25 both addresses serve the site, each deployed by its workflow (issues #2,

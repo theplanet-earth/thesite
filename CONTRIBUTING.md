@@ -199,6 +199,12 @@ Applies to documentation, comments, commit messages and pull request description
   data in `_data/`, the project's own styles in `assets/css/`, the theme (Hyde on Poole, MIT)
   in `public/`. Every local link goes through `relative_url`, never a bare path: the build
   passes an empty `baseurl`, and `npm run check:site` fails on a link that does not resolve.
+- **The pages of text** (About, Privacy, The globe) use the layout `page`: the text in a
+  column of about 70 characters, and an index built from the title and the `##` and `###`
+  headings, beside the text on wide screens and under the title on narrow ones
+  (`docs/assets/css/page.css`, `src/toc/`). A page is divided by headings, not by bold
+  lead-ins, so that its index shows the sections; `toc: false` in the front matter leaves the
+  index out.
 - **The scripts of the site** are ES modules in `src/`, bundled by esbuild (`npm run build`,
   `npm run serve`); no framework. What can be tested without a browser (geometry, timing,
   data) goes in a module without three.js or the DOM, such as `src/globe/geometry.js`, with
