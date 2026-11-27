@@ -1,6 +1,6 @@
 ---
 layout: page
-nav_order: 2
+nav_order: 3
 title: Privacy
 description: What this site does with the data of its visitors, under the GDPR and the Italian rules on cookies.
 ---
@@ -13,8 +13,9 @@ description: What this site does with the data of its visitors, under the GDPR a
 
 **In short**: this site sets no cookies, stores nothing in your browser, and has no
 analytics, advertising, tracking, forms or accounts. It loads its pages, fonts, styles and
-scripts from itself. What is left is what every website does: the servers that deliver it
-receive the address of your device (the IP address) with every request.
+scripts from itself; only the map of the page Map comes from OpenStreetMap. What is left is
+what every website does: the servers that deliver it receive the address of your device (the
+IP address) with every request.
 
 ## Who is responsible
 
@@ -51,6 +52,18 @@ which sends it on to a copy on Amazon S3 in Frankfurt: the OpenStreetMap Foundat
 ([privacy notice](https://aws.amazon.com/privacy/)) receive your IP address and the details of
 those requests. Your browser only downloads public files; it sends nothing else.
 
+**The map** of the page Map is the map of
+[OpenStreetMap](https://www.openstreetmap.org/), on both sites: while it is shown, your
+browser asks `tile.openstreetmap.org` for its images (the tiles) of the places on screen,
+each time you move or zoom it. The home page asks nothing of it until you open the map. The
+OpenStreetMap Foundation receives your IP address, the details of those requests (what your
+browser sends with them, such as its name and version) and, as its
+[tile usage policy](https://operations.osmfoundation.org/policies/tiles/) asks, the address of
+this site (only the site, never the page), as a controller of its own, under its
+[privacy policy](https://osmfoundation.org/wiki/Privacy_Policy), which says that the tiles
+come from "a global network of cache servers" chosen by the operation of a content
+distribution network at the time of the request, and does not name that network.
+
 **Links** to other sites (GitHub, OpenStreetMap, and the sources this site cites) are followed
 only when you click them; that site's own policy then applies.
 
@@ -85,7 +98,9 @@ which the European Commission found adequate on 10 July 2023
 rely on the standard contractual clauses of the Commission. The OpenStreetMap Foundation keeps
 such data in the United Kingdom and the Netherlands; the United Kingdom has an adequacy
 decision of the Commission until 27 December 2031
-([press release](https://ec.europa.eu/commission/presscorner/detail/en/ip_25_3059)).
+([press release](https://ec.europa.eu/commission/presscorner/detail/en/ip_25_3059)). Its
+privacy policy leaves out of that statement the data of the requests for tiles, and says
+neither where the network that serves them is, nor where their records are kept.
 
 ## How long
 
@@ -107,5 +122,5 @@ authority of the country where you live or work (Article 77).
 ## Changes
 
 This page changes with the site, and says so before the site starts to use anything it does
-not describe. Last changed on 25 November 2026; every change is in the
+not describe. Last changed on 26 November 2026; every change is in the
 [history of this page]({{ site.github.repo }}/commits/master/docs/privacy.md).
