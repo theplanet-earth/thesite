@@ -1,6 +1,6 @@
 // The bundles of the site (generated, git-ignored): esbuild bundles src/globe/main.js, with the
-// parts of three.js it uses, into docs/assets/bundle/globe.js, keeping the licence comments of
-// three.js at its end, and src/notice/main.js, the notice of privacy of every page, into
+// parts of three.js and Leaflet it uses, into docs/assets/bundle/globe.js, keeping their licence
+// comments at its end, src/notice/main.js, the notice of privacy of every page, into
 // docs/assets/bundle/notice.js, and src/toc/main.js, the index of the pages of text, into
 // docs/assets/bundle/toc.js. Run by scripts/bundle.sh, which npm run build and npm run serve
 // call.

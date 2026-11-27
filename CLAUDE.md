@@ -23,7 +23,9 @@ shows a 3D globe (`src/globe/`, three.js bundled by esbuild), which replaced the
 of the prototype on 2026-11-23, with the latest edits to OpenStreetMap as orange spikes and
 arcs (issue #1, Section 2): those of the build first, then those the browser reads every 19
 minutes while the globe is shown. `/globe/` explains it and credits the work it builds on.
-In production a Worker (`wrangler.jsonc`, `worker/`) serves the site and reads the edits
+The page Map (`/map/`, since 2026-11-26) shows the Standard map of OpenStreetMap in Leaflet;
+Home and Map are one document with two views (`docs/_includes/world.html`), and the globe
+opens into the map and closes again (Section 2). In production a Worker (`wrangler.jsonc`, `worker/`) serves the site and reads the edits
 once for every visitor. `npm run build` builds it into `build/pages/`, `npm run serve`
 previews it (`npm run serve:stage` as the stage site). Two environments, decided by the owner
 on 2026-11-23 following issue #2, both live since 2026-11-25:
@@ -238,6 +240,22 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   the stage site, the edits of 20 minutes, the page *Privacy* and its notice, now in
   production), then merged `master` into `stage` and `stage` into `dev`; the three branches
   held the same files, and the merge back closed issue #25 (Section 12).
+- 2026-11-26, after two proofs of concept outside the repository: "un'altra voce: "Map" tra
+  Home e About che apre una pagina /map con una transizione fluida tra l'attuale globo (come
+  che venisse zoommato e "aperto") e [...] una mappa 2D di tutto il mondo [...] cliccando di
+  nuovo su home, ci dev'essere la transizione inversa"; of the first map, "vorrei una mappa
+  che fosse presa da OSM (citata a dovere) e che non fosse "ellissioidale" [...] la
+  preferisco rettangolare così com'è quella di osm proprio [...] non si devono assomigliare";
+  of the spikes and arcs, "quando clicco su maps vorrei che la transizione facesse scomparire
+  (e ricomparire poi) anche loro, in maniera fluida"; and "sviluppalo e mergia una PR su dev
+  [...] leva questo "Home closes it back into the globe." nella didascalia e "Map" in alto
+  sopra la mappa". The page Map (`docs/map.html`, `nav_order` 1, About 2, Privacy 3) shows the
+  Standard tiles of OpenStreetMap in Leaflet, credited on the map and under it, with no
+  visible title (an `h1` for assistive technologies only). Following the link from Home, the
+  spikes, arcs and rings sink and fade, the globe turns to Greenwich, comes closer and opens
+  from the back into Web Mercator, its sea and land take the colours of the tiles, the dots
+  fill the land, and the tiles fade in over it; Home plays it backwards
+  (`src/globe/transition.js`). The owner asked Claude to merge the pull request into `dev`.
 - 2026-11-26, on `/globe/`, `/about/` and `/privacy/`: "il font mi piace molto, ma c'è
   qualcosa che non mi convince nel come appare il testo. migliorale usando
   https://github.com/nextlevelbuilder/ui-ux-pro-max-skill"; "non mi piace che il testo copra
@@ -253,7 +271,8 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   under the title below (Section 12). `/globe/` had no headings: its three bold lead-ins
   became its sections. **Against the instruction of 2026-11-24** that `/globe/` fit one
   window: with lines of 70 characters its text no longer fits one, at 1280x800 nor at
-  1920x1080 (1268 pixels high); the home page still does. Reported to the owner.
+  1920x1080 (1268 pixels high); the home page still does. Reported to the owner, who asked
+  Claude to merge the pull request (#43) into `dev`, after the page Map (#42).
 
 Rules of the organization, carried over from thebox or from its issues (keep them unless the
 owner decides otherwise):
@@ -303,7 +322,7 @@ owner decides otherwise):
 | `scripts/lib.sh` | Helpers shared by the shell scripts: repository root, `build/`, `$PY`, `log`, `warn`, `die`, `need`, `project_version` |
 | `scripts/build.sh`, `test.sh`, `check.sh` | Build (the site into `build/pages/`), unit tests, every check (the entry points of CI) |
 | `scripts/serve.sh` | Live preview of the site at `http://localhost:4000` (`npm run serve`; `npm run serve:stage` as the stage site, with its banners), with the bundle rebuilt on every change of `src/` |
-| `scripts/bundle.sh`, `scripts/bundle.mjs` | esbuild bundles `src/globe/main.js` and three.js into `docs/assets/bundle/globe.js`, `src/notice/main.js` into `docs/assets/bundle/notice.js`, and `src/toc/main.js` into `docs/assets/bundle/toc.js` (generated, git-ignored), with the licence of three.js beside it; run by `build.sh` and `serve.sh`; in watch mode it touches the bundle a second after each build (Section 12) |
+| `scripts/bundle.sh`, `scripts/bundle.mjs` | esbuild bundles `src/globe/main.js`, three.js and Leaflet into `docs/assets/bundle/globe.js`, `src/notice/main.js` into `docs/assets/bundle/notice.js`, and `src/toc/main.js` into `docs/assets/bundle/toc.js` (generated, git-ignored), with the licences of three.js and Leaflet beside it, and the stylesheet and images of Leaflet (`leaflet.css`, `images/`); run by `build.sh` and `serve.sh`; in watch mode it touches the bundle a second after each build (Section 12) |
 | `wrangler.jsonc`, `worker/` | The Worker of production (issue #2): static assets from `build/pages/`, custom domain `theplanet.observer`; `worker/index.js` runs only for `/api/*`, `worker/edits.js` serves `/api/osm-edits.json`, read at most every 19 minutes and cached |
 | `scripts/worker.sh` | wrangler at a pinned version: `npm run worker:check` (dry run), `npm run worker:dev` (the site with the Worker at `http://localhost:8787`), and `deploy`, run by `production.yml` with the token and the account in the environment; each builds the site with `JEKYLL_ENV=production` and runs `check-site.py` before wrangler |
 | `media/mascot/` | The mascot of the logo in 3D, not used by the site: the five files Meshy made (walking, running, rigged, without skeleton, preview; 20 MB), `provenance.json` and a `README.md` on what each may serve; kept for thegame (Section 2) |
@@ -313,14 +332,14 @@ owner decides otherwise):
 | `scripts/install-skills.sh` | Claude Code skills installed for the user, pinned to a commit (Section 10) |
 | `scripts/check-confidential.py` | Confidentiality guard (pre-commit hook and `npm run check`) |
 | `scripts/check-template.sh` | Lists the `TEMPLATE` markers left; none since 2026-11-24, so `npm run check` runs it with `--strict` |
-| `scripts/check-site.py` | Check of the built site: every local link and resource of `build/pages/` exists, none loads over `http` or from another host, the notice of privacy is on every page but `/privacy/`, nothing unpublishable is published, and the banner of the stage site is at the top and at the bottom of every page of a build for stage and on no page of any other, by `JEKYLL_ENV` (`npm run check:site`) |
+| `scripts/check-site.py` | Check of the built site: every local link and resource of `build/pages/` exists, none loads over `http` or from another host, the notice of privacy is on every page but `/privacy/`, a page with the map of OpenStreetMap links its copyright page, nothing unpublishable is published, and the banner of the stage site is at the top and at the bottom of every page of a build for stage and on no page of any other, by `JEKYLL_ENV` (`npm run check:site`) |
 | `scripts/version.py` | Version, next version and release notes from the tags and the commits |
 | `scripts/setup-python.sh` | `.venv/` from `requirements.txt`, reinstalled only when it changes |
-| `tests/` | `unittest` checks of the harness scripts, of `check-site.py`, of `land-mask.py`, of `osm-activity.py`, of the permissions of the devcontainer, of the header of `README.md`, of the license and of the deploys (standard library only); `notice.test.mjs` (when the notice of privacy opens), `toc.test.mjs` (the index of the pages of text), `globe.test.mjs`, `replication.test.mjs` and `live.test.mjs` (the live edits and the Worker, against fakes), with `node --test` |
-| `src/globe/` | The globe of the home page: `geometry.js` (dots of the land, spikes, arcs, quality tiers; no three.js), `replication.js` (the replication of changesets: paths, parsing, merging; no DOM), `live.js` (every 19 minutes, the edits from the Worker or from the replication; shared with the Worker), `main.js` (the three.js scene) |
+| `tests/` | `unittest` checks of the harness scripts, of `check-site.py`, of `land-mask.py`, of `osm-activity.py`, of the permissions of the devcontainer, of the header of `README.md`, of the license and of the deploys (standard library only); `notice.test.mjs` (when the notice of privacy opens), `toc.test.mjs` (the index of the pages of text), `globe.test.mjs`, `replication.test.mjs`, `live.test.mjs` (the live edits and the Worker, against fakes), `transition.test.mjs` (the transition between Home and Map, and the first view of the map) and `route.test.mjs` (which links play it), with `node --test` |
+| `src/globe/` | The globe of the home page and the map of Map: `geometry.js` (dots of the land, spikes, arcs, quality tiers, Web Mercator and the first view of the map; no three.js), `transition.js` (the transition between Home and Map over time; no DOM), `route.js` (which links play it; no DOM), `replication.js` (the replication of changesets: paths, parsing, merging; no DOM), `live.js` (every 19 minutes, the edits from the Worker or from the replication; shared with the Worker), `scene.js` (the three.js scene, and its opening into the map), `map.js` (the Leaflet map, created only when shown), `main.js` (the two views, the transition, the History API) |
 | `src/toc/` | The index of the pages of text: `spy.js` (the section being read, where the index scrolls, how slowly; no DOM), `main.js` (builds it from the title and the headings, follows the reading) |
 | `src/notice/` | The notice of privacy: `visit.js` (whether a visit starts, from the referrer and the type of navigation; no DOM), `main.js` (opens the dialog of `docs/_includes/privacy-notice.html`) |
-| `package.json`, `package-lock.json` | Also the dependencies of the site, pinned: three.js and esbuild (Section 10) |
+| `package.json`, `package-lock.json` | Also the dependencies of the site, pinned: three.js, Leaflet and esbuild (Section 10) |
 | `.devcontainer/` | `Dockerfile`, `devcontainer.json`, `post-create.sh` (Section 10) |
 | `.vscode/` | Recommended extensions, settings, and every command as a task |
 | `.mcp.json` | Project MCP servers for Claude Code: Playwright |
@@ -339,7 +358,7 @@ The site, cleaned up on 2026-11-24 (`CONTRIBUTING.md`, *Conventions of this repo
 
 | Path | Content |
 |---|---|
-| `docs/` | Jekyll 4.3 site: `_config.yml`, `Gemfile` and `Gemfile.lock` (Jekyll, and the three gems Ruby 3.3 warns about), `_layouts/` (`default`, `page`: the pages of text, with their index), `_includes/` (`head`, `sidebar`, `preview-banner`, the banner of the stage site, `privacy-notice`), `index.html` (the globe), `globe.md` (how the globe is made, in three sections, linked under it, not in the menu), `about.md`, `privacy.md` (the notice under the GDPR, Section 2), `404.html`; the menu lists the pages with a `nav_order` |
+| `docs/` | Jekyll 4.3 site: `_config.yml`, `Gemfile` and `Gemfile.lock` (Jekyll, and the three gems Ruby 3.3 warns about), `_layouts/` (`default`, `page`: the pages of text, with their index), `_includes/` (`head`, `sidebar`, `preview-banner`, the banner of the stage site, `privacy-notice`, `world`, Home and Map as two views of one document), `index.html` (the globe), `map.html` (the map of OpenStreetMap, the same document with the other view shown), `globe.md` (how the globe is made, in three sections, linked under it, not in the menu), `about.md`, `privacy.md` (the notice under the GDPR, Section 2), `404.html`; the menu lists the pages with a `nav_order` |
 | `docs/_data/coverage.yml` | The places shown as orange rings on the globe (issue #1) |
 | `docs/_data/activity.json` | The latest edits to OpenStreetMap, the orange spikes and arcs of the globe: generated at every build by `scripts/osm-activity.py`, git-ignored |
 | `docs/public/` | The Hyde theme on Poole, third-party, MIT, with the dark colours of the project: its CSS, icons and `LICENSE.md`, published with them as the licence asks |
@@ -360,7 +379,9 @@ The site, cleaned up on 2026-11-24 (`CONTRIBUTING.md`, *Conventions of this repo
 
 For the site: `npm run serve` (or the task *Preview: site (live reload)*), then open
 `http://localhost:4000` with the Playwright MCP server, the home page with its globe (drag it,
-turn it with the arrow keys) and `/about/` at least. A change of the layout is looked at with
+turn it with the arrow keys), Map from the menu and back (the transition both ways; in the
+console `window.__globeSlow = 5` plays it five times slower), `/map/` loaded directly, and
+`/about/` at least. Home must ask nothing of `tile.openstreetmap.org` before Map is followed. A change of the layout is looked at with
 `npm run serve:stage` too (task *Preview: site as stage (live reload)*): the stage site has
 its banners above and below the pages. After `npm run build`, `npm run check:site` checks the links and
 resources of `build/pages/`, that nothing loads over `http` or from another host, that the
@@ -485,6 +506,8 @@ The rules are in `CONTRIBUTING.md`, *Confidentiality*. In addition:
 | Jekyll | 4.3.3, with the gems of `docs/Gemfile.lock` (Bundler 2.5.6) | `docs/` |
 | Mascot | Meshy Image to 3D, `ai_model: latest` (Meshy 7.1 in 2026-11), then rigging; tasks and parameters in `media/mascot/provenance.json`, 2026-11-24, 35 credits | `scripts/meshy.py` |
 | three.js | 0.187.0 (MIT), bundled by esbuild 0.28.2 (MIT); exact versions in `package.json` | `package.json`, `package-lock.json` |
+| Leaflet | 1.9.4 (BSD 2-Clause), bundled by esbuild; its stylesheet, images and licence copied by `scripts/bundle.sh` | `package.json`, `package-lock.json` |
+| Map tiles | the Standard tiles of OpenStreetMap, `https://tile.openstreetmap.org/{z}/{x}/{y}.png`, the URL their tile usage policy asks for | `docs/_config.yml` (`map.tiles`) |
 | Fonts | PT Sans 400, 400 italic, 700 and Roboto Mono 400, 700, latin and latin-ext, from `@fontsource/pt-sans` and `@fontsource/roboto-mono` 5.3.0 (`npm pack`, not dependencies), OFL 1.1 | `docs/assets/fonts/`, `docs/assets/css/fonts.css` |
 | OpenStreetMap edits | the minutely replication of changesets, `https://planet.openstreetmap.org/replication/changesets/` (redirects to a mirror on S3): the edits closed in the 20 minutes before its last run (`WINDOW_MINUTES`), read from the files of 22 minutes, at most 3000: at every build, then every 19 minutes the Worker of production for every visitor, or the browser where there is no Worker (only the files not read yet) | `scripts/osm-activity.py`, `src/globe/live.js`, `worker/edits.js` |
 | wrangler | 4.168.0, through `npx` (not a dependency of the site); `compatibility_date` 2026-11-24 | `scripts/worker.sh`, `wrangler.jsonc` |
@@ -666,15 +689,60 @@ harness) comes from thebox, which is versioned and released like any other repos
   ([GitHub Docs](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)).
 - **`PUBLISH_PAGES` stays unset** in this repository: the GitHub Pages site here is the stage
   site, and `release.yml` would publish `master` on it.
+- **The map of the page Map** (2026-11-26, Section 2):
+  - **The tiles** are the Standard tiles of OpenStreetMap, within their
+    [tile usage policy](https://operations.osmfoundation.org/policies/tiles/) (read on
+    2026-11-26): the URL `https://tile.openstreetmap.org/{z}/{x}/{y}.png`, kept in
+    `docs/_config.yml` as the policy recommends; only the tiles of the view on screen, and none
+    before the map is shown: Home creates the map when its link is followed (Playwright: no
+    request to the tile servers on Home, 16 when the map opens at 1280x800); no prefetch and
+    nothing offline, which the policy forbids, so no proof of concept in an artifact of
+    claude.ai, whose pages may load no image of another host; the credit on the map (Leaflet)
+    and under it, which `check-site.py` checks.
+  - **The Referer**: the tile servers answer "Access blocked" without it
+    ([wiki](https://wiki.openstreetmap.org/wiki/Blocked)). The port forwarding of Codespaces
+    serves pages with `Referrer-Policy: same-origin` (read from its answers on 2026-11-26),
+    which sends none to another host: a preview opened at `*.app.github.dev` got the blocked
+    tile everywhere. `src/globe/map.js` gives every tile `referrerPolicy:
+    'strict-origin-when-cross-origin'`, so that the origin of the site goes with it whatever
+    the page says; the sites send no `Referrer-Policy` (`docs/_includes/head.html`, the Worker).
+  - **The privacy of the tiles**: the
+    [privacy policy of the OpenStreetMap Foundation](https://osmfoundation.org/wiki/Privacy_Policy)
+    (edited on 25 January 2026, read on 2026-11-26) says the tiles come from "a global network
+    of cache servers" of a content distribution network it does not name, and leaves the data
+    of tile requests out of its statement that it keeps data in the United Kingdom and the
+    Netherlands: where they are kept is not said. `docs/privacy.md` says exactly that; the
+    answers of `tile.openstreetmap.org` carry `via: 1.1 varnish` and `x-served-by: cache-ams-...`
+    (one request, 2026-11-26), which name no provider either.
+  - **Fractional zooms**: the first view of the map is at `log2(width / 256)`, between two
+    zooms of the tiles, where Leaflet 1.9 leaves hairlines between tiles; its own fix,
+    `mix-blend-mode: plus-lighter` (`leaflet.css`), turned the joins white here, together with
+    the rounded corners that `poole.css` gives every image. `assets/css/globe.css` squares the
+    tiles, draws them normally and makes them half a pixel larger.
+  - **The opened globe stops at 83 degrees** of latitude, Web Mercator at 85.05: above the top
+    of the map box on the screens measured (81.5 degrees at 1280x800), so the two meet; on a box
+    as high as three quarters of its width the top reaches 82.4 degrees.
+  - **During the transition** the canvas of the globe covers the window (it draws only, under
+    the sidebar), at the pixel ratio of its quality tier; it goes back to the box of the globe
+    at the end, and under the map it stays until the tiles of the first view have loaded.
+  - **`/globe/` does not mention the map**: it had 31 pixels left at 1024x768, less than a
+    line, and must fit one window (Section 2); Leaflet is credited on the map itself and in
+    `README.md`, *Credits*, its licence published next to the bundle.
+  - **Found on the way, and fixed**: on a narrow window the pointer over the logo of the
+    sidebar made it jump at every frame. `.sidebar-logo:hover` set `display: block`, above the
+    flex of narrow screens: the mascot stacked over the logotype, the logo left the pointer and
+    came back (`assets/css/theplanet.css`).
 - **What the preview shows** (`npm run serve`, Playwright at 1280x800 and 390x844, and at
   1440x900 and 1024x768 for the height, 2026-11-24; screenshots in `.playwright-mcp/`,
   git-ignored): the home page ("Global reach") fits one window, without scrolling, as
-  `/globe/` did until 2026-11-26; the menu lists Home, About and Privacy, then the icon of GitHub; on narrow screens the
+  `/globe/` did until 2026-11-26; the menu lists Home, Map, About and Privacy, then the icon of GitHub, on one row
+  under the logotype (gaps of 0.65rem since Map, 2026-11-26); on narrow screens the
   sidebar is a single row, with the mascot and the logotype 56 pixels high and aligned
-  (2026-11-25), down to about 350 pixels (the gaps narrow below 400, so that 360 keeps one
-  row); below, as at 320, two centred rows, the mascot and the logotype, then the menu
-  (measured with Playwright, 2026-11-25); no console error from the site, no broken link, no horizontal
-  scroll. Fixed on the way:
+  (2026-11-25), down to 385 pixels (the gaps narrow below 426, so that 390 keeps one row);
+  below, as at 360 and 320, two centred rows, the mascot and the logotype, then the menu
+  (measured with Playwright, 2026-11-26); the page Map fits one window too, on the stage
+  site between its banners (1280x800, 1024x768, 800x600); no console error from the site,
+  no broken link, no horizontal scroll. Fixed on the way:
   the tiles of CARTO, which now need a key ([CARTO](https://carto.com/basemaps/apikey)),
   until the globe replaced the map; `/about/` without style (links relative to the page);
   the click towards `https://enjoy.theplanet.wtf`, a name with no DNS record, gone with the
