@@ -287,6 +287,8 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   text with sections. The page 404 takes the layout `page`, without index. No colour is
   added: the orange, the blue of the links and the greys are those of the site. The owner
   took it, "mi piace, mergiala a dev": Claude merged it into `dev` (#44).
+- 2026-11-27, "aggiungi al promemoria di fare la issue #3": every recap reminds what is left
+  of issue #3 (its description lists it, Section 12), until the issue is closed.
 - 2026-11-27, "mergia tutto su stage e poi master e al contrario come sempre": Claude
   squash-merged #41 into `stage` and #45 into `master` (`v0.4.0`: the page Map, and the pages
   of text with their index and their look, now in production), then merged `master` into
@@ -882,7 +884,8 @@ Open points:
 - [ ] Owner, postponed (Section 2): HSTS, first without `preload`, and with it the proxy of
   `theplanet.wtf`, after SSL *Full (strict)* and a change of `docs/privacy.md` (Cloudflare
   would receive the visits of stage too). Later, the rotation of the token of production
-  before about 2027-11-25. Issue #3 stays open for them, with the plan of each.
+  before about 2027-11-25. Issue #3 stays open for them, with the plan of each. Remind
+  both points in the recaps until #3 is closed (Section 2, 2026-11-27).
 - [ ] Older issues to plan with the owner: #1 (coverage map: colours from an API,
   click to explore), #4 (security audit with the skill, profile `quick`, findings only as
   private advisories), #18 (a section of the site with a Leaflet map).
