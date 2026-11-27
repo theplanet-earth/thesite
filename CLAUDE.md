@@ -695,6 +695,25 @@ harness) comes from thebox, which is versioned and released like any other repos
   and `1.1.1.1` and `8.8.8.8` answer the DS, the A records of both sites and the MX of
   `theplanet.dev` with the flag AD, so validating resolvers now check them; both sites still
   answer 200. No site sends `Strict-Transport-Security`: HSTS is postponed (Section 2).
+  Checked from outside on 2026-11-27, and written into the description of issue #3, which
+  since then shows only what is done and what is left (the original checklist is in its
+  edit history):
+  - **Universal SSL stays on** (point 6 of #3): `theplanet.observer` serves a certificate of
+    Google Trust Services for the apex and `*.theplanet.observer`, the coverage of Universal
+    SSL, and disabling it without an advanced or custom certificate leaves HTTPS without one
+    ([documentation](https://developers.cloudflare.com/ssl/edge-certificates/universal-ssl/disable-universal-ssl/)).
+  - **The domains expire** on 2027-03-13 (`theplanet.wtf`), 2027-03-21 (`theplanet.dev`) and
+    2027-05-11 (`theplanet.observer`), by RDAP; Cloudflare Registrar turns auto-renew on by
+    default and tries 30 days before
+    ([documentation](https://developers.cloudflare.com/registrar/account-options/renew-domains/)),
+    which the owner checks in the dashboard.
+  - **The apex and `www` of `theplanet.dev`** have proxied A and AAAA records that answer
+    Cloudflare's Error 1000, "DNS points to prohibited IP": they point at an address of
+    Cloudflare. No site lives there; Email Routing needs only its MX, SPF and DKIM records.
+  - **The certificate of GitHub Pages** for `theplanet.wtf` and `www.theplanet.wtf` is
+    approved until 2027-02-22, with *Enforce HTTPS* (API): the first condition of the proxy
+    of `theplanet.wtf` is met. Behind the proxy GitHub may fail to renew it, and under *Full
+    (strict)* Cloudflare would then answer 526: not verified; #3 says how to watch it.
 - **The yearly rebuild** (`.github/workflows/new-year.yml`, 2026-11-25): GitHub runs a
   schedule only from the default branch, so it works since the file reached `master` with
   `v0.2.0` (*New year* is active); the run then has the ref of `master`, and the environment
@@ -849,9 +868,14 @@ Open points:
 
 - [ ] Optional, owner: turn off Network Error Logging on the zone of `theplanet.observer`;
   the page *Privacy* then no longer needs to name it.
+- [ ] Owner, at any time (issue #3): confirm two-factor authentication on the Cloudflare
+  account; check the auto-renew of the three domains; remove the A and AAAA records of the
+  apex and `www` of `theplanet.dev` (Error 1000) or point them at a site; export the records
+  of the three zones and compare them with those of #3.
 - [ ] Owner, postponed (Section 2): HSTS, first without `preload`, and with it the proxy of
-  `theplanet.wtf`; then SSL *Full (strict)*. Later, the rotation of the token of
-  production before about 2027-11-25. Issue #3 stays open for them.
+  `theplanet.wtf`, after SSL *Full (strict)* and a change of `docs/privacy.md` (Cloudflare
+  would receive the visits of stage too). Later, the rotation of the token of production
+  before about 2027-11-25. Issue #3 stays open for them, with the plan of each.
 - [ ] Older issues to plan with the owner: #1 (coverage map: colours from an API,
   click to explore), #4 (security audit with the skill, profile `quick`, findings only as
   private advisories), #18 (a section of the site with a Leaflet map).
