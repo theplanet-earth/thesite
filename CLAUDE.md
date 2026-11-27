@@ -287,6 +287,13 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   text with sections. The page 404 takes the layout `page`, without index. No colour is
   added: the orange, the blue of the links and the greys are those of the site. The owner
   took it, "mi piace, mergiala a dev": Claude merged it into `dev` (#44).
+- 2026-11-27, "mergia tutto su stage e poi master e al contrario come sempre": Claude
+  squash-merged #41 into `stage` and #45 into `master` (`v0.4.0`: the page Map, and the pages
+  of text with their index and their look, now in production), then merged `master` into
+  `stage` and `stage` into `dev`; the three branches held the same files. Checked from
+  outside: `theplanet.wtf` and `theplanet.observer` serve the index on `/privacy/` and
+  `/globe/` and the page Map, `/api/osm-edits.json` answers 200, and production shows no
+  banner.
 
 Rules of the organization, carried over from thebox or from its issues (keep them unless the
 owner decides otherwise):
