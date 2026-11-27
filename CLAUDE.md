@@ -676,8 +676,11 @@ harness) comes from thebox, which is versioned and released like any other repos
   are registered with Cloudflare Registrar (RDAP), which reads the CDS and sends the DS
   record to the registry within one to two days
   ([documentation](https://developers.cloudflare.com/registrar/get-started/enable-dnssec/)).
-  Until the registry publishes the DS, resolvers do not validate the answers. No site sends
-  `Strict-Transport-Security`: HSTS is postponed (Section 2).
+  The registries published it by 2026-11-27 (checked the same way, at 00:19 UTC, issue #3):
+  in each of the three, the DS answers `2371 13 2` with the digest of the CDS of the zone,
+  and `1.1.1.1` and `8.8.8.8` answer the DS, the A records of both sites and the MX of
+  `theplanet.dev` with the flag AD, so validating resolvers now check them; both sites still
+  answer 200. No site sends `Strict-Transport-Security`: HSTS is postponed (Section 2).
 - **The yearly rebuild** (`.github/workflows/new-year.yml`, 2026-11-25): GitHub runs a
   schedule only from the default branch, so it works since the file reached `master` with
   `v0.2.0` (*New year* is active); the run then has the ref of `master`, and the environment
@@ -828,11 +831,6 @@ Open points:
 
 - [ ] Optional, owner: turn off Network Error Logging on the zone of `theplanet.observer`;
   the page *Privacy* then no longer needs to name it.
-- [ ] From 2026-11-27: check that the registry publishes the DS record of
-  `theplanet.observer`, `theplanet.wtf` and `theplanet.dev` (a DS query through `1.1.1.1`
-  answers, with the flag AD), then record it on issue #3 and in Section 12. If it is
-  still missing after a few more days, the owner looks at *Manage Domains* in the
-  dashboard.
 - [ ] Owner, postponed (Section 2): HSTS, first without `preload`, and with it the proxy of
   `theplanet.wtf`; then SSL *Full (strict)*. Later, the rotation of the token of
   production before about 2027-11-25. Issue #3 stays open for them.
