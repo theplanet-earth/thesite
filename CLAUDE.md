@@ -276,7 +276,7 @@ Dated, in the owner's words where possible. Add every new standing instruction h
 - 2026-11-27, on the same pages: "c'è qualcosa che continua a non convincermi dello stile [...]
   puoi farmi una proposta tu, hai completa libertà, giusto non tradire lo stile e i colori
   dell'attuale soluzione, ma fai tutto quello che ritieni necessario". The proposal, on the
-  branch `typography`, for the owner to take or leave: the pages of text mirror the sidebar,
+  branch `typography`: the pages of text mirror the sidebar,
   whose logotype is Roboto Mono, bold, in capitals, in a square, `#444` on `#ddd`, where the
   content is `#ddd` on `#444`. Titles in Roboto Mono capitals (the page title, Global reach
   on the home page, and the index's first entry, as the title of the notice of privacy
@@ -285,7 +285,8 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   margin on wide screens, with the same numbers in the index; square list markers and code
   with square corners; links with a fainter underline; a small orange square at the end of a
   text with sections. The page 404 takes the layout `page`, without index. No colour is
-  added: the orange, the blue of the links and the greys are those of the site.
+  added: the orange, the blue of the links and the greys are those of the site. The owner
+  took it, "mi piace, mergiala a dev": Claude merged it into `dev` (#44).
 
 Rules of the organization, carried over from thebox or from its issues (keep them unless the
 owner decides otherwise):
