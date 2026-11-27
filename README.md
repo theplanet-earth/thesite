@@ -81,6 +81,8 @@ that the owner squash-merges, each followed by a merge back down the chain
   are one document with two views (`docs/_includes/world.html`): following the link from one to
   the other, the spikes and arcs of the globe leave, the globe opens into the map and the
   tiles fade in over it, and back (`src/globe/transition.js`); each page also loads on its own.
+- The pages of text (About, Privacy, The globe) are set in a column of about 70 characters,
+  with an index of their sections that follows the reading (`CLAUDE.md`, Section 2).
 - The mascot of the logo in 3D is kept in [`media/mascot/`](media/mascot/README.md), not used
   by the site.
 - Since 2026-11-25 both addresses serve the site, each deployed by its workflow (issues #2,

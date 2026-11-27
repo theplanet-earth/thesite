@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # The scripts of the site: esbuild bundles src/globe/main.js, with the parts of three.js and of
-# Leaflet it uses, into docs/assets/bundle/globe.js, and src/notice/main.js, the notice of
-# privacy, into docs/assets/bundle/notice.js, where Jekyll picks them up. The bundle is generated
-# (git-ignored, never edited by hand); package-lock.json pins three.js, Leaflet and esbuild, and
-# the licence comments of three.js and Leaflet stay at the end of the bundle. Run by
-# scripts/build.sh and by scripts/serve.sh, which rebuilds it on every change of src/ (--watch).
+# Leaflet it uses, into docs/assets/bundle/globe.js, src/notice/main.js, the notice of privacy,
+# into docs/assets/bundle/notice.js, and src/toc/main.js, the index of the pages of text, into
+# docs/assets/bundle/toc.js, where Jekyll picks them up. The bundle is generated (git-ignored,
+# never edited by hand); package-lock.json pins three.js, Leaflet and esbuild, and the licence
+# comments of three.js and Leaflet stay at the end of the bundle. Run by scripts/build.sh and by
+# scripts/serve.sh, which rebuilds it on every change of src/ (--watch).
 #   bash scripts/bundle.sh [--watch]
 . "$(dirname "$0")/lib.sh"
 
@@ -29,4 +30,4 @@ if [[ "${1:-}" == "--watch" ]]; then
   exec node scripts/bundle.mjs --watch
 fi
 node scripts/bundle.mjs
-log "bundle: docs/assets/bundle/globe.js ($(wc -c < docs/assets/bundle/globe.js) bytes), notice.js ($(wc -c < docs/assets/bundle/notice.js) bytes)"
+log "bundle: docs/assets/bundle/globe.js ($(wc -c < docs/assets/bundle/globe.js) bytes), notice.js ($(wc -c < docs/assets/bundle/notice.js) bytes), toc.js ($(wc -c < docs/assets/bundle/toc.js) bytes)"
