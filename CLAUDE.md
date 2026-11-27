@@ -273,6 +273,20 @@ Dated, in the owner's words where possible. Add every new standing instruction h
   window: with lines of 70 characters its text no longer fits one, at 1280x800 nor at
   1920x1080 (1268 pixels high); the home page still does. Reported to the owner, who asked
   Claude to merge the pull request (#43) into `dev`, after the page Map (#42).
+- 2026-11-27, on the same pages: "c'è qualcosa che continua a non convincermi dello stile [...]
+  puoi farmi una proposta tu, hai completa libertà, giusto non tradire lo stile e i colori
+  dell'attuale soluzione, ma fai tutto quello che ritieni necessario". The proposal, on the
+  branch `typography`: the pages of text mirror the sidebar,
+  whose logotype is Roboto Mono, bold, in capitals, in a square, `#444` on `#ddd`, where the
+  content is `#ddd` on `#444`. Titles in Roboto Mono capitals (the page title, Global reach
+  on the home page, and the index's first entry, as the title of the notice of privacy
+  already is); the opening paragraph larger; sections opened by a hairline and, from two
+  sections up, numbered 01, 02, ... in Roboto Mono and in the orange of the globe, in the
+  margin on wide screens, with the same numbers in the index; square list markers and code
+  with square corners; links with a fainter underline; a small orange square at the end of a
+  text with sections. The page 404 takes the layout `page`, without index. No colour is
+  added: the orange, the blue of the links and the greys are those of the site. The owner
+  took it, "mi piace, mergiala a dev": Claude merged it into `dev` (#44).
 
 Rules of the organization, carried over from thebox or from its issues (keep them unless the
 owner decides otherwise):
@@ -358,7 +372,7 @@ The site, cleaned up on 2026-11-24 (`CONTRIBUTING.md`, *Conventions of this repo
 
 | Path | Content |
 |---|---|
-| `docs/` | Jekyll 4.3 site: `_config.yml`, `Gemfile` and `Gemfile.lock` (Jekyll, and the three gems Ruby 3.3 warns about), `_layouts/` (`default`, `page`: the pages of text, with their index), `_includes/` (`head`, `sidebar`, `preview-banner`, the banner of the stage site, `privacy-notice`, `world`, Home and Map as two views of one document), `index.html` (the globe), `map.html` (the map of OpenStreetMap, the same document with the other view shown), `globe.md` (how the globe is made, in three sections, linked under it, not in the menu), `about.md`, `privacy.md` (the notice under the GDPR, Section 2), `404.html`; the menu lists the pages with a `nav_order` |
+| `docs/` | Jekyll 4.3 site: `_config.yml`, `Gemfile` and `Gemfile.lock` (Jekyll, and the three gems Ruby 3.3 warns about), `_layouts/` (`default`, `page`: the pages of text, with their index), `_includes/` (`head`, `sidebar`, `preview-banner`, the banner of the stage site, `privacy-notice`, `world`, Home and Map as two views of one document), `index.html` (the globe), `map.html` (the map of OpenStreetMap, the same document with the other view shown), `globe.md` (how the globe is made, in three sections, linked under it, not in the menu), `about.md`, `privacy.md` (the notice under the GDPR, Section 2), `404.html` (the layout `page`, without index); the menu lists the pages with a `nav_order` |
 | `docs/_data/coverage.yml` | The places shown as orange rings on the globe (issue #1) |
 | `docs/_data/activity.json` | The latest edits to OpenStreetMap, the orange spikes and arcs of the globe: generated at every build by `scripts/osm-activity.py`, git-ignored |
 | `docs/public/` | The Hyde theme on Poole, third-party, MIT, with the dark colours of the project: its CSS, icons and `LICENSE.md`, published with them as the licence asks |
@@ -774,6 +788,10 @@ harness) comes from thebox, which is versioned and released like any other repos
   stopped in Chrome until it was kept to an index that overflows. A heading reached from the
   index stops 1.5rem under the top of the window, or under the banner; with reduced motion the
   page jumps instead of scrolling. No horizontal scroll, no console error.
+  With the look of 2026-11-27 (Playwright at 1440x900, 1280x800, 1024x768 and 390x844, as on
+  dev and as the stage site, every page): the home page still fits one window with Global
+  reach in capitals, and goes to Map and back; the section numbers stand in the margin from
+  768 pixels, before their headings below; no horizontal scroll, no console error.
 - **Merge settings of the repository** (GitHub API, 2026-11-25, issue #7, closed): squash
   and merge commits allowed, rebase off; squash title `PR_TITLE` and message `BLANK`, as
   `CONTRIBUTING.md` expects.

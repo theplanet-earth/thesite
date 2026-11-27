@@ -224,3 +224,11 @@
         justify-content: center;
     }
 }
+
+/* Every title of the site as the logotype is set, Roboto Mono, bold, in capitals (2026-11-27):
+   the pages of text (assets/css/page.css), and Global reach on the home page. */
+.globe-heading {
+    font-family: 'Roboto Mono', monospace;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+}

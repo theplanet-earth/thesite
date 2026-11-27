@@ -203,8 +203,9 @@ Applies to documentation, comments, commit messages and pull request description
   column of about 70 characters, and an index built from the title and the `##` and `###`
   headings, beside the text on wide screens and under the title on narrow ones
   (`docs/assets/css/page.css`, `src/toc/`). A page is divided by headings, not by bold
-  lead-ins, so that its index shows the sections; `toc: false` in the front matter leaves the
-  index out.
+  lead-ins, so that its index shows the sections, numbered from two sections up;
+  `toc: false` in the front matter leaves the index out. Titles are set as the logotype is,
+  in Roboto Mono capitals, and the orange of the globe is the only accent of the text.
 - **The scripts of the site** are ES modules in `src/`, bundled by esbuild (`npm run build`,
   `npm run serve`); no framework. Their libraries (three.js, Leaflet) are dependencies pinned
   in `package.json` and bundled with them, never loaded from another host. What can be tested
